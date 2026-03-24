@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title || 'AERTHH' %></title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'sans': ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-out',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0', transform: 'translateY(-10px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    html, body { height: 100%; }
+    html { overflow-y: auto; }
+    body {
+      margin: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+    /* Hide scrollbars but keep scrolling */
+    body, main {
+      scrollbar-width: none;
+    }
+    body::-webkit-scrollbar,
+    main::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+    }
+    .nav-link { position: relative; transition: all 0.2s ease; }
+    .nav-link:hover { color: #ffffff; }
+    .nav-link::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0%; height: 2px;
+      background: linear-gradient(90deg, #b6e4f1, #a7d2d1); transition: width 0.25s ease; border-radius: 2px;
+    }
+    .nav-link:hover::after { width: 100%; }
+    .logo-glow:hover { filter: drop-shadow(0 0 8px rgba(96, 165, 250, 0.3)); }
+    @keyframes marquee { 0% { transform: translateX(0);} 100% { transform: translateX(-33.33%);} }
+    .animate-marquee { animation: marquee 12s linear infinite; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 font-sans antialiased">
+
+  <%- include('./header') %>
+
+  <!-- spacer for fixed header -->
+  <div class="h-[200px]"></div>
+
+  <main class="max-w-none px-0">
+    <div class="max-w-7xl mx-auto px-2 py-0">
+      <%- body || '' %>
+    </div>
+  </main>
+
+  <%- include('./footer') %>
+</body>
+</html>
