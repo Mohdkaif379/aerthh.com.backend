@@ -50,6 +50,67 @@
   </div>
 </section>
 
+<section class="py-4 pb-10">
+  <div class="w-full px-4 md:px-6">
+    <div class="rounded-[2rem] bg-white p-5 shadow-xl ring-1 ring-emerald-100 md:p-6">
+      <div class="mb-4 flex items-center justify-between gap-4">
+        <h2 class="text-2xl font-bold">Featured Products</h2>
+        <a href="/products" class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-700 transition hover:text-emerald-900">
+          <span>View All</span>
+          <i class="fas fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+      <div class="relative">
+        <div class="featured-track flex gap-6 overflow-x-auto pb-2 hide-scroll scroll-smooth">
+          <!-- featured products will be injected via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="pb-10">
+  <div class="w-full px-4 md:px-6">
+    <div class="grid gap-6 lg:grid-cols-[0.72fr_2.28fr]">
+      <div class="rounded-[0.8rem] border border-cyan-200 bg-cyan-50/40 p-3 shadow-sm">
+        <div class="mb-4">
+          <h2 class="text-[16px] font-bold uppercase tracking-[0.06em] text-emerald-700">RECOMMENDED PRODUCT</h2>
+        </div>
+        <div class="recommended-product-card">
+          <!-- recommended product will be injected via JS -->
+        </div>
+      </div>
+
+      <div>
+        <div class="mb-5 flex items-center justify-between gap-4">
+          <h2 class="text-[18px] font-bold text-[#0f172a] md:text-[20px]">Latest Products</h2>
+          <a href="/products" class="inline-flex items-center gap-2 text-[13px] font-medium text-emerald-700 transition hover:text-cyan-600">
+            <span>View All</span>
+            <i class="fas fa-angle-right text-[12px]"></i>
+          </a>
+        </div>
+        <div class="relative">
+          <div class="latest-track flex gap-3 overflow-x-auto pb-2 hide-scroll scroll-smooth">
+            <!-- latest products will be injected via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="latestProductModal" class="fixed inset-0 z-[1400] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+  <div class="latest-product-modal-panel hide-scroll relative max-h-[78vh] w-full max-w-[1040px] overflow-y-auto rounded-[0.4rem] bg-white shadow-2xl">
+    <button id="closeLatestProductModal" type="button"
+      class="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
+      <i class="fas fa-times text-xl"></i>
+    </button>
+    <div id="latestProductModalContent">
+      <!-- latest product details will render here -->
+    </div>
+  </div>
+</div>
+
 <script>
   (function() {
     let currentSlide = 0;
@@ -84,6 +145,13 @@
 
     // auto-scroll categories horizontally
     const catTrack = document.querySelector('.cat-track');
+    const featuredTrack = document.querySelector('.featured-track');
+    const latestTrack = document.querySelector('.latest-track');
+    const recommendedCard = document.querySelector('.recommended-product-card');
+    const latestProductModal = document.getElementById('latestProductModal');
+    const latestProductModalContent = document.getElementById('latestProductModalContent');
+    const closeLatestProductModal = document.getElementById('closeLatestProductModal');
+    const latestProductMap = new Map();
 
     function renderCategoriesClient(cats) {
       if (!Array.isArray(cats)) return '';
@@ -99,6 +167,273 @@
       }).join('');
     }
 
+    function renderFeaturedProductsClient(products) {
+      if (!Array.isArray(products)) return '';
+      return products.map(function(product) {
+        const productHref = '/products/' + (product.slug || product.id || '');
+        const image = product.image || product.thumbnail || product.featured_image || '';
+        const title = product.product_name || product.name || product.title || 'Product';
+        const unitPrice = Number(product.unit_price || product.price || product.sale_price || product.base_price || 0);
+        const discountValue = Number(product.discount || 0);
+        const discountType = product.discount_type || '';
+        const hasDiscount = discountValue > 0;
+        let finalPrice = unitPrice;
+        let discountLabel = '';
+
+        if (hasDiscount) {
+          if (discountType === 'percent') {
+            finalPrice = unitPrice - ((unitPrice * discountValue) / 100);
+            discountLabel = '-' + discountValue + '%';
+          } else {
+            finalPrice = Math.max(unitPrice - discountValue, 0);
+            discountLabel = '-&#8377;' + discountValue;
+          }
+        }
+
+        const oldPrice = hasDiscount ? unitPrice.toFixed(2) : '';
+        const price = Number.isFinite(finalPrice) ? finalPrice.toFixed(2) : Number.isFinite(unitPrice) ? unitPrice.toFixed(2) : '--';
+        const discount = product.discount_label || discountLabel;
+        const discountDisplay = discount ? (discountType === 'percent' ? 'Percent' : 'Flat') + '-' + discount.replace(/^-/, '') : '';
+
+        return ''
+          + '<a href="' + productHref + '" class="featured-card min-w-[195px] max-w-[195px] flex-shrink-0 rounded-3xl bg-white p-2.5 transition-transform duration-200 hover:-translate-y-1">'
+          +   '<div class="relative h-[195px] w-full overflow-hidden rounded-2xl bg-white ring-1 ring-gray-100">'
+          +     (discountDisplay ? '<span class="absolute left-2.5 top-2.5 z-10 rounded-md bg-emerald-300 px-2 py-1 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
+          +     '<img src="' + image + '" alt="' + title + '" class="h-full w-full object-contain">'
+          +   '</div>'
+          +   '<div class="px-1.5 pt-2.5">'
+          +     '<h3 class="truncate text-[13px] font-semibold leading-tight text-gray-900">' + title + '</h3>'
+          +     '<div class="mt-1 flex items-end gap-1.5">'
+          +       (oldPrice ? '<span class="text-[11px] text-gray-400 line-through">&#8377;' + oldPrice + '</span>' : '')
+          +       '<span class="text-[13px] font-bold text-slate-700">&#8377;' + price + '</span>'
+          +     '</div>'
+          +   '</div>'
+          + '</a>';
+      }).join('');
+    }
+    function renderLatestProductsClient(products) {
+      if (!Array.isArray(products)) return '';
+      return products.map(function(product) {
+        const productHref = '/products/' + (product.slug || product.id || '');
+        const image = product.image || '';
+        const title = product.product_name || product.name || 'Product';
+        const unitPrice = Number(product.unit_price || product.price || 0);
+        const discountValue = Number(product.discount || 0);
+        const discountType = product.discount_type || '';
+        const hasDiscount = discountValue > 0;
+        let finalPrice = unitPrice;
+        let discountLabel = '';
+
+        if (hasDiscount) {
+          if (discountType === 'percent') {
+            finalPrice = unitPrice - ((unitPrice * discountValue) / 100);
+            discountLabel = '-' + discountValue + '%';
+          } else {
+            finalPrice = Math.max(unitPrice - discountValue, 0);
+            discountLabel = '-&#8377;' + discountValue;
+          }
+        }
+
+        const oldPrice = hasDiscount ? unitPrice.toFixed(2) : '';
+        const price = Number.isFinite(finalPrice) ? finalPrice.toFixed(2) : Number.isFinite(unitPrice) ? unitPrice.toFixed(2) : '--';
+        const discountDisplay = hasDiscount ? (discountType === 'percent' ? 'Percent' : 'Flat') + '-' + discountLabel.replace(/^-/, '') : '';
+
+        return ''
+          + '<a href="' + productHref + '" class="latest-card min-w-[190px] max-w-[190px] flex-shrink-0 rounded-2xl border border-gray-100 bg-white p-2 shadow-sm transition-transform duration-200 hover:-translate-y-1">'
+          +   '<div class="relative h-[150px] overflow-hidden rounded-2xl bg-white">'
+          +     (discountDisplay ? '<span class="absolute left-3 top-3 z-10 rounded-md bg-emerald-500 px-2.5 py-1.5 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
+          +     '<button type="button" class="latest-product-view-btn absolute inset-0 z-10 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-200 hover:bg-slate-900/35 hover:opacity-100 focus:bg-slate-900/35 focus:opacity-100" data-product-id="' + (product.id || '') + '" aria-label="View product details">'
+          +       '<span class="flex h-11 w-11 items-center justify-center rounded-full bg-white text-emerald-600 shadow-lg"><i class="fas fa-eye"></i></span>'
+          +     '</button>'
+          +     '<img src="' + image + '" alt="' + title + '" class="h-full w-full object-contain">'
+          +   '</div>'
+          +   '<div class="pt-2">'
+          +     '<h3 class="truncate text-[13px] font-medium text-[#111827]">' + title + '</h3>'
+          +     '<div class="mt-1 flex items-end gap-1.5">'
+          +       (oldPrice ? '<span class="text-[10px] text-gray-400 line-through">&#8377;' + oldPrice + '</span>' : '')
+          +       '<span class="text-[13px] font-bold text-[#334155]">&#8377;' + price + '</span>'
+          +     '</div>'
+          +   '</div>'
+          + '</a>';
+      }).join('');
+    }
+    function formatMoney(value) {
+      const amount = Number(value || 0);
+      return '&#8377;' + amount.toFixed(2);
+    }
+
+    function sanitizeHtmlText(value) {
+      return value ? String(value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+    }
+
+    function normalizeAdditionalImages(value) {
+      if (Array.isArray(value)) return value.filter(Boolean);
+      if (typeof value === 'string') {
+        try {
+          const parsed = JSON.parse(value);
+          return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+        } catch (error) {
+          return value ? [value] : [];
+        }
+      }
+      return [];
+    }
+
+    function renderProductModal(product) {
+      if (!latestProductModalContent || !product) return;
+
+      const title = product.product_name || product.name || 'Product';
+      const image = product.image || '';
+      const unitPrice = Number(product.unit_price || 0);
+      const discountValue = Number(product.discount || 0);
+      const discountType = product.discount_type || '-';
+      const discountTypeLabel = discountValue > 0
+        ? (discountType === 'percent' ? 'Percent' : 'Flat')
+        : '';
+      const description = sanitizeHtmlText(product.description || '');
+      const additionalImages = normalizeAdditionalImages(product.additional_image || product.additional_images || product.gallery_images);
+      const finalPrice = discountValue > 0
+        ? (discountType === 'percent'
+          ? unitPrice - ((unitPrice * discountValue) / 100)
+          : Math.max(unitPrice - discountValue, 0))
+        : unitPrice;
+      const discountLabel = discountValue > 0
+        ? (discountType === 'percent' ? '-' + discountValue + '%' : '-&#8377;' + discountValue)
+        : '';
+      const discountDisplay = discountLabel
+        ? discountTypeLabel + '-' + discountLabel.replace(/^-/, '')
+        : '';
+      const additionalImagesHtml = additionalImages.length
+        ? '<p class="mt-3 px-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-500">Additional Images</p>'
+          + '<div class="mt-2 flex gap-2 overflow-x-auto hide-scroll px-1 pb-1">'
+          + additionalImages.map(function(img) { return '<button type="button" class="flex h-[48px] w-[48px] flex-shrink-0 items-center justify-center overflow-hidden rounded-[0.25rem] border border-slate-200 bg-white p-1"><img src="' + img + '" alt="' + title + ' thumbnail" class="h-full w-full object-contain"></button>'; }).join('')
+          + '</div>'
+        : '';
+
+      latestProductModalContent.innerHTML = ''
+        + '<div class="border-b border-slate-200 px-5 py-3.5 md:px-6">'
+        +   '<div class="flex items-center gap-3 text-slate-900">'
+        +     '<h3 class="text-[20px] font-medium tracking-tight">' + title + '</h3>'
+        +     '<i class="fas fa-angle-right text-[20px] text-cyan-500"></i>'
+        +   '</div>'
+        + '</div>'
+        + '<div class="grid gap-3 p-4 md:grid-cols-[0.88fr_1.12fr] md:p-4">'
+        +   '<div>'
+        +     '<div class="rounded-[0.35rem] border border-[#dce8ff] bg-white p-2">'
+        +       '<div class="relative flex h-[290px] items-center justify-center overflow-hidden rounded-[0.3rem] bg-white">'
+        +       (discountDisplay ? '<span class="absolute left-4 top-4 z-10 rounded-md bg-emerald-500 px-2.5 py-1 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
+        +       '<button type="button" class="absolute right-4 top-4 flex h-7 w-7 items-center justify-center rounded-full bg-lime-500 text-white">'
+        +         '<i class="fas fa-share-alt text-sm"></i>'
+        +       '</button>'
+        +       '<img src="' + image + '" alt="' + title + '" class="h-[250px] w-full object-contain">'
+        +       '</div>'
+        +     '</div>'
+        +     additionalImagesHtml
+        +   '</div>'
+        +   '<div class="rounded-[0.35rem] border border-[#dce8ff] bg-white p-3.5 md:p-4">'
+        +     '<h4 class="text-[17px] font-medium text-slate-900">' + title + '</h4>'
+        +     '<div class="mt-3 flex items-end gap-2">'
+        +       (discountValue > 0 ? '<span class="text-[13px] text-slate-400 line-through">' + formatMoney(unitPrice) + '</span>' : '')
+        +       '<span class="text-[24px] font-bold text-slate-700">' + formatMoney(finalPrice) + '</span>'
+        +     '</div>'
+        +     (discountDisplay ? '<p class="mt-1.5 text-[12px] font-semibold text-emerald-600">Discount: ' + discountDisplay + '</p>' : '')
+        +     '<div class="mt-5 flex items-center gap-3">'
+        +       '<span class="text-[14px] font-semibold text-slate-700">Quantity :</span>'
+        +       '<div class="flex items-center overflow-hidden rounded-[0.35rem] border border-cyan-300">'
+        +         '<button type="button" class="latest-product-qty-btn flex h-[34px] w-[34px] items-center justify-center text-[17px] text-cyan-700" data-direction="decrement">-</button>'
+        +         '<div id="latestProductQtyValue" class="flex h-[34px] min-w-[52px] items-center justify-center border-x border-cyan-300 text-[16px] text-[#4b5563]">1</div>'
+        +         '<button type="button" class="latest-product-qty-btn flex h-[34px] w-[34px] items-center justify-center text-[17px] text-cyan-700" data-direction="increment">+</button>'
+        +       '</div>'
+        +     '</div>'
+        +     '<div class="mt-4 text-[13px] font-semibold text-slate-700">Total Price : <span id="latestProductTotalPrice" class="text-[13px] font-bold text-slate-800">' + formatMoney(finalPrice) + '</span></div>'
+        +     '<div class="mt-4 flex flex-wrap items-center gap-2.5">'
+        +       '<a href="/products/' + (product.slug || product.id || '') + '" class="inline-flex items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:from-emerald-600 hover:to-cyan-600">Buy now</a>'
+        +       '<a href="/products/' + (product.slug || product.id || '') + '" class="inline-flex items-center justify-center rounded-[0.45rem] bg-slate-700 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:bg-slate-800">Add to cart</a>'
+        +       '<button type="button" class="inline-flex h-[40px] min-w-[70px] items-center justify-center gap-2 rounded-[0.45rem] border border-slate-200 bg-white px-3 text-[12px] text-slate-500 transition hover:border-slate-300 hover:text-slate-700"><i class="far fa-heart"></i><span>0</span></button>'
+        +     '</div>'
+        +     '<hr class="my-4 border-slate-200">'
+        +     '<div>'
+        +       '<h5 class="text-[12px] font-semibold uppercase tracking-[0.08em] text-slate-700">Product Description</h5>'
+        +       '<p class="mt-1.5 text-[12px] leading-5 text-slate-600">' + (description || 'Description unavailable') + '</p>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>';
+    }
+    function openLatestProductModal(product) {
+      if (!latestProductModal || !product) return;
+      renderProductModal(product);
+      latestProductModal.classList.remove('hidden');
+      latestProductModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+
+      const qtyValueEl = document.getElementById('latestProductQtyValue');
+      const totalPriceEl = document.getElementById('latestProductTotalPrice');
+      const unitPrice = Number(product.unit_price || product.price || 0);
+      const discountValue = Number(product.discount || 0);
+      const discountType = product.discount_type || '';
+      const discountedPrice = discountValue > 0
+        ? (discountType === 'percent'
+          ? unitPrice - ((unitPrice * discountValue) / 100)
+          : Math.max(unitPrice - discountValue, 0))
+        : unitPrice;
+
+      if (latestProductModalContent && qtyValueEl && totalPriceEl) {
+        latestProductModalContent.querySelectorAll('.latest-product-qty-btn').forEach(function(button) {
+          button.addEventListener('click', function() {
+            const currentQty = Number(qtyValueEl.textContent || 1);
+            const nextQty = this.dataset.direction === 'increment'
+              ? currentQty + 1
+              : Math.max(currentQty - 1, 1);
+
+            qtyValueEl.textContent = String(nextQty);
+            totalPriceEl.textContent = formatMoney(discountedPrice * nextQty);
+          });
+        });
+      }
+    }
+
+    function closeProductModal() {
+      if (!latestProductModal) return;
+      latestProductModal.classList.add('hidden');
+      latestProductModal.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function renderRecommendedProduct(product) {
+      if (!recommendedCard || !product) return;
+
+      const image = product.image || '';
+      const title = product.product_name || product.name || 'Product';
+      const unitPrice = Number(product.unit_price || product.price || 0);
+      const discountValue = Number(product.discount || 0);
+      const discountType = product.discount_type || '';
+      const hasDiscount = discountValue > 0;
+      const finalPrice = hasDiscount
+        ? (discountType === 'percent'
+          ? unitPrice - ((unitPrice * discountValue) / 100)
+          : Math.max(unitPrice - discountValue, 0))
+        : unitPrice;
+      const discountLabel = hasDiscount
+        ? (discountType === 'percent' ? '-' + discountValue + '%' : '-&#8377;' + discountValue)
+        : '';
+      const discountDisplay = hasDiscount ? (discountType === 'percent' ? 'Percent' : 'Flat') + '-' + discountLabel.replace(/^-/, '') : '';
+
+      recommendedCard.innerHTML = ''
+        + '<div class="rounded-[0.8rem] bg-white p-2.5">'
+        +   '<div class="relative overflow-hidden rounded-[0.6rem] border border-gray-100 bg-white">'
+        +     (discountDisplay ? '<span class="absolute left-3 top-3 z-10 rounded-md bg-emerald-500 px-2.5 py-1.5 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
+        +     '<img src="' + image + '" alt="' + title + '" class="h-[185px] w-full object-contain">'
+        +   '</div>'
+        +   '<div class="pt-2 text-center">'
+        +     '<h3 class="truncate text-[14px] font-medium uppercase tracking-[0.02em] text-[#0f172a]">' + title + '</h3>'
+        +     '<div class="mt-1.5 flex items-end justify-center gap-2">'
+        +       (hasDiscount ? '<span class="text-[12px] text-gray-400 line-through">&#8377;' + unitPrice.toFixed(2) + '</span>' : '')
+        +       '<span class="text-[16px] font-bold text-[#334155]">&#8377;' + finalPrice.toFixed(2) + '</span>'
+        +     '</div>'
+        +     '<a href="/products/' + (product.slug || product.id || '') + '" class="mt-3 inline-flex items-center justify-center rounded-[0.8rem] bg-gradient-to-r from-emerald-500 to-cyan-500 px-6 py-2 text-[11px] font-bold uppercase tracking-[0.04em] text-white transition hover:from-emerald-600 hover:to-cyan-600">Buy Now</a>'
+        +   '</div>'
+        + '</div>';
+    }
     // Client-only base URL for APIs
     const apiBaseClient = 'https://aerthh.newhopeindia17.com/api/';
 
@@ -111,50 +446,122 @@
         const data = await resp.json();
         const list = Array.isArray(data.data) ? data.data : [];
         catTrack.innerHTML = renderCategoriesClient(list);
-        initCatCarousel();
+        initInfiniteCarousel(catTrack, 'cat-card');
       } catch (err) {
         console.error('Failed to load categories:', err.message || err);
         catTrack.innerHTML = '<div class="text-sm text-gray-500">Categories unavailable</div>';
       }
     }
 
-    function initCatCarousel() {
-      const items = Array.from(catTrack.children).filter(el => el.classList.contains('cat-card'));
-      if (!items.length) return;
-      let catIndex = 0;
-
-      const scrollToItem = (idx, smooth = true) => {
-        const target = items[idx];
-        if (!target) return;
-        catTrack.scrollTo({
-          left: target.offsetLeft - 12,
-          behavior: smooth ? 'smooth' : 'instant'
+    async function loadFeaturedProducts() {
+      if (!featuredTrack || !apiBaseClient || featuredTrack.dataset.loaded === 'true') return;
+      featuredTrack.dataset.loaded = 'true';
+      const endpoint = apiBaseClient + "products";
+      try {
+        const resp = await fetch(endpoint);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        const list = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+        latestProductMap.clear();
+        list.forEach((item) => {
+          if (item?.id !== undefined && item?.id !== null) {
+            latestProductMap.set(String(item.id), item);
+          }
         });
-      };
-
-      const nextCat = () => {
-        catIndex = (catIndex + 1) % items.length;
-        scrollToItem(catIndex);
-      };
-
-      // autoplay every 3s
-      let catInterval = setInterval(nextCat, 3000);
-
-      // pause on hover/touch
-      ['mouseenter', 'touchstart', 'focusin'].forEach(evt => {
-        catTrack.addEventListener(evt, () => clearInterval(catInterval));
-      });
-      ['mouseleave', 'touchend', 'focusout'].forEach(evt => {
-        catTrack.addEventListener(evt, () => { catInterval = setInterval(nextCat, 3000); });
-      });
-
-      // initial alignment
-      scrollToItem(0, false);
+        featuredTrack.innerHTML = renderFeaturedProductsClient(list);
+        initInfiniteCarousel(featuredTrack, 'featured-card');
+        const latestProducts = [...list]
+          .sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
+          .slice(0, 8);
+        if (latestTrack) {
+          latestTrack.innerHTML = renderLatestProductsClient(latestProducts);
+          initInfiniteCarousel(latestTrack, 'latest-card');
+        }
+        const recommendedProduct = list.find((item) => Number(item.discount || 0) > 0) || list[0];
+        renderRecommendedProduct(recommendedProduct);
+      } catch (err) {
+        console.error('Failed to load featured products:', err.message || err);
+        featuredTrack.dataset.loaded = 'false';
+        featuredTrack.innerHTML = '<div class="text-sm text-gray-500">Featured products unavailable</div>';
+        if (latestTrack) {
+          latestTrack.innerHTML = '<div class="text-sm text-gray-500">Latest products unavailable</div>';
+        }
+        if (recommendedCard) {
+          recommendedCard.innerHTML = '<div class="text-sm text-gray-500">Recommended product unavailable</div>';
+        }
+      }
     }
 
+    function initInfiniteCarousel(track, itemClassName) {
+      const items = Array.from(track.children).filter(el => el.classList.contains(itemClassName));
+      if (!items.length || track.dataset.carouselReady === 'true') return;
+
+      if (items.length === 1) {
+        track.dataset.carouselReady = 'true';
+        track.classList.remove('overflow-x-auto');
+        track.classList.add('justify-start');
+        return;
+      }
+
+      track.dataset.carouselReady = 'true';
+      const originalMarkup = track.innerHTML;
+      track.innerHTML = originalMarkup + originalMarkup + originalMarkup;
+
+      let animationFrameId = null;
+      const singleSetWidth = track.scrollWidth / 3;
+
+      const step = () => {
+        track.scrollLeft += 0.7;
+        if (track.scrollLeft >= singleSetWidth * 2) {
+          track.scrollLeft -= singleSetWidth;
+        }
+        animationFrameId = window.requestAnimationFrame(step);
+      };
+
+      if (animationFrameId) {
+        window.cancelAnimationFrame(animationFrameId);
+      }
+
+      track.scrollLeft = singleSetWidth;
+      animationFrameId = window.requestAnimationFrame(step);
+    }
+
+    if (latestTrack) {
+      latestTrack.addEventListener('click', function(event) {
+        const trigger = event.target.closest('.latest-product-view-btn');
+        if (!trigger) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const productId = trigger.getAttribute('data-product-id');
+        openLatestProductModal(latestProductMap.get(productId));
+      });
+    }
+
+    if (closeLatestProductModal) {
+      closeLatestProductModal.addEventListener('click', closeProductModal);
+    }
+
+    if (latestProductModal) {
+      latestProductModal.addEventListener('click', function(event) {
+        if (event.target === latestProductModal) {
+          closeProductModal();
+        }
+      });
+    }
+
+    document.addEventListener('keydown', function(event) {
+      if (event.key === 'Escape') {
+        closeProductModal();
+      }
+    });
+
     loadCategories();
+    loadFeaturedProducts();
   })();
 </script>
 `; %>
 
 <%- include('../layout/app', { title: title || 'Home', body }) %>
+
+
+
