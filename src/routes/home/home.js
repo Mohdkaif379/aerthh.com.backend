@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
   }
 
   res.render('home/home', {
-    title: 'Home Page',
+    title: 'Home',
     message: 'Hello from routes!',
     banners: banners || [],
     categories: [], // categories will be fetched client-side now
