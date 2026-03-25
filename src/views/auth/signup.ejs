@@ -207,7 +207,7 @@
             <!-- Login Link -->
             <div class="mt-4 text-center text-sm">
                 Already have an account?
-                <a href="#" class="text-emerald-600 font-semibold">Login</a>
+                <a href="/auth/signin" class="text-emerald-600 font-semibold">Login</a>
             </div>
         </div>
 
@@ -296,6 +296,33 @@
             }
         }
 
+        function fileToDataUrl(file) {
+            return new Promise((resolve, reject) => {
+                if (!file) return resolve('');
+                const reader = new FileReader();
+                reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+                reader.onerror = () => reject(new Error('Unable to read selected image'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function resolveProfileImage(data, fallbackImage) {
+            const candidates = [
+                data?.profile_image,
+                data?.image,
+                data?.avatar,
+                data?.profile_image_url,
+                data?.customer?.profile_image,
+                data?.customer?.image,
+                data?.customer?.avatar,
+                data?.data?.profile_image,
+                data?.data?.image,
+                data?.data?.avatar
+            ];
+
+            return candidates.find((value) => typeof value === 'string' && value.trim()) || fallbackImage || '';
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -359,7 +386,12 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    localStorage.setItem('userData', JSON.stringify(data));
+                    const fallbackImage = await fileToDataUrl(profileImage);
+                    const userPayload = {
+                        ...data,
+                        profile_image: resolveProfileImage(data, fallbackImage)
+                    };
+                    localStorage.setItem('userData', JSON.stringify(userPayload));
                     const name = data.first_name ? ` ${data.first_name}` : '';
                     showMessage(`🎉 Welcome${name}! Your account has been created successfully.`, false);
                     form.reset();

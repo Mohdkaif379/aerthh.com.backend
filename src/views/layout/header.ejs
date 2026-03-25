@@ -126,7 +126,9 @@
           <div
             class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full overflow-visible">
             <a href="#" class="flex items-center gap-1 cursor-pointer">
-              <i
+              <img id="headerUserAvatar" src="" alt="User profile"
+                class="hidden w-8 h-8 rounded-full object-cover border border-emerald-200">
+              <i id="headerUserIcon"
                 class="fas fa-user-circle text-gray-600 hover:text-gray-900 text-2xl transition-colors duration-200"></i>
             </a>
 
@@ -134,14 +136,18 @@
             <div
               class="absolute right-0 top-full mt-2 w-32 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
               <div class="py-2">
-                <a href="/signin"
+                <a id="headerSignInLink" href="/auth/signin"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
                   <i class="fas fa-sign-in-alt mr-2 w-4"></i> Sign In
                 </a>
-                <a href="/auth/signup"
+                <a id="headerSignUpLink" href="/auth/signup"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
                   <i class="fas fa-user-plus mr-2 w-4"></i> Sign Up
                 </a>
+                <button id="headerLogoutButton" type="button"
+                  class="hidden w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150">
+                  <i class="fas fa-sign-out-alt mr-2 w-4"></i> Logout
+                </button>
               </div>
             </div>
           </div>
@@ -220,4 +226,90 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+  <script>
+    (function () {
+      const avatarEl = document.getElementById('headerUserAvatar');
+      const iconEl = document.getElementById('headerUserIcon');
+      const signInLink = document.getElementById('headerSignInLink');
+      const signUpLink = document.getElementById('headerSignUpLink');
+      const logoutButton = document.getElementById('headerLogoutButton');
+
+      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !logoutButton) return;
+
+      function getImageFromUserData() {
+        const storageKeys = ['userData', 'customerData', 'authData'];
+
+        for (const key of storageKeys) {
+          const rawValue = localStorage.getItem(key);
+          if (!rawValue) continue;
+
+          try {
+            const parsed = JSON.parse(rawValue);
+            const candidates = [
+              parsed?.profile_image,
+              parsed?.image,
+              parsed?.avatar,
+              parsed?.profile_image_url,
+              parsed?.customer?.profile_image,
+              parsed?.customer?.image,
+              parsed?.customer?.avatar,
+              parsed?.data?.profile_image,
+              parsed?.data?.image,
+              parsed?.data?.avatar
+            ];
+
+            const matchedImage = candidates.find((value) => typeof value === 'string' && value.trim());
+            if (matchedImage) return matchedImage;
+          } catch (error) {
+            console.error('Unable to parse stored user data:', error);
+          }
+        }
+
+        return '';
+      }
+
+      function setLoggedInState(profileImage) {
+        signInLink.classList.add('hidden');
+        signUpLink.classList.add('hidden');
+        logoutButton.classList.remove('hidden');
+
+        if (profileImage) {
+          avatarEl.src = profileImage;
+          avatarEl.classList.remove('hidden');
+          iconEl.classList.add('hidden');
+        } else {
+          avatarEl.classList.add('hidden');
+          iconEl.classList.remove('hidden');
+        }
+      }
+
+      function setLoggedOutState() {
+        avatarEl.src = '';
+        avatarEl.classList.add('hidden');
+        iconEl.classList.remove('hidden');
+        signInLink.classList.remove('hidden');
+        signUpLink.classList.remove('hidden');
+        logoutButton.classList.add('hidden');
+      }
+
+      const hasStoredSession = !!(localStorage.getItem('userData') || localStorage.getItem('customerData') || localStorage.getItem('authData'));
+      const profileImage = getImageFromUserData();
+
+      if (hasStoredSession) {
+        setLoggedInState(profileImage);
+      } else {
+        setLoggedOutState();
+      }
+
+      logoutButton.addEventListener('click', function () {
+        localStorage.removeItem('userData');
+        localStorage.removeItem('customerData');
+        localStorage.removeItem('authData');
+        localStorage.removeItem('customerToken');
+        localStorage.removeItem('tokenType');
+        setLoggedOutState();
+        window.location.href = '/';
+      });
+    })();
+  </script>
 </div>

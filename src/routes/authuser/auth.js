@@ -14,4 +14,11 @@ router.get('/signup', async (req, res) => {
   });
 });
 
+router.get('/signin', async (req, res) => {
+  res.render('auth/signin', {
+    title: 'Sign In',
+    message: 'Please sign in to continue'
+  });
+});
+
 module.exports = router;
