@@ -1,219 +1,223 @@
 <!-- Fixed Header Wrapper -->
 <div class="fixed top-0 left-0 w-full z-[1200]">
-<!-- Banner with reduced height -->
-<div class="bg-gradient-to-r from-emerald-100 to-emerald-50 text-black text-center py-1 text-xs font-medium overflow-hidden relative">
-  <div class="carousel-container whitespace-nowrap animate-marquee">
-    <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products! Limited time only!</span>
-    <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products! Limited time only!</span>
-    <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products! Limited time only!</span>
-  </div>
-</div>
-
-<!-- Top utility bar (currency/language) -->
-<div class="bg-white border-b border-emerald-100/50 py-0.5">
-  <div class="max-w-7xl mx-auto px-3 flex items-center justify-end gap-3 text-sm">
-    
-    <!-- Currency Dropdown -->
-    <div class="relative" x-data="{ open: false }">
-      <div @click="open = !open" 
-           class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-full shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-300">
-        <span class="text-gray-700 text-sm font-semibold">INR</span>
-        <span class="text-emerald-600 text-xs font-medium">₹</span>
-        <i class="fas fa-chevron-down text-gray-400 text-[10px] transition-transform duration-300" :class="{ 'rotate-180': open }"></i>
-      </div>
-      
-      <div x-show="open" 
-           x-transition:enter="transition ease-out duration-200"
-           x-transition:enter-start="opacity-0 translate-y-2"
-           x-transition:enter-end="opacity-100 translate-y-0"
-           x-transition:leave="transition ease-in duration-150"
-           x-transition:leave-start="opacity-100 translate-y-0"
-           x-transition:leave-end="opacity-0 translate-y-2"
-           @click.away="open = false" 
-           class="absolute right-0 mt-2 w-28 bg-white border border-emerald-100 rounded-2xl shadow-xl z-[15000] overflow-hidden">
-        <a href="#" class="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs group">
-          <div class="flex items-center gap-2">
-            <span class="text-emerald-600 text-xs">₹</span>
-            <span class="font-medium">INR</span>
-          </div>
-        </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
-          <i class="fas fa-dollar-sign text-emerald-500 text-xs"></i>
-          <span class="font-medium">USD</span>
-        </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
-          <i class="fas fa-euro-sign text-emerald-500 text-xs"></i>
-          <span class="font-medium">EUR</span>
-        </a>
-        <a href="#" class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
-          <i class="fas fa-pound-sign text-emerald-500 text-xs"></i>
-          <span class="font-medium">GBP</span>
-        </a>
-      </div>
+  <!-- Banner with reduced height -->
+  <div
+    class="bg-gradient-to-r from-emerald-100 to-emerald-50 text-black text-center py-1 text-xs font-medium overflow-hidden relative">
+    <div class="carousel-container whitespace-nowrap animate-marquee">
+      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+        Limited time only!</span>
+      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+        Limited time only!</span>
+      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+        Limited time only!</span>
     </div>
-    
-    <!-- Language Dropdown with PNG flags -->
-    <div class="relative" x-data="{ open: false }">
-      <div @click="open = !open"
-           class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-2xl shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200">
-        <img src="https://flagcdn.com/w20/us.png" alt="US flag" class="w-5 h-3 rounded-sm shadow-sm object-cover">
-        <span class="text-gray-700 text-sm font-semibold">English</span>
-        <i class="fas fa-chevron-down text-gray-400 text-[10px]" :class="{ 'rotate-180': open }"></i>
-      </div>
-      <div x-show="open"
-           x-transition:enter="transition ease-out duration-200"
-           x-transition:enter-start="opacity-0 translate-y-2"
-           x-transition:enter-end="opacity-100 translate-y-0"
-           x-transition:leave="transition ease-in duration-150"
-           x-transition:leave-start="opacity-100 translate-y-0"
-           x-transition:leave-end="opacity-0 translate-y-2"
-           @click.away="open = false"
-           class="absolute right-0 mt-2 w-48 bg-white border border-emerald-100 rounded-lg shadow-xl z-[15000] overflow-hidden">
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
-          <img src="https://flagcdn.com/w20/us.png" alt="US flag" class="w-5 h-3 rounded-sm object-cover"> English
-        </a>
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
-          <img src="https://flagcdn.com/w20/in.png" alt="India flag" class="w-5 h-3 rounded-sm object-cover"> हिंदी
-        </a>
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
-          <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" class="w-5 h-3 rounded-sm object-cover"> Español
-        </a>
-        <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
-          <img src="https://flagcdn.com/w20/fr.png" alt="France flag" class="w-5 h-3 rounded-sm object-cover"> Français
-        </a>
-      </div>
-    </div>
-    
   </div>
-</div>
 
-<!-- Full Width Section with White Background -->
-<div class="w-full bg-white shadow-md relative z-[500] overflow-visible">
-  <div class="px-6 py-2">
-    <div class="flex items-center justify-between gap-4 overflow-visible">
-      
-      <!-- Left: logo -->
-      <a href="/" class="flex items-center gap-2 text-gray-700 font-bold text-sm hover:text-emerald-700 transition-colors duration-200">
-        <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp"
-             alt="AERTHH logo"
-             class="w-10 h-10 rounded-lg object-cover shadow-md">
-        <span>AERTHH</span>
-      </a>
+  <!-- Top utility bar (currency/language) -->
+  <div class="bg-white border-b border-emerald-100/50 py-0.5">
+    <div class="max-w-7xl mx-auto px-3 flex items-center justify-end gap-3 text-sm">
 
-      <!-- Search Bar centered -->
-      <div class="relative flex-1 flex justify-center">
-        <div class="relative w-full max-w-lg">
-          <input type="text" placeholder="Search for items..."
-            class="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200" />
-          <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
+      <!-- Currency Dropdown -->
+      <div class="relative" x-data="{ open: false }">
+        <div @click="open = !open"
+          class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-full shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-300">
+          <span class="text-gray-700 text-sm font-semibold">INR</span>
+          <span class="text-emerald-600 text-xs font-medium">₹</span>
+          <i class="fas fa-chevron-down text-gray-400 text-[10px] transition-transform duration-300"
+            :class="{ 'rotate-180': open }"></i>
         </div>
-      </div>
 
-      <!-- Right Side: Wishlist, User, Cart -->
-      <div class="flex items-center gap-4">
-
-        <!-- Wishlist Icon with Anchor Tag -->
-        <a href="/wishlist"
-          class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full">
-          <i class="fas fa-heart  text-xl transition-colors duration-200"></i>
-          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
-        </a>
-
-        <!-- User Dropdown (on hover) -->
-        <div
-          class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full overflow-visible">
-          <a href="#" class="flex items-center gap-1 cursor-pointer">
-            <i
-              class="fas fa-user-circle text-gray-600 hover:text-gray-900 text-2xl transition-colors duration-200"></i>
-          </a>
-
-          <!-- Dropdown Menu -->
-          <div
-            class="absolute right-0 top-full mt-2 w-32 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
-            <div class="py-2">
-              <a href="/signin"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-                <i class="fas fa-sign-in-alt mr-2 w-4"></i> Sign In
-              </a>
-              <a href="/signup"
-                class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-                <i class="fas fa-user-plus mr-2 w-4"></i> Sign Up
-              </a>
+        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+          x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+          x-transition:leave-end="opacity-0 translate-y-2" @click.away="open = false"
+          class="absolute right-0 mt-2 w-28 bg-white border border-emerald-100 rounded-2xl shadow-xl z-[15000] overflow-hidden">
+          <a href="#"
+            class="flex items-center justify-between px-4 py-2 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs group">
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-600 text-xs">₹</span>
+              <span class="font-medium">INR</span>
             </div>
+          </a>
+          <a href="#"
+            class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
+            <i class="fas fa-dollar-sign text-emerald-500 text-xs"></i>
+            <span class="font-medium">USD</span>
+          </a>
+          <a href="#"
+            class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
+            <i class="fas fa-euro-sign text-emerald-500 text-xs"></i>
+            <span class="font-medium">EUR</span>
+          </a>
+          <a href="#"
+            class="flex items-center gap-2 px-4 py-2.5 text-gray-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-transparent transition-all duration-200 text-xs">
+            <i class="fas fa-pound-sign text-emerald-500 text-xs"></i>
+            <span class="font-medium">GBP</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Language Dropdown with PNG flags -->
+      <div class="relative" x-data="{ open: false }">
+        <div @click="open = !open"
+          class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-white/80 backdrop-blur-sm border border-emerald-200 rounded-2xl shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 hover:bg-emerald-50 transition-all duration-200">
+          <img src="https://flagcdn.com/w20/us.png" alt="US flag" class="w-5 h-3 rounded-sm shadow-sm object-cover">
+          <span class="text-gray-700 text-sm font-semibold">English</span>
+          <i class="fas fa-chevron-down text-gray-400 text-[10px]" :class="{ 'rotate-180': open }"></i>
+        </div>
+        <div x-show="open" x-transition:enter="transition ease-out duration-200"
+          x-transition:enter-start="opacity-0 translate-y-2" x-transition:enter-end="opacity-100 translate-y-0"
+          x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
+          x-transition:leave-end="opacity-0 translate-y-2" @click.away="open = false"
+          class="absolute right-0 mt-2 w-48 bg-white border border-emerald-100 rounded-lg shadow-xl z-[15000] overflow-hidden">
+          <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
+            <img src="https://flagcdn.com/w20/us.png" alt="US flag" class="w-5 h-3 rounded-sm object-cover"> English
+          </a>
+          <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
+            <img src="https://flagcdn.com/w20/in.png" alt="India flag" class="w-5 h-3 rounded-sm object-cover"> हिंदी
+          </a>
+          <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
+            <img src="https://flagcdn.com/w20/es.png" alt="Spain flag" class="w-5 h-3 rounded-sm object-cover"> Español
+          </a>
+          <a href="#" class="flex items-center gap-2 px-3 py-2 text-gray-700 hover:bg-emerald-50 text-xs">
+            <img src="https://flagcdn.com/w20/fr.png" alt="France flag" class="w-5 h-3 rounded-sm object-cover">
+            Français
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Full Width Section with White Background -->
+  <div class="w-full bg-white shadow-md relative z-[500] overflow-visible">
+    <div class="px-6 py-2">
+      <div class="flex items-center justify-between gap-4 overflow-visible">
+
+        <!-- Left: logo -->
+        <a href="/"
+          class="flex items-center gap-2 text-gray-700 font-bold text-sm hover:text-emerald-700 transition-colors duration-200">
+          <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp" alt="AERTHH logo"
+            class="w-10 h-10 rounded-lg object-cover shadow-md">
+          <span>AERTHH</span>
+        </a>
+
+        <!-- Search Bar centered -->
+        <div class="relative flex-1 flex justify-center">
+          <div class="relative w-full max-w-lg">
+            <input type="text" placeholder="Search for items..."
+              class="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-full focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all duration-200" />
+            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm"></i>
           </div>
         </div>
 
-        <!-- Cart Dropdown -->
-        <div
-          class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full overflow-visible">
-          <a href="#" class="flex items-center gap-2 cursor-pointer">
-            <i class="fas fa-shopping-cart text-gray-600 hover:text-gray-900 text-xl transition-colors duration-200"></i>
-            <span class="text-sm font-semibold text-gray-700">0.00</span>
-            <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+        <!-- Right Side: Wishlist, User, Cart -->
+        <div class="flex items-center gap-4">
+
+          <!-- Wishlist Icon with Anchor Tag -->
+          <a href="/wishlist"
+            class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full">
+            <i class="fas fa-heart  text-xl transition-colors duration-200"></i>
+            <span
+              class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
           </a>
 
+          <!-- User Dropdown (on hover) -->
           <div
-            class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
-            <div class="p-4">
-              <div class="text-center py-4">
-                <i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>
-                <p class="text-gray-500 text-sm">Your cart is empty</p>
-                <a href="/products"
-                  class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200">
-                  Start Shopping
+            class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full overflow-visible">
+            <a href="#" class="flex items-center gap-1 cursor-pointer">
+              <i
+                class="fas fa-user-circle text-gray-600 hover:text-gray-900 text-2xl transition-colors duration-200"></i>
+            </a>
+
+            <!-- Dropdown Menu -->
+            <div
+              class="absolute right-0 top-full mt-2 w-32 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
+              <div class="py-2">
+                <a href="/signin"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-sign-in-alt mr-2 w-4"></i> Sign In
+                </a>
+                <a href="/auth/signup"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-user-plus mr-2 w-4"></i> Sign Up
                 </a>
               </div>
             </div>
           </div>
+
+          <!-- Cart Dropdown -->
+          <div
+            class="relative group bg-white/80 backdrop-blur-sm border border-emerald-200 shadow-lg hover:shadow-emerald-100/50 hover:border-emerald-300 transition-all duration-200 p-2 rounded-full overflow-visible">
+            <a href="#" class="flex items-center gap-2 cursor-pointer">
+              <i
+                class="fas fa-shopping-cart text-gray-600 hover:text-gray-900 text-xl transition-colors duration-200"></i>
+              <span class="text-sm font-semibold text-gray-700">0.00</span>
+              <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+            </a>
+
+            <div
+              class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
+              <div class="p-4">
+                <div class="text-center py-4">
+                  <i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>
+                  <p class="text-gray-500 text-sm">Your cart is empty</p>
+                  <a href="/products"
+                    class="inline-block mt-3 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    Start Shopping
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
       </div>
-
     </div>
   </div>
-</div>
 
 
-<!-- Modern Header with Glassmorphism, reduced height and centered -->
-<div class="flex justify-center w-full px-4 mt-2">
+  <!-- Modern Header with Glassmorphism, reduced height and centered -->
+  <div class="flex justify-center w-full px-4 mt-2">
     <header
-        class="sticky top-6 z-[600] bg-white/90 backdrop-blur-md border-b border-white/30 shadow-lg w-full max-w-2xl rounded-2xl overflow-visible">
-        <div class="max-w-7xl mx-auto px-4 py-2">
-            <div class="flex items-center justify-between gap-3">
+      class="sticky top-6 z-[600] bg-white/90 backdrop-blur-md border-b border-white/30 shadow-lg w-full max-w-2xl rounded-2xl overflow-visible">
+      <div class="max-w-7xl mx-auto px-4 py-2">
+        <div class="flex items-center justify-between gap-3">
 
-                <!-- Logo with IMAGE from URL -->
-                <div class="flex items-center gap-2 group cursor-pointer logo-glow transition-all duration-300">
-                    <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp"
-                        alt="AERTH Logo" class="w-8 h-8 rounded-lg object-cover shadow-md" />
+          <!-- Logo with IMAGE from URL -->
+          <div class="flex items-center gap-2 group cursor-pointer logo-glow transition-all duration-300">
+            <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp" alt="AERTH Logo"
+              class="w-8 h-8 rounded-lg object-cover shadow-md" />
 
-                </div>
+          </div>
 
-                <!-- Navigation CENTERED -->
-                <nav class="flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
-                    <a href="/"
-                        class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
-                        <i class="fas fa-home"></i>
-                        Home
-                    </a>
-                    <a href="/about"
-                        class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
-                        <i class="fas fa-info-circle"></i>
-                        About
-                    </a>
-                    <a href="/products"
-                        class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
-                        <i class="fas fa-box"></i>
-                        Products
-                    </a>
-                </nav>
+          <!-- Navigation CENTERED -->
+          <nav class="flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
+            <a href="/"
+              class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
+              <i class="fas fa-home"></i>
+              Home
+            </a>
+            <a href="/about"
+              class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
+              <i class="fas fa-info-circle"></i>
+              About
+            </a>
+            <a href="/products"
+              class="nav-link text-emerald-600 hover:text-emerald-900 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
+              <i class="fas fa-box"></i>
+              Products
+            </a>
+          </nav>
 
-                <!-- Empty div to maintain spacing -->
-                <div class="w-[100px]"></div>
+          <!-- Empty div to maintain spacing -->
+          <div class="w-[100px]"></div>
 
-            </div>
         </div>
+      </div>
     </header>
-</div>
+  </div>
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.min.js" defer></script>
 </div>
