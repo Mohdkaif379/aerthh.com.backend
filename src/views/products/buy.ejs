@@ -63,9 +63,9 @@
           : '';
 
         return ''
-          + '<a href="/products/buy?id=' + (relatedItem?.id || '') + '" class="featured-card block rounded-3xl bg-white p-2.5 transition-transform duration-200 hover:-translate-y-1">'
-          +   '<div class="relative h-[195px] w-full overflow-hidden rounded-2xl bg-white ring-1 ring-gray-100">'
-          +     (relatedDiscountDisplay ? '<span class="absolute left-2.5 top-2.5 z-10 rounded-md bg-emerald-300 px-2 py-1 text-[11px] font-bold text-white">' + relatedDiscountDisplay + '</span>' : '')
+          + '<a href="/products/buy?id=' + (relatedItem?.id || '') + '" class="featured-card block rounded-3xl border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-2.5 shadow-[0_10px_24px_rgba(148,163,184,0.10)] transition-transform duration-200 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_16px_30px_rgba(125,211,252,0.16)]">'
+          +   '<div class="relative h-[195px] w-full overflow-hidden rounded-2xl bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100">'
+          +     (relatedDiscountDisplay ? '<span class="absolute left-2.5 top-2.5 z-10 rounded-md bg-sky-500 px-2 py-1 text-[11px] font-bold text-white">' + relatedDiscountDisplay + '</span>' : '')
           +     '<img src="' + relatedImage + '" alt="' + relatedTitle + '" class="h-full w-full object-contain">'
           +   '</div>'
           +   '<div class="px-1.5 pt-2.5">'
@@ -84,27 +84,28 @@
     .buy-thumb::-webkit-scrollbar { width: 0; height: 0; }
     .buy-thumb { scrollbar-width: none; }
   </style>
-  <section class="px-4 py-5 md:px-6 md:py-7">
+  <section class="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
     <div class="mx-auto max-w-[1280px]">
       ${error ? `
         <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">${error}</div>
       ` : item ? `
         <div class="mx-4 md:mx-8 lg:mx-12 xl:mx-16 grid gap-4 xl:grid-cols-[0.95fr_1.45fr_0.8fr]">
           <div>
-            <div class="overflow-hidden rounded-[0.85rem] border border-sky-100 bg-white shadow-sm">
-              <div class="relative flex min-h-[300px] items-center justify-center bg-white p-3 md:min-h-[330px]">
+            <div class="overflow-hidden rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+              <div class="relative flex min-h-[300px] items-center justify-center bg-[radial-gradient(circle_at_top,#dbeafe,transparent_58%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-3 md:min-h-[330px]">
                 <img id="buyMainImage" src="${galleryImages[0] || ''}" alt="${titleText}" class="max-h-[300px] w-full object-contain">
               </div>
             </div>
             <div class="buy-thumb mt-3 flex gap-2.5 overflow-x-auto pb-1">
               ${galleryImages.map(function(image, index) {
                 const activeClass = index === 0 ? 'border-sky-400 ring-2 ring-sky-100' : 'border-slate-200';
-                return '<button type="button" class="buy-gallery-thumb flex h-[60px] w-[60px] flex-shrink-0 items-center justify-center overflow-hidden rounded-[0.65rem] border bg-white p-1 transition ' + activeClass + '" data-image-src="' + image + '"><img src="' + image + '" alt="${titleText} thumbnail" class="h-full w-full object-contain"></button>';
+                return '<button type="button" class="buy-gallery-thumb flex h-[60px] w-[60px] flex-shrink-0 items-center justify-center overflow-hidden rounded-[0.65rem] border bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-1 transition ' + activeClass + '" data-image-src="' + image + '"><img src="' + image + '" alt="${titleText} thumbnail" class="h-full w-full object-contain"></button>';
               }).join('')}
             </div>
           </div>
 
           <div class="pt-3 md:pt-5">
+            <p class="text-xs font-bold uppercase tracking-[0.22em] text-sky-600">Product Details</p>
             <h1 class="text-[24px] font-bold leading-tight text-slate-900">${titleText}</h1>
             <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-slate-600">
               <div class="flex items-center gap-1 text-orange-400">
@@ -133,10 +134,10 @@
 
             <div class="mt-8 flex flex-wrap items-center gap-3">
               <span class="text-[15px] font-semibold text-slate-800">Quantity :</span>
-              <div class="flex items-center overflow-hidden rounded-[0.45rem] border border-[#9f9382] bg-white">
-                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-[#8c7b68]" data-direction="decrement">-</button>
-                <div id="buyQtyValue" class="flex h-[38px] min-w-[46px] items-center justify-center border-x border-[#d8d1c9] text-[16px] text-slate-700">1</div>
-                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-[#8c7b68]" data-direction="increment">+</button>
+              <div class="flex items-center overflow-hidden rounded-[0.55rem] border border-sky-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)]">
+                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-sky-700 transition hover:bg-sky-50" data-direction="decrement">-</button>
+                <div id="buyQtyValue" class="flex h-[38px] min-w-[46px] items-center justify-center border-x border-sky-100 text-[16px] text-slate-700">1</div>
+                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-sky-700 transition hover:bg-sky-50" data-direction="increment">+</button>
               </div>
             </div>
 
@@ -147,9 +148,9 @@
             </div>
 
             <div class="mt-5 flex flex-wrap items-center gap-3">
-              <a href="/products/buy?id=${item?.id || ''}" class="inline-flex min-w-[116px] items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-[15px] font-medium text-white transition hover:from-emerald-600 hover:to-cyan-600">Buy now</a>
-              <button type="button" class="inline-flex min-w-[132px] items-center justify-center rounded-[0.45rem] border border-cyan-200 bg-cyan-50 px-5 py-2.5 text-[15px] font-medium text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100">Add to cart</button>
-              <button type="button" class="inline-flex h-[46px] min-w-[84px] items-center justify-center gap-2 rounded-[0.45rem] border border-emerald-200 bg-white px-4 text-[16px] text-emerald-600 transition hover:border-cyan-300 hover:text-cyan-600">
+              <button type="button" id="buyNowBtn" class="inline-flex min-w-[116px] items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[15px] font-medium text-white transition hover:from-sky-600 hover:to-blue-600">Buy now</button>
+              <button type="button" class="inline-flex min-w-[132px] items-center justify-center rounded-[0.45rem] border border-sky-200 bg-sky-50 px-5 py-2.5 text-[15px] font-medium text-sky-700 transition hover:border-sky-300 hover:bg-sky-100">Add to cart</button>
+              <button type="button" class="inline-flex h-[46px] min-w-[84px] items-center justify-center gap-2 rounded-[0.45rem] border border-sky-200 bg-white px-4 text-[16px] text-sky-600 transition hover:border-sky-300 hover:text-sky-700">
                 <i class="far fa-heart"></i>
                 <span class="text-[14px]">0</span>
               </button>
@@ -157,34 +158,34 @@
           </div>
 
           <div class="space-y-4">
-            <div class="overflow-hidden rounded-[0.75rem] border border-slate-100 bg-white shadow-sm">
-              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-truck"></i></span>
+            <div class="overflow-hidden rounded-[0.9rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+              <div class="flex items-center gap-3 border-b border-sky-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-[12px] text-sky-500"><i class="fas fa-truck"></i></span>
                 <span>Fast Delivery all across the country</span>
               </div>
-              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="far fa-credit-card"></i></span>
+              <div class="flex items-center gap-3 border-b border-sky-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-[12px] text-sky-500"><i class="far fa-credit-card"></i></span>
                 <span>Safe Payment</span>
               </div>
-              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-rotate-left"></i></span>
+              <div class="flex items-center gap-3 border-b border-sky-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-[12px] text-sky-500"><i class="fas fa-rotate-left"></i></span>
                 <span>7 Days Return Policy</span>
               </div>
               <div class="flex items-center gap-3 px-4 py-4 text-[14px] text-slate-700">
-                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-shield-heart"></i></span>
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-sky-200 bg-sky-50 text-[12px] text-sky-500"><i class="fas fa-shield-heart"></i></span>
                 <span>100% Authentic Products</span>
               </div>
             </div>
 
-            <div class="rounded-[0.75rem] border border-slate-100 bg-white p-6 shadow-sm">
-              <img src="${brandImage}" alt="${brandName}" class="h-14 w-14 rounded-full object-cover">
+            <div class="rounded-[0.9rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-6 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+              <img src="${brandImage}" alt="${brandName}" class="h-14 w-14 rounded-full object-cover ring-2 ring-sky-100">
               <h2 class="mt-5 text-left text-[16px] font-bold leading-8 text-slate-900">${brandName}</h2>
             </div>
           </div>
         </div>
 
-        <div class="mx-4 mt-7 rounded-[0.85rem] border border-sky-100 bg-white p-5 shadow-sm md:mx-8 lg:mx-12 xl:mx-16">
-          <div class="flex items-center justify-center gap-10 border-b border-slate-200 pb-3">
+        <div class="mx-4 mt-7 rounded-[0.95rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)] md:mx-8 lg:mx-12 xl:mx-16">
+          <div class="flex items-center justify-center gap-10 border-b border-sky-100 pb-3">
             <button type="button" class="buy-detail-tab border-b-2 border-sky-500 px-1 pb-2 text-[14px] font-semibold text-sky-600" data-tab="description">Description</button>
             <button type="button" class="buy-detail-tab border-b-2 border-transparent px-1 pb-2 text-[14px] font-semibold text-slate-500" data-tab="reviews">Reviews</button>
           </div>
@@ -197,10 +198,10 @@
         </div>
 
         ${relatedItems.length ? `
-          <div class="mx-4 mt-7 rounded-[0.85rem] border border-sky-100 bg-white p-5 shadow-sm md:mx-8 lg:mx-12 xl:mx-16">
+          <div class="mx-4 mt-7 rounded-[0.95rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)] md:mx-8 lg:mx-12 xl:mx-16">
             <div class="mb-4 flex items-center justify-between gap-3">
               <h2 class="text-[18px] font-bold text-slate-900">Similar Products</h2>
-              <span class="text-[12px] font-medium uppercase tracking-[0.16em] text-cyan-600">Recommended for you</span>
+              <span class="text-[12px] font-medium uppercase tracking-[0.16em] text-sky-600">Recommended for you</span>
             </div>
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               ${similarProductsHtml}
@@ -213,10 +214,12 @@
             const mainImage = document.getElementById('buyMainImage');
             const qtyValueEl = document.getElementById('buyQtyValue');
             const totalPriceEl = document.getElementById('buyTotalPrice');
+            const buyNowBtn = document.getElementById('buyNowBtn');
             const descriptionPanel = document.getElementById('buyDescriptionPanel');
             const reviewsPanel = document.getElementById('buyReviewsPanel');
             const unitPrice = ${JSON.stringify(finalPriceNumber)};
             const taxAmount = ${JSON.stringify(taxAmountNumber)};
+            const productId = ${JSON.stringify(String(item?.id || ''))};
 
             document.querySelectorAll('.buy-gallery-thumb').forEach(function(button) {
               button.addEventListener('click', function() {
@@ -267,10 +270,21 @@
                 });
               });
             });
+
+            if (buyNowBtn) {
+              buyNowBtn.addEventListener('click', function() {
+                const qty = Math.max(Number(qtyValueEl ? qtyValueEl.textContent : 1), 1);
+                const params = new URLSearchParams({
+                  id: productId,
+                  qty: String(qty)
+                });
+                window.location.href = '/products/address?' + params.toString();
+              });
+            }
           })();
         </script>
       ` : `
-        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Product not found.</div>
+        <div class="rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-4 py-3 text-sm text-slate-600">Product not found.</div>
       `}
     </div>
   </section>

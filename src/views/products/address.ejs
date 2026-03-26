@@ -1,0 +1,305 @@
+<%
+  const item = typeof product !== 'undefined' ? product : null;
+  const error = typeof errorMessage !== 'undefined' ? errorMessage : '';
+  const quantity = Math.max(Number(typeof qty !== 'undefined' ? qty : 1), 1);
+  const formatMoney = (value) => new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+  const unitPriceValue = Number(item?.unit_price || item?.price || 0);
+  const discountValue = Number(item?.discount || 0);
+  const discountType = item?.discount_type || '';
+  const taxAmountValue = Number(item?.tax_amount || 0);
+  const shippingCostValue = Number(item?.shipping_cost || item?.shipping_charge || item?.delivery_charge || 0);
+  const skuValue = item?.sku || '--';
+  const finalUnitPrice = discountValue > 0
+    ? (discountType === 'percent'
+        ? unitPriceValue - ((unitPriceValue * discountValue) / 100)
+        : Math.max(unitPriceValue - discountValue, 0))
+    : unitPriceValue;
+  const discountAmountValue = Math.max(unitPriceValue - finalUnitPrice, 0);
+  const subtotalPrice = finalUnitPrice * quantity;
+  const totalPrice = subtotalPrice + taxAmountValue + shippingCostValue;
+  const titleText = item?.product_name || item?.name || 'Selected Product';
+  const productImage = item?.image || 'https://via.placeholder.com/320x320/eef7ff/64748b?text=Product';
+  const discountLabel = discountValue > 0
+    ? (discountType === 'percent'
+        ? discountValue + '%'
+        : formatMoney(discountValue))
+    : 'No discount';
+
+  const body = `
+  <section class="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
+    <div class="mx-auto max-w-[1280px]">
+      ${error ? `
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">${error}</div>
+      ` : item ? `
+      <div class="mb-6 rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-5 py-6 shadow-[0_14px_34px_rgba(148,163,184,0.10)]">
+        <div class="relative mx-auto flex max-w-4xl items-start justify-between">
+          <div class="absolute left-[36px] right-[36px] top-[15px] h-[4px] bg-sky-100"></div>
+          <div class="absolute left-[36px] top-[15px] h-[4px] w-[50%] bg-gradient-to-r from-sky-400 to-blue-400"></div>
+
+          <div class="relative z-10 flex w-28 flex-col items-center text-center">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
+              <i class="fas fa-cart-arrow-down text-[13px]"></i>
+            </div>
+            <span class="mt-5 text-[13px] font-medium text-slate-700">Cart</span>
+          </div>
+
+          <div class="relative z-10 flex w-40 flex-col items-center text-center">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-300 bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
+              <i class="fas fa-box-open text-[12px]"></i>
+            </div>
+            <span class="mt-5 text-[13px] font-medium text-sky-700">Shipping And Billing</span>
+          </div>
+
+          <div class="relative z-10 flex w-28 flex-col items-center text-center">
+            <div class="flex h-8 w-8 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
+              <i class="far fa-credit-card text-[13px]"></i>
+            </div>
+            <span class="mt-5 text-[13px] font-medium text-slate-700">Payment</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div class="rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+          <div class="mb-5">
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Checkout</p>
+            <h1 class="text-[26px] font-bold text-slate-900">Delivery Address</h1>
+            <p class="mt-2 text-sm text-slate-500">Fill in your address details to continue with this order.</p>
+          </div>
+
+          <form id="checkoutAddressForm" class="space-y-6">
+            <div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 1</p>
+                  <h2 class="text-lg font-bold text-slate-900">Shipping Address</h2>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100">Primary</span>
+              </div>
+              <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">First Name <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="First name">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Last Name <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Last name">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Email <span class="text-rose-500">*</span></label>
+                  <input type="email" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="name@example.com">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Phone <span class="text-rose-500">*</span></label>
+                  <input type="tel" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Phone number">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Address Line <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="House no, street, area">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">City <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="City">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">State <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="State">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Postal Code <span class="text-rose-500">*</span></label>
+                  <input type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Postal code">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Country</label>
+                  <input type="text" value="India" class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Country">
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <div class="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 2</p>
+                  <h2 class="text-lg font-bold text-slate-900">Billing Address</h2>
+                </div>
+                <label class="flex items-center gap-2 text-xs text-slate-600">
+                  <input id="sameAsShippingCheckbox" type="checkbox" class="h-4 w-4 rounded border-sky-200 text-sky-500">
+                  Same as shipping
+                </label>
+              </div>
+              <div id="billingAddressFields" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">First Name <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="First name">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Last Name <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Last name">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Email <span class="text-rose-500">*</span></label>
+                  <input type="email" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="name@example.com">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Phone <span class="text-rose-500">*</span></label>
+                  <input type="tel" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Phone number">
+                </div>
+                <div class="md:col-span-2">
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Address Line <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="House no, street, area">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">City <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="City">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">State <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="State">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Postal Code <span class="text-rose-500">*</span></label>
+                  <input type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Postal code">
+                </div>
+                <div>
+                  <label class="mb-1 block text-sm font-medium text-slate-700">Country</label>
+                  <input type="text" value="India" class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Country">
+                </div>
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <aside class="h-fit rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+          <div class="mb-4 flex items-center justify-between gap-3">
+            <h2 class="text-lg font-bold text-slate-900">Order Summary</h2>
+            <span class="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-sky-700">Current Product</span>
+          </div>
+
+          <div class="rounded-[1rem] border border-sky-100 bg-white/90 p-3">
+            <div class="flex items-center gap-3">
+              <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100">
+                <img src="${productImage}" alt="${titleText}" class="h-full w-full object-contain">
+              </div>
+              <div class="min-w-0 flex-1">
+                <h3 class="line-clamp-2 text-sm font-semibold text-slate-800">${titleText}</h3>
+                <p class="mt-2 text-xs text-slate-500">Product ID: ${item?.id || '--'}</p>
+                <p class="mt-1 text-xs text-slate-500">SKU: ${skuValue}</p>
+                <p class="mt-1 text-xs text-slate-500">Quantity: ${quantity}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-4 space-y-3 rounded-[1rem] border border-sky-100 bg-white/90 p-4 text-sm">
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Base Price</span>
+              <span class="font-medium text-slate-800">${formatMoney(unitPriceValue)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Discount</span>
+              <span class="font-medium text-slate-800">${discountLabel}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Discount Amount</span>
+              <span class="font-medium text-slate-800">- ${formatMoney(discountAmountValue)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Price After Discount</span>
+              <span class="font-medium text-slate-800">${formatMoney(finalUnitPrice)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Quantity</span>
+              <span class="font-medium text-slate-800">${quantity}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Subtotal</span>
+              <span class="font-medium text-slate-800">${formatMoney(subtotalPrice)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Tax</span>
+              <span class="font-medium text-slate-800">${formatMoney(taxAmountValue)}</span>
+            </div>
+            <div class="flex items-center justify-between gap-3 text-slate-600">
+              <span>Shipping Cost</span>
+              <span class="font-medium text-slate-800">${formatMoney(shippingCostValue)}</span>
+            </div>
+            <div class="border-t border-sky-100 pt-3">
+              <div class="flex items-center justify-between gap-3">
+                <span class="text-base font-semibold text-slate-800">Total</span>
+                <span class="text-base font-bold text-sky-700">${formatMoney(totalPrice)}</span>
+              </div>
+            </div>
+            <div class="border-t border-sky-100 pt-4 space-y-3">
+              <button type="submit" form="checkoutAddressForm" class="inline-flex w-full items-center justify-center rounded-[0.7rem] bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">
+                Proceed to Checkout
+              </button>
+              <a href="/products" class="inline-flex w-full items-center justify-center gap-2 rounded-[0.7rem] px-6 py-3 text-sm font-semibold text-sky-700 transition hover:text-sky-900">
+                <i class="fas fa-arrow-left text-[12px]"></i>
+                Continue to Shopping
+              </a>
+            </div>
+            <div class="grid grid-cols-3 gap-3 border-t border-sky-100 pt-4 text-center">
+              <div class="flex flex-col items-center">
+                <div class="flex h-11 w-11 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
+                  <i class="fas fa-truck-fast text-[15px]"></i>
+                </div>
+                <p class="mt-3 text-[12px] leading-5 text-slate-600">Fast Delivery all across the country</p>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="flex h-11 w-11 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
+                  <i class="far fa-credit-card text-[15px]"></i>
+                </div>
+                <p class="mt-3 text-[12px] leading-5 text-slate-600">Safe Payment</p>
+              </div>
+              <div class="flex flex-col items-center">
+                <div class="flex h-11 w-11 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
+                  <i class="fas fa-box-open text-[15px]"></i>
+                </div>
+                <p class="mt-3 text-[12px] leading-5 text-slate-600">7 Days Return Policy</p>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      ` : `
+        <div class="rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-4 py-3 text-sm text-slate-600">Product not found.</div>
+      `}
+    </div>
+  </section>
+  <script>
+    (function () {
+      const sameAsShippingCheckbox = document.getElementById('sameAsShippingCheckbox');
+      const billingAddressFields = document.getElementById('billingAddressFields');
+      const billingRequiredFields = Array.from(document.querySelectorAll('[data-billing-required="true"]'));
+      const checkoutAddressForm = document.getElementById('checkoutAddressForm');
+
+      if (!sameAsShippingCheckbox || !billingAddressFields || !checkoutAddressForm) return;
+
+      function syncBillingVisibility() {
+        billingAddressFields.classList.toggle('hidden', sameAsShippingCheckbox.checked);
+        billingRequiredFields.forEach(function (field) {
+          field.required = !sameAsShippingCheckbox.checked;
+          if (sameAsShippingCheckbox.checked) {
+            field.setCustomValidity('');
+          }
+        });
+      }
+
+      sameAsShippingCheckbox.addEventListener('change', syncBillingVisibility);
+      checkoutAddressForm.addEventListener('submit', function (event) {
+        if (!checkoutAddressForm.checkValidity()) {
+          event.preventDefault();
+          checkoutAddressForm.reportValidity();
+        }
+      });
+      syncBillingVisibility();
+    })();
+  </script>
+  `; %>
+
+<%- include('../layout/app', { title: title || 'Address', body }) %>

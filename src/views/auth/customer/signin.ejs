@@ -19,22 +19,22 @@
     position: absolute;
     width: 12px;
     height: 12px;
-    border: solid 1.2px rgba(6, 182, 212, 0.1);
+    border: solid 1.2px rgba(59, 130, 246, 0.10);
     transform-origin: top left;
     transform: scale(0) rotate(0deg) translate(-50%, -50%);
     animation: cube-float 14s ease-in forwards infinite;
-    background: rgba(6, 182, 212, 0.02);
+    background: rgba(59, 130, 246, 0.03);
     backdrop-filter: blur(1px);
   }
 
   .cube:nth-child(2n) {
-    border-color: rgba(16, 185, 129, 0.1);
-    background: rgba(16, 185, 129, 0.02);
+    border-color: rgba(14, 165, 233, 0.10);
+    background: rgba(14, 165, 233, 0.02);
   }
 
   .cube:nth-child(3n) {
-    border-color: rgba(59, 130, 246, 0.1);
-    background: rgba(59, 130, 246, 0.02);
+    border-color: rgba(96, 165, 250, 0.12);
+    background: rgba(96, 165, 250, 0.03);
   }
 
   @keyframes cube-float {
@@ -54,15 +54,15 @@
   .cube8 { top: 8%; left: 72%; animation-delay: 6s; }
 
   .captcha-container {
-    background: linear-gradient(135deg, #ecfdf5 0%, #e0f2fe 100%);
-    border: 1px solid #a5f3fc;
+    background: linear-gradient(135deg, #f8fcff 0%, #eef7ff 100%);
+    border: 1px solid #dbeafe;
   }
 
   .captcha-text {
     font-family: 'Courier New', monospace;
     letter-spacing: 4px;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
-    background: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -83,7 +83,7 @@
   }
 </style>
 
-<section class="signin-shell flex items-center justify-center p-3">
+<section class="signin-shell flex items-center justify-center px-3 pt-4 pb-6 md:pt-5 md:pb-8">
   <div class="cube-background">
     <div class="cube cube1"></div>
     <div class="cube cube2"></div>
@@ -95,62 +95,63 @@
     <div class="cube cube8"></div>
   </div>
 
-  <div class="relative z-10 min-h-[440px] w-full max-w-3xl overflow-hidden rounded-xl border border-white/40 bg-white/90 shadow-lg backdrop-blur-md md:flex">
-    <div class="flex w-full flex-col justify-center bg-white/70 p-5 backdrop-blur-sm md:w-1/2 lg:p-6">
+  <div class="relative z-10 min-h-[440px] w-full max-w-3xl overflow-hidden rounded-[1.4rem] border border-sky-100/80 bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(248,251,255,0.92)_100%)] shadow-[0_22px_60px_rgba(148,163,184,0.16)] backdrop-blur-md md:flex">
+    <div class="flex w-full flex-col justify-center bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(244,249,255,0.76)_100%)] p-5 backdrop-blur-sm md:w-1/2 lg:p-6">
       <div class="mb-4">
-        <h2 class="mb-0.5 text-xl font-bold text-gray-700 lg:text-2xl">Welcome Back! Customer</h2>
-        <p class="text-xs text-gray-400">Sign in to your account</p>
+        <p class="text-[11px] font-bold uppercase tracking-[0.24em] text-sky-600">Customer Access</p>
+        <h2 class="mb-0.5 text-xl font-bold text-slate-700 lg:text-2xl">Welcome Back! Customer</h2>
+        <p class="text-xs text-slate-400">Sign in to your account</p>
       </div>
 
       <form id="loginForm" class="space-y-3">
         <input type="hidden" id="captchaVerified" value="0">
 
         <div class="space-y-0.5">
-          <label for="email" class="block text-[11px] font-medium text-gray-500">
-            <i class="far fa-envelope mr-1 text-cyan-400"></i> Email
+          <label for="email" class="block text-[11px] font-medium text-slate-500">
+            <i class="far fa-envelope mr-1 text-sky-400"></i> Email
           </label>
           <div class="relative">
-            <i class="fas fa-envelope absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-cyan-400"></i>
+            <i class="fas fa-envelope absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-sky-400"></i>
             <input id="email" type="email" placeholder="john@example.com" required
-              class="w-full rounded-lg border border-gray-100 bg-white/90 py-2 pl-8 pr-2.5 text-xs text-gray-600 transition-all duration-300 focus:border-cyan-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-cyan-100">
+              class="w-full rounded-lg border border-sky-100 bg-white/90 py-2 pl-8 pr-2.5 text-xs text-slate-600 transition-all duration-300 focus:border-sky-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-100">
           </div>
         </div>
 
         <div class="space-y-0.5">
-          <label for="password" class="block text-[11px] font-medium text-gray-500">
-            <i class="far fa-lock mr-1 text-emerald-400"></i> Password
+          <label for="password" class="block text-[11px] font-medium text-slate-500">
+            <i class="far fa-lock mr-1 text-sky-400"></i> Password
           </label>
           <div class="relative">
-            <i class="fas fa-lock absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-emerald-400"></i>
+            <i class="fas fa-lock absolute left-2.5 top-1/2 -translate-y-1/2 text-xs text-sky-400"></i>
             <input id="password" type="password" placeholder="........" required
-              class="w-full rounded-lg border border-gray-100 bg-white/90 py-2 pl-8 pr-9 text-xs text-gray-600 transition-all duration-300 focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-100">
+              class="w-full rounded-lg border border-sky-100 bg-white/90 py-2 pl-8 pr-9 text-xs text-slate-600 transition-all duration-300 focus:border-sky-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-100">
             <button id="togglePasswordBtn" type="button"
-              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-gray-300 transition hover:text-emerald-500">
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-300 transition hover:text-sky-500">
               <i id="togglePasswordIcon" class="fas fa-eye"></i>
             </button>
           </div>
         </div>
 
         <div class="captcha-container space-y-0.5 rounded-lg p-2.5">
-          <label class="block text-[11px] font-medium text-gray-500">
-            <i class="fas fa-shield-alt mr-1 text-cyan-500"></i> Verify
+          <label class="block text-[11px] font-medium text-slate-500">
+            <i class="fas fa-shield-alt mr-1 text-sky-500"></i> Verify
           </label>
 
           <div class="flex items-center space-x-1.5">
-            <div class="flex flex-shrink-0 items-center overflow-hidden rounded-lg border border-cyan-100 bg-white/80">
-              <div class="bg-gradient-to-r from-cyan-50 to-emerald-50 px-2 py-1.5">
+            <div class="flex flex-shrink-0 items-center overflow-hidden rounded-lg border border-sky-100 bg-white/80">
+              <div class="bg-gradient-to-r from-sky-50 to-blue-50 px-2 py-1.5">
                 <span id="captchaDisplay" class="captcha-text text-base font-bold">8A2F</span>
               </div>
               <button id="refreshCaptchaBtn" type="button"
-                class="refresh-captcha border-l border-cyan-100 bg-white px-1.5 py-1.5 text-cyan-500 transition-all duration-300 hover:bg-cyan-50">
+                class="refresh-captcha border-l border-sky-100 bg-white px-1.5 py-1.5 text-sky-500 transition-all duration-300 hover:bg-sky-50">
                 <i class="fas fa-sync-alt text-[10px]"></i>
               </button>
             </div>
 
             <div class="relative flex-1">
-              <i class="fas fa-pencil-alt absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-emerald-400"></i>
+              <i class="fas fa-pencil-alt absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-sky-400"></i>
               <input id="captchaInput" type="text" placeholder="Code" required
-                class="w-full rounded-lg border border-gray-100 bg-white/90 py-1.5 pl-7 pr-2 text-xs uppercase text-gray-600 transition-all duration-300 focus:border-emerald-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-emerald-100">
+                class="w-full rounded-lg border border-sky-100 bg-white/90 py-1.5 pl-7 pr-2 text-xs uppercase text-slate-600 transition-all duration-300 focus:border-sky-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-sky-100">
             </div>
           </div>
 
@@ -159,18 +160,18 @@
 
         <div class="mt-1 flex items-center justify-between">
           <label class="flex cursor-pointer items-center space-x-1.5">
-            <input id="remember_me" type="checkbox" class="h-3 w-3 rounded border-gray-200 text-cyan-500 focus:ring-cyan-100">
-            <span class="text-[10px] text-gray-500">
-              <i class="far fa-check-square mr-0.5 text-[10px] text-cyan-400"></i> Remember me
+            <input id="remember_me" type="checkbox" class="h-3 w-3 rounded border-sky-200 text-sky-500 focus:ring-sky-100">
+            <span class="text-[10px] text-slate-500">
+              <i class="far fa-check-square mr-0.5 text-[10px] text-sky-400"></i> Remember me
             </span>
           </label>
-          <a href="#" class="text-[10px] font-medium text-emerald-500 hover:text-emerald-600">
+          <a href="#" class="text-[10px] font-medium text-sky-600 hover:text-sky-700">
             <i class="far fa-question-circle mr-0.5"></i> Forgot Password?
           </a>
         </div>
 
         <button id="loginBtn" type="submit"
-          class="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-300 hover:scale-[1.01] hover:from-cyan-600 hover:to-emerald-600">
+          class="w-full rounded-lg bg-gradient-to-r from-sky-500 to-blue-500 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-300 hover:scale-[1.01] hover:from-sky-600 hover:to-blue-600">
           <i class="fas fa-sign-in-alt mr-1.5 text-xs"></i> Sign In
         </button>
       </form>
@@ -178,56 +179,56 @@
       <div id="signinMessage" class="mt-3 hidden rounded-lg px-3 py-2 text-xs"></div>
     </div>
 
-    <div class="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-cyan-50/80 via-white to-emerald-50/80 p-4 backdrop-blur-sm md:w-1/2">
-      <div class="absolute right-3 top-3 h-12 w-12 rotate-12 animate-pulse border border-cyan-100/50"></div>
-      <div class="absolute bottom-6 left-3 h-8 w-8 -rotate-12 animate-bounce border border-emerald-100/50" style="animation-duration: 3s;"></div>
+    <div class="relative flex w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#dbeafe,transparent_38%),linear-gradient(135deg,rgba(239,246,255,0.95)_0%,rgba(255,255,255,0.92)_46%,rgba(224,242,254,0.95)_100%)] p-4 backdrop-blur-sm md:w-1/2">
+      <div class="absolute right-3 top-3 h-12 w-12 rotate-12 animate-pulse border border-sky-100/70 bg-white/20"></div>
+      <div class="absolute bottom-6 left-3 h-8 w-8 -rotate-12 animate-bounce border border-blue-100/70 bg-white/20" style="animation-duration: 3s;"></div>
 
       <div class="relative z-10 text-center">
         <div class="mb-3 flex justify-center">
-          <div class="h-28 w-28 rounded-full p-1 shadow-lg">
+          <div class="h-28 w-28 rounded-full bg-[linear-gradient(180deg,#ffffff_0%,#eef7ff_100%)] p-1 shadow-[0_14px_30px_rgba(148,163,184,0.18)]">
             <div class="h-full w-full overflow-hidden rounded-full bg-white">
               <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp"
                 alt="Aerthh Logo"
                 class="h-full w-full object-cover"
-                onerror="this.src='https://via.placeholder.com/150/06b6d4/ffffff?text=AERTH'">
+                onerror="this.src='https://via.placeholder.com/150/3b82f6/ffffff?text=AERTH'">
             </div>
           </div>
         </div>
 
-        <h1 class="mb-0.5 text-xl font-bold tracking-tight text-gray-600">
-          <i class="fas fa-crown mr-1 text-sm text-yellow-200"></i>
-          <span class="bg-gradient-to-r from-cyan-500 to-emerald-500 bg-clip-text text-transparent">AERTH</span>
+        <h1 class="mb-0.5 text-xl font-bold tracking-tight text-slate-600">
+          <i class="fas fa-crown mr-1 text-sm text-sky-200"></i>
+          <span class="bg-gradient-to-r from-sky-500 to-blue-500 bg-clip-text text-transparent">AERTH</span>
         </h1>
-        <p class="mx-auto max-w-xs text-[9px] text-gray-400">
-          <i class="far fa-gem mr-0.5 text-[9px] text-cyan-400"></i>
+        <p class="mx-auto max-w-xs text-[9px] text-slate-400">
+          <i class="far fa-gem mr-0.5 text-[9px] text-sky-400"></i>
           Averythink Technology
         </p>
 
         <div class="mt-2 flex justify-center space-x-1.5">
-          <i class="fas fa-circle animate-pulse text-[4px] text-cyan-200"></i>
-          <i class="fas fa-circle animate-pulse text-[4px] text-emerald-200 delay-150"></i>
-          <i class="fas fa-circle animate-pulse text-[4px] text-teal-200 delay-300"></i>
+          <i class="fas fa-circle animate-pulse text-[4px] text-sky-200"></i>
+          <i class="fas fa-circle animate-pulse text-[4px] text-blue-200 delay-150"></i>
+          <i class="fas fa-circle animate-pulse text-[4px] text-cyan-200 delay-300"></i>
         </div>
 
-        <div class="mt-2 grid grid-cols-3 gap-1 text-[9px] text-gray-400">
+        <div class="mt-2 grid grid-cols-3 gap-1 text-[9px] text-slate-400">
           <div class="flex flex-col items-center">
-            <i class="fas fa-truck mb-0.5 text-xs text-cyan-400"></i>
-            <span class="text-gray-300">Free</span>
+            <i class="fas fa-truck mb-0.5 text-xs text-sky-400"></i>
+            <span class="text-slate-300">Free</span>
           </div>
           <div class="flex flex-col items-center">
-            <i class="fas fa-shield-alt mb-0.5 text-xs text-emerald-400"></i>
-            <span class="text-gray-300">Secure</span>
+            <i class="fas fa-shield-alt mb-0.5 text-xs text-blue-400"></i>
+            <span class="text-slate-300">Secure</span>
           </div>
           <div class="flex flex-col items-center">
-            <i class="fas fa-undo-alt mb-0.5 text-xs text-teal-400"></i>
-            <span class="text-gray-300">Returns</span>
+            <i class="fas fa-undo-alt mb-0.5 text-xs text-cyan-400"></i>
+            <span class="text-slate-300">Returns</span>
           </div>
         </div>
 
-        <div class="mt-2 flex justify-center space-x-3 text-[9px] text-gray-300">
-          <i class="fab fa-cc-visa transition-colors hover:text-cyan-500"></i>
-          <i class="fab fa-cc-mastercard transition-colors hover:text-emerald-500"></i>
-          <i class="fab fa-cc-paypal transition-colors hover:text-cyan-500"></i>
+        <div class="mt-2 flex justify-center space-x-3 text-[9px] text-slate-300">
+          <i class="fab fa-cc-visa transition-colors hover:text-sky-500"></i>
+          <i class="fab fa-cc-mastercard transition-colors hover:text-blue-500"></i>
+          <i class="fab fa-cc-paypal transition-colors hover:text-sky-500"></i>
         </div>
       </div>
     </div>
@@ -254,7 +255,7 @@
       messageBox.textContent = text;
       messageBox.className = 'mt-3 rounded-lg px-3 py-2 text-xs ' + (isError
         ? 'border border-rose-200 bg-rose-50 text-rose-500'
-        : 'border border-emerald-200 bg-emerald-50 text-emerald-600');
+        : 'border border-sky-200 bg-sky-50 text-sky-600');
       messageBox.classList.remove('hidden');
     }
 
@@ -314,7 +315,7 @@
         return;
       }
 
-      captchaMessage.className = 'mt-0.5 text-[10px] font-medium text-emerald-500';
+      captchaMessage.className = 'mt-0.5 text-[10px] font-medium text-sky-500';
       captchaMessage.innerHTML = '<i class="fas fa-check-circle mr-0.5"></i> Verified!';
       captchaMessage.classList.remove('hidden');
       captchaVerified.value = '1';

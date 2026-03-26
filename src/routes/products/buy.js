@@ -76,7 +76,7 @@ router.get('/', async (req, res) => {
     errorMessage = error.message || 'Failed to fetch products.';
   }
 
-  res.render('prodcuts/products', {
+  res.render('products/products', {
     title: selectedCategoryName || selectedBrandName || 'Products',
     products,
     selectedCategoryId,
@@ -114,10 +114,35 @@ router.get('/buy', async (req, res) => {
     }
   }
 
-  res.render('prodcuts/buy', {
+  res.render('products/buy', {
     title: product?.product_name || 'Buy',
     product,
     similarProducts,
+    errorMessage
+  });
+});
+
+router.get('/address', async (req, res) => {
+  const productId = String(req.query.id || '').trim();
+  const qty = Math.max(Number(req.query.qty || 1), 1);
+  let product = null;
+  let errorMessage = '';
+
+  if (!productId) {
+    errorMessage = 'Product id is required.';
+  } else {
+    try {
+      product = await fetchSingleProduct(productId);
+    } catch (error) {
+      console.error('Error fetching product for address page:', error.message || error);
+      errorMessage = error.message || 'Failed to fetch product.';
+    }
+  }
+
+  res.render('products/address', {
+    title: product?.product_name || 'Address',
+    product,
+    qty,
     errorMessage
   });
 });
@@ -148,7 +173,7 @@ router.get('/:id', async (req, res) => {
     }
   }
 
-  res.render('prodcuts/buy', {
+  res.render('products/buy', {
     title: product?.product_name || 'Buy',
     product,
     similarProducts,
