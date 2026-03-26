@@ -1,0 +1,279 @@
+<%
+  const item = typeof product !== 'undefined' ? product : null;
+  const error = typeof errorMessage !== 'undefined' ? errorMessage : '';
+  const relatedItems = typeof similarProducts !== 'undefined' && Array.isArray(similarProducts) ? similarProducts : [];
+
+  const titleText = item?.product_name || 'Product';
+  const mainImage = item?.image || '';
+  const brandName = item?.brand?.name || 'Brand';
+  const brandImage = item?.brand?.image
+    ? (String(item.brand.image).startsWith('http') ? item.brand.image : `https://aerthh.newhopeindia17.com/public/brand/${item.brand.image}`)
+    : 'https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp';
+  const additionalImages = Array.isArray(item?.additional_image)
+    ? item.additional_image.filter(Boolean)
+    : typeof item?.additional_image === 'string'
+      ? (() => {
+          try {
+            const parsed = JSON.parse(item.additional_image);
+            return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+          } catch (error) {
+            return item.additional_image ? [item.additional_image] : [];
+          }
+        })()
+      : [];
+  const galleryImages = [mainImage].concat(additionalImages).filter(Boolean);
+
+  const unitPriceNumber = Number(item?.unit_price || 0);
+  const discountValue = Number(item?.discount || 0);
+  const taxAmountNumber = Number(item?.tax_amount || 0);
+  const discountType = item?.discount_type || '';
+  const finalPriceNumber = discountValue > 0
+    ? (discountType === 'percent'
+        ? unitPriceNumber - ((unitPriceNumber * discountValue) / 100)
+        : Math.max(unitPriceNumber - discountValue, 0))
+    : unitPriceNumber;
+  const totalWithTaxNumber = finalPriceNumber + taxAmountNumber;
+  const formatMoney = (value) => new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  }).format(Number(value || 0));
+  const discountDisplay = discountValue > 0
+    ? (discountType === 'percent' ? discountValue + '%' : formatMoney(discountValue))
+    : '';
+  const similarProductsHtml = relatedItems.length
+    ? relatedItems.map(function(relatedItem) {
+        const relatedTitle = relatedItem?.product_name || relatedItem?.name || 'Product';
+        const relatedImage = relatedItem?.image || '';
+        const relatedUnitPrice = Number(relatedItem?.unit_price || relatedItem?.price || 0);
+        const relatedDiscount = Number(relatedItem?.discount || 0);
+        const relatedDiscountType = relatedItem?.discount_type || '';
+        const hasRelatedDiscount = relatedDiscount > 0;
+        const relatedFinalPrice = relatedDiscount > 0
+          ? (relatedDiscountType === 'percent'
+              ? relatedUnitPrice - ((relatedUnitPrice * relatedDiscount) / 100)
+              : Math.max(relatedUnitPrice - relatedDiscount, 0))
+          : relatedUnitPrice;
+        const relatedDiscountLabel = hasRelatedDiscount
+          ? (relatedDiscountType === 'percent' ? '-' + relatedDiscount + '%' : '-' + formatMoney(relatedDiscount))
+          : '';
+        const relatedDiscountDisplay = hasRelatedDiscount
+          ? (relatedDiscountType === 'percent' ? 'Percent' : 'Flat') + '-' + relatedDiscountLabel.replace(/^-/, '')
+          : '';
+
+        return ''
+          + '<a href="/products/buy?id=' + (relatedItem?.id || '') + '" class="featured-card block rounded-3xl bg-white p-2.5 transition-transform duration-200 hover:-translate-y-1">'
+          +   '<div class="relative h-[195px] w-full overflow-hidden rounded-2xl bg-white ring-1 ring-gray-100">'
+          +     (relatedDiscountDisplay ? '<span class="absolute left-2.5 top-2.5 z-10 rounded-md bg-emerald-300 px-2 py-1 text-[11px] font-bold text-white">' + relatedDiscountDisplay + '</span>' : '')
+          +     '<img src="' + relatedImage + '" alt="' + relatedTitle + '" class="h-full w-full object-contain">'
+          +   '</div>'
+          +   '<div class="px-1.5 pt-2.5">'
+          +     '<h3 class="truncate text-[13px] font-semibold leading-tight text-gray-900">' + relatedTitle + '</h3>'
+          +     '<div class="mt-1 flex items-end gap-1.5">'
+          +       (hasRelatedDiscount ? '<span class="text-[11px] text-gray-400 line-through">' + formatMoney(relatedUnitPrice) + '</span>' : '')
+          +       '<span class="text-[13px] font-bold text-slate-700">' + formatMoney(relatedFinalPrice) + '</span>'
+          +     '</div>'
+          +   '</div>'
+          + '</a>';
+      }).join('')
+    : '';
+
+  const body = `
+  <style>
+    .buy-thumb::-webkit-scrollbar { width: 0; height: 0; }
+    .buy-thumb { scrollbar-width: none; }
+  </style>
+  <section class="px-4 py-5 md:px-6 md:py-7">
+    <div class="mx-auto max-w-[1280px]">
+      ${error ? `
+        <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">${error}</div>
+      ` : item ? `
+        <div class="mx-4 md:mx-8 lg:mx-12 xl:mx-16 grid gap-4 xl:grid-cols-[0.95fr_1.45fr_0.8fr]">
+          <div>
+            <div class="overflow-hidden rounded-[0.85rem] border border-sky-100 bg-white shadow-sm">
+              <div class="relative flex min-h-[300px] items-center justify-center bg-white p-3 md:min-h-[330px]">
+                <img id="buyMainImage" src="${galleryImages[0] || ''}" alt="${titleText}" class="max-h-[300px] w-full object-contain">
+              </div>
+            </div>
+            <div class="buy-thumb mt-3 flex gap-2.5 overflow-x-auto pb-1">
+              ${galleryImages.map(function(image, index) {
+                const activeClass = index === 0 ? 'border-sky-400 ring-2 ring-sky-100' : 'border-slate-200';
+                return '<button type="button" class="buy-gallery-thumb flex h-[60px] w-[60px] flex-shrink-0 items-center justify-center overflow-hidden rounded-[0.65rem] border bg-white p-1 transition ' + activeClass + '" data-image-src="' + image + '"><img src="' + image + '" alt="${titleText} thumbnail" class="h-full w-full object-contain"></button>';
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="pt-3 md:pt-5">
+            <h1 class="text-[24px] font-bold leading-tight text-slate-900">${titleText}</h1>
+            <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-slate-600">
+              <div class="flex items-center gap-1 text-orange-400">
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+                <i class="far fa-star"></i>
+              </div>
+              <span class="font-semibold text-slate-500">(0)</span>
+              <span class="font-medium text-slate-700">0 Reviews</span>
+              <span>|</span>
+              <span class="font-medium text-slate-700">0 Orders</span>
+              <span>|</span>
+              <span class="font-medium text-slate-700">0 Wish Listed</span>
+            </div>
+
+            <div class="mt-4 flex items-end gap-2.5">
+              ${discountValue > 0 ? `<span class="text-[17px] font-medium text-slate-400 line-through">${formatMoney(unitPriceNumber)}</span>` : ''}
+              <span class="text-[20px] font-bold text-slate-700">${formatMoney(totalWithTaxNumber)}</span>
+            </div>
+            <div class="mt-2 space-y-1 text-[13px] text-slate-600">
+              <p><span class="font-semibold text-slate-800">SKU:</span> ${item?.sku || '--'}</p>
+              ${discountValue > 0 ? `<p><span class="font-semibold text-slate-800">Discount:</span> ${discountDisplay}</p>` : ''}
+            </div>
+
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+              <span class="text-[15px] font-semibold text-slate-800">Quantity :</span>
+              <div class="flex items-center overflow-hidden rounded-[0.45rem] border border-[#9f9382] bg-white">
+                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-[#8c7b68]" data-direction="decrement">-</button>
+                <div id="buyQtyValue" class="flex h-[38px] min-w-[46px] items-center justify-center border-x border-[#d8d1c9] text-[16px] text-slate-700">1</div>
+                <button type="button" class="buy-qty-btn flex h-[38px] w-[38px] items-center justify-center text-[16px] text-[#8c7b68]" data-direction="increment">+</button>
+              </div>
+            </div>
+
+            <div class="mt-4 text-[15px] font-semibold text-slate-800">
+              Total Price :
+              <span id="buyTotalPrice" class="font-bold text-slate-700">${formatMoney(totalWithTaxNumber)}</span>
+              <span class="ml-1 text-[12px] font-medium text-slate-500">(Tax incl.)</span>
+            </div>
+
+            <div class="mt-5 flex flex-wrap items-center gap-3">
+              <a href="/products/buy?id=${item?.id || ''}" class="inline-flex min-w-[116px] items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-emerald-500 to-cyan-500 px-5 py-2.5 text-[15px] font-medium text-white transition hover:from-emerald-600 hover:to-cyan-600">Buy now</a>
+              <button type="button" class="inline-flex min-w-[132px] items-center justify-center rounded-[0.45rem] border border-cyan-200 bg-cyan-50 px-5 py-2.5 text-[15px] font-medium text-cyan-700 transition hover:border-cyan-300 hover:bg-cyan-100">Add to cart</button>
+              <button type="button" class="inline-flex h-[46px] min-w-[84px] items-center justify-center gap-2 rounded-[0.45rem] border border-emerald-200 bg-white px-4 text-[16px] text-emerald-600 transition hover:border-cyan-300 hover:text-cyan-600">
+                <i class="far fa-heart"></i>
+                <span class="text-[14px]">0</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="overflow-hidden rounded-[0.75rem] border border-slate-100 bg-white shadow-sm">
+              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-truck"></i></span>
+                <span>Fast Delivery all across the country</span>
+              </div>
+              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="far fa-credit-card"></i></span>
+                <span>Safe Payment</span>
+              </div>
+              <div class="flex items-center gap-3 border-b border-slate-100 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-rotate-left"></i></span>
+                <span>7 Days Return Policy</span>
+              </div>
+              <div class="flex items-center gap-3 px-4 py-4 text-[14px] text-slate-700">
+                <span class="flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 text-[12px] text-slate-400"><i class="fas fa-shield-heart"></i></span>
+                <span>100% Authentic Products</span>
+              </div>
+            </div>
+
+            <div class="rounded-[0.75rem] border border-slate-100 bg-white p-6 shadow-sm">
+              <img src="${brandImage}" alt="${brandName}" class="h-14 w-14 rounded-full object-cover">
+              <h2 class="mt-5 text-left text-[16px] font-bold leading-8 text-slate-900">${brandName}</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="mx-4 mt-7 rounded-[0.85rem] border border-sky-100 bg-white p-5 shadow-sm md:mx-8 lg:mx-12 xl:mx-16">
+          <div class="flex items-center justify-center gap-10 border-b border-slate-200 pb-3">
+            <button type="button" class="buy-detail-tab border-b-2 border-sky-500 px-1 pb-2 text-[14px] font-semibold text-sky-600" data-tab="description">Description</button>
+            <button type="button" class="buy-detail-tab border-b-2 border-transparent px-1 pb-2 text-[14px] font-semibold text-slate-500" data-tab="reviews">Reviews</button>
+          </div>
+          <div id="buyDescriptionPanel" class="pt-4 text-[14px] leading-6 text-slate-600">
+            ${item?.description || 'Description unavailable'}
+          </div>
+          <div id="buyReviewsPanel" class="hidden pt-4 text-[14px] leading-6 text-slate-600">
+            Reviews unavailable for this product.
+          </div>
+        </div>
+
+        ${relatedItems.length ? `
+          <div class="mx-4 mt-7 rounded-[0.85rem] border border-sky-100 bg-white p-5 shadow-sm md:mx-8 lg:mx-12 xl:mx-16">
+            <div class="mb-4 flex items-center justify-between gap-3">
+              <h2 class="text-[18px] font-bold text-slate-900">Similar Products</h2>
+              <span class="text-[12px] font-medium uppercase tracking-[0.16em] text-cyan-600">Recommended for you</span>
+            </div>
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              ${similarProductsHtml}
+            </div>
+          </div>
+        ` : ''}
+
+        <script>
+          (function() {
+            const mainImage = document.getElementById('buyMainImage');
+            const qtyValueEl = document.getElementById('buyQtyValue');
+            const totalPriceEl = document.getElementById('buyTotalPrice');
+            const descriptionPanel = document.getElementById('buyDescriptionPanel');
+            const reviewsPanel = document.getElementById('buyReviewsPanel');
+            const unitPrice = ${JSON.stringify(finalPriceNumber)};
+            const taxAmount = ${JSON.stringify(taxAmountNumber)};
+
+            document.querySelectorAll('.buy-gallery-thumb').forEach(function(button) {
+              button.addEventListener('click', function() {
+                if (!mainImage) return;
+                const nextImage = this.dataset.imageSrc || '';
+                if (!nextImage) return;
+
+                mainImage.src = nextImage;
+                document.querySelectorAll('.buy-gallery-thumb').forEach(function(thumb) {
+                  thumb.classList.remove('border-sky-400', 'ring-2', 'ring-sky-100');
+                  thumb.classList.add('border-slate-200');
+                });
+
+                this.classList.remove('border-slate-200');
+                this.classList.add('border-sky-400', 'ring-2', 'ring-sky-100');
+              });
+            });
+
+            document.querySelectorAll('.buy-qty-btn').forEach(function(button) {
+              button.addEventListener('click', function() {
+                if (!qtyValueEl || !totalPriceEl) return;
+                const currentQty = Number(qtyValueEl.textContent || 1);
+                const nextQty = this.dataset.direction === 'increment' ? currentQty + 1 : Math.max(currentQty - 1, 1);
+                qtyValueEl.textContent = String(nextQty);
+                totalPriceEl.textContent = new Intl.NumberFormat('en-IN', {
+                  style: 'currency',
+                  currency: 'INR',
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                }).format((unitPrice * nextQty) + taxAmount);
+              });
+            });
+
+            document.querySelectorAll('.buy-detail-tab').forEach(function(tab) {
+              tab.addEventListener('click', function() {
+                const selectedTab = this.dataset.tab || 'description';
+                const isDescription = selectedTab === 'description';
+
+                if (descriptionPanel) descriptionPanel.classList.toggle('hidden', !isDescription);
+                if (reviewsPanel) reviewsPanel.classList.toggle('hidden', isDescription);
+
+                document.querySelectorAll('.buy-detail-tab').forEach(function(item) {
+                  const isActive = item.dataset.tab === selectedTab;
+                  item.classList.toggle('border-sky-500', isActive);
+                  item.classList.toggle('text-sky-600', isActive);
+                  item.classList.toggle('border-transparent', !isActive);
+                  item.classList.toggle('text-slate-500', !isActive);
+                });
+              });
+            });
+          })();
+        </script>
+      ` : `
+        <div class="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">Product not found.</div>
+      `}
+    </div>
+  </section>
+  `; %>
+
+<%- include('../layout/app', { title: title || 'Buy', body }) %>
