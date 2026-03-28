@@ -1,0 +1,190 @@
+<%
+const body = `
+<section class="px-4 pt-6 pb-10 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="rounded-[1.4rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_18px_38px_rgba(148,163,184,0.14)] md:p-8">
+      <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Orders</p>
+          <h1 class="mt-2 text-[28px] font-bold text-slate-900">My Orders</h1>
+          <p class="mt-2 text-sm text-slate-500">Review your latest purchases, payment updates, and order status in one place.</p>
+        </div>
+        <a href="/products" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Continue Shopping</a>
+      </div>
+
+      <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Latest Status</p>
+          <p class="mt-2 text-base font-semibold text-slate-900">Track placed and confirmed orders</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Payments</p>
+          <p class="mt-2 text-base font-semibold text-slate-900">Check payment method and payment status</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Products</p>
+          <p class="mt-2 text-base font-semibold text-slate-900">See quantity, price, and product details</p>
+        </div>
+      </div>
+
+      <div id="ordersMessage" class="mt-6 hidden rounded-[1rem] px-4 py-3 text-sm"></div>
+      <div id="ordersList" class="mt-6 space-y-4">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">Loading orders...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const ordersList = document.getElementById('ordersList');
+    const ordersMessage = document.getElementById('ordersMessage');
+    const apiBase = 'https://aerthh.newhopeindia17.com/api/';
+
+    function showMessage(text, isError) {
+      if (!ordersMessage) return;
+      ordersMessage.textContent = text;
+      ordersMessage.className = 'mt-6 rounded-[1rem] px-4 py-3 text-sm ' + (isError
+        ? 'border border-rose-200 bg-rose-50 text-rose-600'
+        : 'border border-sky-200 bg-sky-50 text-sky-700');
+      ordersMessage.classList.remove('hidden');
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(Number(value || 0));
+    }
+
+    function formatDate(value) {
+      if (!value) return '--';
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return '--';
+      return new Intl.DateTimeFormat('en-IN', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date);
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getCustomerAuth() {
+      try {
+        return {
+          token: localStorage.getItem('customerToken') || '',
+          tokenType: localStorage.getItem('tokenType') || 'Bearer'
+        };
+      } catch (error) {
+        return { token: '', tokenType: 'Bearer' };
+      }
+    }
+
+    function renderOrders(list) {
+      if (!ordersList) return;
+      if (!Array.isArray(list) || !list.length) {
+        ordersList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">No orders found.</div>';
+        return;
+      }
+
+      ordersList.innerHTML = list.map(function (order) {
+        const product = order.product || {};
+        const image = product.image || 'https://via.placeholder.com/240x240/eef7ff/64748b?text=Product';
+        const title = product.product_name || 'Product';
+        const quantity = Number(order.quantity || 0);
+        const totalPrice = Number(order.total_price || 0);
+        const shippingCost = Number(order.shipping_cost || 0);
+        const finalAmount = totalPrice + shippingCost;
+        const orderStatus = order.status || '--';
+        const paymentMethod = order.payment_method || '--';
+        const paymentStatus = order.payment_status || '--';
+        const createdAt = formatDate(order.created_at);
+
+        return ''
+          + '<div class="group rounded-[1.15rem] border border-sky-100 bg-white p-4 shadow-[0_10px_26px_rgba(148,163,184,0.10)] transition-shadow duration-200 hover:shadow-[0_16px_32px_rgba(148,163,184,0.16)] md:p-5">'
+          + '<div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">'
+          + '<div class="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-start">'
+          + '<div class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[0.9rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100 sm:h-28 sm:w-28">'
+          + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-full w-full object-contain">'
+          + '</div>'
+          + '<div class="min-w-0 flex-1">'
+          + '<div class="flex flex-wrap items-center gap-2">'
+          + '<h2 class="text-lg font-semibold text-slate-900">' + escapeHtml(title) + '</h2>'
+          + '<span class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700 ring-1 ring-sky-100">' + escapeHtml(orderStatus) + '</span>'
+          + '</div>'
+          + '<p class="mt-2 text-sm text-slate-500">Order ID: ' + escapeHtml(order.id) + '</p>'
+          + '<p class="mt-1 text-sm text-slate-500">Placed on: ' + escapeHtml(createdAt) + '</p>'
+          + '<div class="mt-3 grid gap-2 sm:grid-cols-2">'
+          + '<div class="rounded-[0.9rem] border border-sky-100 bg-sky-50/60 px-3 py-2.5 text-sm text-slate-600"><span class="font-semibold text-slate-800">Quantity:</span> ' + escapeHtml(quantity) + '</div>'
+          + '<div class="rounded-[0.9rem] border border-sky-100 bg-sky-50/60 px-3 py-2.5 text-sm text-slate-600"><span class="font-semibold text-slate-800">Payment Method:</span> ' + escapeHtml(paymentMethod.toUpperCase()) + '</div>'
+          + '<div class="rounded-[0.9rem] border border-sky-100 bg-sky-50/60 px-3 py-2.5 text-sm text-slate-600"><span class="font-semibold text-slate-800">Payment Status:</span> ' + escapeHtml(paymentStatus) + '</div>'
+          + '<div class="rounded-[0.9rem] border border-sky-100 bg-sky-50/60 px-3 py-2.5 text-sm text-slate-600"><span class="font-semibold text-slate-800">Shipping Cost:</span> ' + escapeHtml(formatMoney(shippingCost)) + '</div>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+          + '<div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-4 py-3 lg:min-w-[220px]">'
+          + '<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Order Summary</p>'
+          + '<p class="mt-3 text-sm text-slate-500">Products Total</p>'
+          + '<p class="mt-1 text-base font-semibold text-slate-900">' + escapeHtml(formatMoney(totalPrice)) + '</p>'
+          + '<p class="mt-3 text-sm text-slate-500">Final Total</p>'
+          + '<p class="mt-1 text-xl font-bold text-sky-700">' + escapeHtml(formatMoney(finalAmount)) + '</p>'
+          + '<a href="/products/buy?id=' + encodeURIComponent(String(product.id || order.product_id || '')) + '" class="mt-4 inline-flex w-full items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">View Product</a>'
+          + '<button type="button" class="mt-3 inline-flex w-full items-center justify-center rounded-[0.85rem] border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-600 opacity-100 transition hover:bg-rose-50 sm:opacity-0 sm:pointer-events-none sm:group-hover:pointer-events-auto sm:group-hover:opacity-100">Cancel</button>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    async function loadOrders() {
+      if (!ordersList) return;
+      const auth = getCustomerAuth();
+
+      if (!auth.token) {
+        showMessage('Please sign in to view your orders.', true);
+        ordersList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">Orders are available after sign in.</div>';
+        return;
+      }
+
+      try {
+        const response = await fetch(apiBase + 'orders', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          }
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to fetch orders.');
+        }
+
+        renderOrders(Array.isArray(result.data) ? result.data : []);
+      } catch (error) {
+        console.error('Orders fetch error:', error);
+        showMessage(error.message || 'Unable to fetch orders.', true);
+        ordersList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">Unable to load orders right now.</div>';
+      }
+    }
+
+    loadOrders();
+  })();
+</script>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Orders', body }) %>

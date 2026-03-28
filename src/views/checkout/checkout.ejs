@@ -416,7 +416,10 @@
             closeOrderSuccessModalBtn.addEventListener('click', closeOrderSuccessModal);
         }
         if (modalDoneBtn) {
-            modalDoneBtn.addEventListener('click', closeOrderSuccessModal);
+            modalDoneBtn.addEventListener('click', function () {
+                closeOrderSuccessModal();
+                window.location.href = '/orders';
+            });
         }
         if (orderSuccessModal) {
             orderSuccessModal.addEventListener('click', function (event) {
@@ -452,6 +455,11 @@
                         payment_method: selectedPaymentMethod ? selectedPaymentMethod.value : 'cod'
                     }, auth);
 
+                    try {
+                        sessionStorage.removeItem('checkoutState');
+                    } catch (storageError) {
+                        console.warn('Unable to clear checkout state:', storageError);
+                    }
                     showMessage(result?.message || 'Order placed successfully.', false);
                     openOrderSuccessModal(result?.data || {}, paymentLabel);
                 } catch (error) {
