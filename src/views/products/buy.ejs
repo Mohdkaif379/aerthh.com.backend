@@ -221,6 +221,19 @@
             const taxAmount = ${JSON.stringify(taxAmountNumber)};
             const productId = ${JSON.stringify(String(item?.id || ''))};
 
+            function hasCustomerSession() {
+              try {
+                return !!(
+                  localStorage.getItem('customerToken') ||
+                  localStorage.getItem('authData') ||
+                  localStorage.getItem('customerData') ||
+                  localStorage.getItem('userData')
+                );
+              } catch (error) {
+                return false;
+              }
+            }
+
             document.querySelectorAll('.buy-gallery-thumb').forEach(function(button) {
               button.addEventListener('click', function() {
                 if (!mainImage) return;
@@ -278,7 +291,12 @@
                   id: productId,
                   qty: String(qty)
                 });
-                window.location.href = '/products/address?' + params.toString();
+                const checkoutUrl = '/products/address?' + params.toString();
+                if (!hasCustomerSession()) {
+                  window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent(checkoutUrl);
+                  return;
+                }
+                window.location.href = checkoutUrl;
               });
             }
           })();

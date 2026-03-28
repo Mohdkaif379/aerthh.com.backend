@@ -1,0 +1,470 @@
+<% const item=typeof product !=='undefined' ? product : null; const error=typeof errorMessage !=='undefined' ?
+    errorMessage : '' ; const quantity=Math.max(Number(typeof qty !=='undefined' ? qty : 1), 1); const
+    formatMoney=(value)=> new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+    }).format(Number(value || 0));
+    const unitPriceValue = Number(item?.unit_price || item?.price || 0);
+    const discountValue = Number(item?.discount || 0);
+    const discountType = item?.discount_type || '';
+    const taxAmountValue = Number(item?.tax_amount || 0);
+    const shippingCostValue = Number(item?.shipping_cost || item?.shipping_charge || item?.delivery_charge || 0);
+    const finalUnitPrice = discountValue > 0
+    ? (discountType === 'percent'
+    ? unitPriceValue - ((unitPriceValue * discountValue) / 100)
+    : Math.max(unitPriceValue - discountValue, 0))
+    : unitPriceValue;
+    const subtotalPrice = finalUnitPrice * quantity;
+    const totalPrice = subtotalPrice + taxAmountValue + shippingCostValue;
+    const titleText = item?.product_name || item?.name || 'Selected Product';
+    const productImage = item?.image || 'https://via.placeholder.com/320x320/eef7ff/64748b?text=Product';
+    const body = `
+    <section class="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
+        <div class="mx-auto max-w-[1280px]">
+            ${error ? `
+            <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">${error}</div>
+            ` : item ? `
+            <div
+                class="mb-6 rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-5 py-6 shadow-[0_14px_34px_rgba(148,163,184,0.10)]">
+                <div class="relative mx-auto flex max-w-4xl items-start justify-between">
+                    <div class="absolute left-[36px] right-[36px] top-[15px] h-[4px] bg-sky-100"></div>
+                    <div
+                        class="absolute left-[36px] top-[15px] h-[4px] w-full bg-gradient-to-r from-sky-400 to-blue-400">
+                    </div>
+
+                    <div class="relative z-10 flex w-28 flex-col items-center text-center">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
+                            <i class="fas fa-cart-arrow-down text-[13px]"></i>
+                        </div>
+                        <span class="mt-5 text-[13px] font-medium text-slate-700">Cart</span>
+                    </div>
+
+                    <div class="relative z-10 flex w-40 flex-col items-center text-center">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
+                            <i class="fas fa-box-open text-[12px]"></i>
+                        </div>
+                        <span class="mt-5 text-[13px] font-medium text-slate-700">Shipping And Billing</span>
+                    </div>
+
+                    <div class="relative z-10 flex w-28 flex-col items-center text-center">
+                        <div
+                            class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-300 bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
+                            <i class="far fa-credit-card text-[13px]"></i>
+                        </div>
+                        <span class="mt-5 text-[13px] font-medium text-sky-700">Payment</span>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                class="mx-auto max-w-4xl rounded-[1.3rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_18px_38px_rgba(148,163,184,0.14)] md:p-6">
+                <div class="mb-5 flex items-start justify-between gap-4">
+                    <div>
+                        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Checkout</p>
+                        <h1 class="mt-1 text-[26px] font-bold text-slate-900">Review Your Order</h1>
+                        <p class="mt-2 text-sm text-slate-500">Review your product, address details, and payment
+                            selection before placing the order.</p>
+                    </div>
+                    <a href="/products/address?id=${encodeURIComponent(String(item?.id || ''))}&qty=${encodeURIComponent(String(quantity))}"
+                        class="rounded-full bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-100 hover:text-sky-900">Edit
+                        Address</a>
+                </div>
+
+                <div id="checkoutAddressMessage" class="hidden rounded-xl px-4 py-3 text-sm"></div>
+
+                <div class="grid gap-5 lg:grid-cols-[1.1fr_0.9fr]">
+                    <div class="space-y-5">
+                        <div class="flex gap-4 rounded-[1rem] border border-sky-100 bg-white/90 p-4">
+                            <div
+                                class="flex h-28 w-28 items-center justify-center overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100">
+                                <img src="${productImage}" alt="${titleText}" class="h-full w-full object-contain">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-lg font-semibold text-slate-900">${titleText}</h3>
+                                <p class="mt-2 text-sm text-slate-500">Product ID: ${item?.id || '--'}</p>
+                                <p class="mt-1 text-sm text-slate-500">Quantity: ${quantity}</p>
+                                <p class="mt-1 text-sm font-semibold text-sky-700">Unit Price:
+                                    ${formatMoney(finalUnitPrice)}</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div
+                                class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
+                                <div class="mb-3">
+                                    <h2 class="text-base font-bold text-slate-900">Shipping Address</h2>
+                                </div>
+                                <div id="shippingAddressCard" class="text-sm leading-6 text-slate-600"></div>
+                            </div>
+
+                            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+                                <div class="mb-3">
+                                    <h2 class="text-base font-bold text-slate-900">Billing Address</h2>
+                                </div>
+                                <div id="billingAddressCard" class="text-sm leading-6 text-slate-600"></div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div
+                        class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <h2 class="text-lg font-bold text-slate-900">Order Summary</h2>
+                            <span
+                                class="rounded-full bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-sky-700 ring-1 ring-sky-100">Ready</span>
+                        </div>
+
+                        <div class="space-y-3 rounded-[1rem] border border-sky-100 bg-white/90 p-4 text-sm">
+                            <div class="flex items-center justify-between gap-3 text-slate-600">
+                                <span>Price After Discount</span>
+                                <span class="font-medium text-slate-800">${formatMoney(finalUnitPrice)}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-slate-600">
+                                <span>Quantity</span>
+                                <span class="font-medium text-slate-800">${quantity}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-slate-600">
+                                <span>Subtotal</span>
+                                <span class="font-medium text-slate-800">${formatMoney(subtotalPrice)}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-slate-600">
+                                <span>Tax</span>
+                                <span class="font-medium text-slate-800">${formatMoney(taxAmountValue)}</span>
+                            </div>
+                            <div class="flex items-center justify-between gap-3 text-slate-600">
+                                <span>Shipping Cost</span>
+                                <span class="font-medium text-slate-800">${formatMoney(shippingCostValue)}</span>
+                            </div>
+                            <div class="border-t border-sky-100 pt-3">
+                                <div class="flex items-center justify-between gap-3">
+                                    <span class="text-base font-semibold text-slate-800">Total</span>
+                                    <span class="text-base font-bold text-sky-700">${formatMoney(totalPrice)}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 rounded-[1rem] border border-sky-100 bg-white/90 p-4">
+                            <div class="mb-3 flex items-center justify-between gap-3">
+                                <h3 class="text-base font-bold text-slate-900">Payment Method</h3>
+                                <span
+                                    class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100">Select
+                                    One</span>
+                            </div>
+
+                            <div class="grid gap-3">
+                                <label
+                                    class="payment-method-option flex cursor-pointer items-start gap-3 rounded-[0.9rem] border border-sky-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-4 py-4 transition hover:border-sky-300 hover:bg-sky-50/60">
+                                    <input type="radio" name="paymentMethod" value="cod" checked
+                                        class="mt-1 h-4 w-4 border-sky-300 text-sky-500 focus:ring-sky-400">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">Cash on Delivery</p>
+                                    </div>
+                                </label>
+
+                                <label
+                                    class="payment-method-option flex cursor-pointer items-start gap-3 rounded-[0.9rem] border border-sky-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-4 py-4 transition hover:border-sky-300 hover:bg-sky-50/60">
+                                    <input type="radio" name="paymentMethod" value="online"
+                                        class="mt-1 h-4 w-4 border-sky-300 text-sky-500 focus:ring-sky-400">
+                                    <div>
+                                        <p class="text-sm font-semibold text-slate-900">Online Payment</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 border-t border-sky-100 pt-5">
+                    <button id="confirmOrderBtn" type="button"
+                        class="inline-flex w-full items-center justify-center rounded-[0.8rem] bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-3.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">
+                        Confirm Order
+                    </button>
+                </div>
+            </div>
+
+            <div id="orderSuccessModal" class="fixed inset-0 z-[20000] hidden items-center justify-center bg-slate-950/55 px-4">
+                <div class="w-full max-w-lg rounded-[1.4rem] border border-sky-100 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.24)]">
+                    <div class="flex items-start justify-between gap-4">
+                        <div class="flex items-center gap-3">
+                            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100">
+                                <i class="fas fa-check text-lg"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Order Placed</p>
+                                <h2 class="text-xl font-bold text-slate-900">Order placed successfully</h2>
+                            </div>
+                        </div>
+                        <button id="closeOrderSuccessModalBtn" type="button" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition hover:bg-slate-200 hover:text-slate-700">
+                            <i class="fas fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <div class="mt-5 rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4">
+                        <div class="flex gap-4">
+                            <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[0.9rem] bg-sky-50 ring-1 ring-sky-100">
+                                <img id="orderSuccessProductImage" src="${productImage}" alt="${titleText}" class="h-full w-full object-contain">
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 id="orderSuccessProductTitle" class="text-base font-semibold text-slate-900">${titleText}</h3>
+                                <p id="orderSuccessOrderId" class="mt-2 text-sm text-slate-500">Order ID: --</p>
+                                <p id="orderSuccessQuantity" class="mt-1 text-sm text-slate-500">Quantity: ${quantity}</p>
+                                <p id="orderSuccessPayment" class="mt-1 text-sm text-slate-500">Payment Method: --</p>
+                                <p id="orderSuccessTotal" class="mt-2 text-sm font-semibold text-sky-700">Total: ${formatMoney(totalPrice)}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-5 flex gap-3">
+                        <a href="/products" class="inline-flex flex-1 items-center justify-center rounded-[0.85rem] border border-sky-200 bg-white px-4 py-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-50">Continue Shopping</a>
+                        <button id="modalDoneBtn" type="button" class="inline-flex flex-1 items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-4 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Done</button>
+                    </div>
+                </div>
+            </div>
+            ` : `
+            <div
+                class="rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-4 py-3 text-sm text-slate-600">
+                Product not found.</div>
+            `}
+        </div>
+    </section>
+    <script>
+        (function () {
+            const messageBox = document.getElementById('checkoutAddressMessage');
+            const shippingCard = document.getElementById('shippingAddressCard');
+            const billingCard = document.getElementById('billingAddressCard');
+            const confirmOrderBtn = document.getElementById('confirmOrderBtn');
+            const paymentMethodInputs = Array.from(document.querySelectorAll('input[name="paymentMethod"]'));
+            const orderSuccessModal = document.getElementById('orderSuccessModal');
+            const closeOrderSuccessModalBtn = document.getElementById('closeOrderSuccessModalBtn');
+            const modalDoneBtn = document.getElementById('modalDoneBtn');
+            const orderSuccessOrderId = document.getElementById('orderSuccessOrderId');
+            const orderSuccessQuantity = document.getElementById('orderSuccessQuantity');
+            const orderSuccessPayment = document.getElementById('orderSuccessPayment');
+            const orderSuccessTotal = document.getElementById('orderSuccessTotal');
+        const checkoutPath = window.location.pathname + window.location.search;
+        const productId = ${ JSON.stringify(String(item?.id || ''))
+        };
+        const quantity = ${ JSON.stringify(quantity)};
+        const shippingCost = ${ JSON.stringify(shippingCostValue)};
+        const taxAmount = ${ JSON.stringify(taxAmountValue)};
+        const pageTotal = ${ JSON.stringify(totalPrice)};
+
+        function hasCustomerSession() {
+            try {
+                return !!(
+                    localStorage.getItem('customerToken') ||
+                    localStorage.getItem('authData') ||
+                    localStorage.getItem('customerData') ||
+                    localStorage.getItem('userData')
+                );
+            } catch (error) {
+                return false;
+            }
+        }
+
+        function showMessage(text, isError) {
+            if (!messageBox) return;
+            messageBox.textContent = text;
+            messageBox.className = 'rounded-xl px-4 py-3 text-sm ' + (isError
+                ? 'border border-rose-200 bg-rose-50 text-rose-600'
+                : 'border border-sky-200 bg-sky-50 text-sky-700');
+            messageBox.classList.remove('hidden');
+        }
+
+        function formatMoneyValue(value) {
+            return new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(Number(value || 0));
+        }
+
+        function getCustomerAuth() {
+            try {
+                return {
+                    token: localStorage.getItem('customerToken') || '',
+                    tokenType: localStorage.getItem('tokenType') || 'Bearer'
+                };
+            } catch (error) {
+                return {
+                    token: '',
+                    tokenType: 'Bearer'
+                };
+            }
+        }
+
+        async function createOrder(payload, auth) {
+            const response = await fetch('https://aerthh.newhopeindia17.com/api/order/create', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                    'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+
+            if (!response.ok || !result?.status) {
+                throw new Error(result?.message || result?.error || 'Unable to place order.');
+            }
+
+            return result;
+        }
+
+        function openOrderSuccessModal(orderData, paymentLabel) {
+            if (!orderSuccessModal) return;
+            const orderTotal = Number(orderData?.total_price || 0)
+                + Number(orderData?.shipping_cost || shippingCost || 0)
+                + Number(orderData?.tax_amount || taxAmount || 0);
+            if (orderSuccessOrderId) orderSuccessOrderId.textContent = 'Order ID: ' + String(orderData?.id || '--');
+            if (orderSuccessQuantity) orderSuccessQuantity.textContent = 'Quantity: ' + String(orderData?.quantity || quantity);
+            if (orderSuccessPayment) orderSuccessPayment.textContent = 'Payment Method: ' + paymentLabel;
+            if (orderSuccessTotal) orderSuccessTotal.textContent = 'Total: ' + formatMoneyValue(orderTotal || pageTotal);
+            orderSuccessModal.classList.remove('hidden');
+            orderSuccessModal.classList.add('flex');
+        }
+
+        function closeOrderSuccessModal() {
+            if (!orderSuccessModal) return;
+            orderSuccessModal.classList.add('hidden');
+            orderSuccessModal.classList.remove('flex');
+        }
+
+        function renderAddress(container, address) {
+            if (!container) return;
+            if (!address) {
+                container.innerHTML = '<div class="rounded-[1rem] border border-dashed border-sky-200 bg-white/90 px-4 py-5 text-sm text-slate-500">Address not available.</div>';
+                return;
+            }
+
+            const fullName = [address.first_name, address.last_name].filter(Boolean).join(' ');
+            const locationLine = [address.city, address.state, address.zip_code].filter(Boolean).join(', ');
+            const addressLines = [address.address_line, locationLine, address.country].filter(Boolean);
+
+            container.innerHTML = ''
+                + '<div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">'
+                + '<div class="flex flex-wrap items-start justify-between gap-3">'
+                + '<div class="flex min-w-0 flex-1 items-start gap-3">'
+                + '<div class="flex h-11 w-11 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">'
+                + '<i class="fas fa-location-dot text-sm"></i>'
+                + '</div>'
+                + '<div class="min-w-0 flex-1 break-words">'
+                + '<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Contact</p>'
+                + '<p class="mt-1 text-sm font-semibold text-slate-900">' + (fullName || 'Customer') + '</p>'
+                + (address.phone ? '<p class="mt-1 text-xs font-medium text-slate-600">' + address.phone + '</p>' : '')
+                + '</div>'
+                + '</div>'
+                + '<span class="shrink-0 rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100">' + (address.type === 'billing' ? 'Billing' : 'Shipping') + '</span>'
+                + '</div>'
+                + '<div class="mt-4 rounded-[0.95rem] border border-sky-100 bg-sky-50/70 px-3.5 py-3 break-words">'
+                + '<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Address</p>'
+                + '<div class="mt-2 space-y-1.5 text-sm leading-6 text-slate-600">'
+                + addressLines.map(function (line) {
+                    return '<p>' + line + '</p>';
+                }).join('')
+                + '</div>'
+                + '</div>'
+                + '</div>';
+        }
+
+        function syncPaymentMethodSelection() {
+            document.querySelectorAll('.payment-method-option').forEach(function (option) {
+                const radio = option.querySelector('input[name="paymentMethod"]');
+                const isActive = !!(radio && radio.checked);
+                option.classList.toggle('border-sky-400', isActive);
+                option.classList.toggle('bg-sky-50', isActive);
+            });
+        }
+
+        if (!hasCustomerSession()) {
+            window.location.replace('/auth/customer/signin?redirect=' + encodeURIComponent(checkoutPath));
+            return;
+        }
+
+        let checkoutState = null;
+        try {
+            checkoutState = JSON.parse(sessionStorage.getItem('checkoutState') || 'null');
+        } catch (error) {
+            checkoutState = null;
+        }
+
+        if (!checkoutState || String(checkoutState.productId || '') !== productId || Number(checkoutState.qty || 0) !== quantity) {
+            showMessage('Saved address details were not found. Please enter your address again.', true);
+            window.setTimeout(function () {
+                window.location.href = '/products/address?id=' + encodeURIComponent(productId) + '&qty=' + encodeURIComponent(String(quantity));
+            }, 1200);
+            return;
+        }
+
+        renderAddress(shippingCard, checkoutState.shippingAddress);
+        renderAddress(billingCard, checkoutState.billingAddress);
+
+        paymentMethodInputs.forEach(function (input) {
+            input.addEventListener('change', syncPaymentMethodSelection);
+        });
+        syncPaymentMethodSelection();
+
+        if (closeOrderSuccessModalBtn) {
+            closeOrderSuccessModalBtn.addEventListener('click', closeOrderSuccessModal);
+        }
+        if (modalDoneBtn) {
+            modalDoneBtn.addEventListener('click', closeOrderSuccessModal);
+        }
+        if (orderSuccessModal) {
+            orderSuccessModal.addEventListener('click', function (event) {
+                if (event.target === orderSuccessModal) {
+                    closeOrderSuccessModal();
+                }
+            });
+        }
+
+        if (confirmOrderBtn) {
+            confirmOrderBtn.addEventListener('click', async function () {
+                const selectedPaymentMethod = paymentMethodInputs.find(function (input) {
+                    return input.checked;
+                });
+                const auth = getCustomerAuth();
+                const paymentLabel = selectedPaymentMethod && selectedPaymentMethod.value === 'online'
+                    ? 'Online Payment'
+                    : 'Cash on Delivery';
+
+                if (!auth.token) {
+                    window.location.replace('/auth/customer/signin?redirect=' + encodeURIComponent(checkoutPath));
+                    return;
+                }
+
+                const originalBtnText = confirmOrderBtn.innerHTML;
+                confirmOrderBtn.disabled = true;
+                confirmOrderBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2 text-xs"></i> Placing Order';
+
+                try {
+                    const result = await createOrder({
+                        product_id: Number(productId),
+                        quantity: Number(quantity),
+                        payment_method: selectedPaymentMethod ? selectedPaymentMethod.value : 'cod'
+                    }, auth);
+
+                    showMessage(result?.message || 'Order placed successfully.', false);
+                    openOrderSuccessModal(result?.data || {}, paymentLabel);
+                } catch (error) {
+                    console.error('Order create error:', error);
+                    showMessage(error.message || 'Unable to place order. Please try again.', true);
+                } finally {
+                    confirmOrderBtn.disabled = false;
+                    confirmOrderBtn.innerHTML = originalBtnText;
+                }
+            });
+        }
+    }) ();
+    </script>
+    `; %>
+
+    <%- include('../layout/app', { title: title || 'Checkout' , body }) %>

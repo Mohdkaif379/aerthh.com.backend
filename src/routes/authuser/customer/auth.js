@@ -13,9 +13,11 @@ router.get('/customer/signup', async (req, res) => {
 });
 
 router.get('/customer/signin', async (req, res) => {
+  const redirectTo = typeof req.query.redirect === 'string' ? req.query.redirect.trim() : '';
   res.render('auth/customer/signin', {
     title: 'Sign In',
-    message: 'Please sign in to continue'
+    message: 'Please sign in to continue',
+    redirectTo: redirectTo.startsWith('/') ? redirectTo : ''
   });
 });
 
