@@ -31,51 +31,51 @@
     : 'No discount';
 
   const body = `
-  <section class="px-4 pt-4 pb-8 md:px-6 md:pt-5 md:pb-10">
+  <section class="px-3 pt-4 pb-8 sm:px-4 md:px-6 md:pt-5 md:pb-10">
     <div class="mx-auto max-w-[1280px]">
       ${error ? `
         <div class="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">${error}</div>
       ` : item ? `
-      <div class="mb-6 rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-5 py-6 shadow-[0_14px_34px_rgba(148,163,184,0.10)]">
-        <div class="relative mx-auto flex max-w-4xl items-start justify-between">
-          <div class="absolute left-[36px] right-[36px] top-[15px] h-[4px] bg-sky-100"></div>
-          <div class="absolute left-[36px] top-[15px] h-[4px] w-[50%] bg-gradient-to-r from-sky-400 to-blue-400"></div>
+      <div class="mt-2 mb-6 rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-3 py-5 sm:px-5 sm:py-6 shadow-[0_14px_34px_rgba(148,163,184,0.10)]">
+        <div class="relative mx-auto flex max-w-4xl items-start justify-between gap-2 sm:gap-4">
+          <div class="absolute left-[24px] right-[24px] top-[15px] h-[4px] bg-sky-100 sm:left-[36px] sm:right-[36px]"></div>
+          <div class="absolute left-[24px] top-[15px] h-[4px] w-[50%] bg-gradient-to-r from-sky-400 to-blue-400 sm:left-[36px]"></div>
 
-          <div class="relative z-10 flex w-28 flex-col items-center text-center">
+          <div class="relative z-10 flex w-20 sm:w-28 flex-col items-center text-center">
             <div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
               <i class="fas fa-cart-arrow-down text-[13px]"></i>
             </div>
-            <span class="mt-5 text-[13px] font-medium text-slate-700">Cart</span>
+            <span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-slate-700">Cart</span>
           </div>
 
-          <div class="relative z-10 flex w-40 flex-col items-center text-center">
+          <div class="relative z-10 flex w-28 sm:w-40 flex-col items-center text-center">
             <div class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-300 bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm">
               <i class="fas fa-box-open text-[12px]"></i>
             </div>
-            <span class="mt-5 text-[13px] font-medium text-sky-700">Shipping And Billing</span>
+            <span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-sky-700">Shipping And Billing</span>
           </div>
 
-          <div class="relative z-10 flex w-28 flex-col items-center text-center">
+          <div class="relative z-10 flex w-20 sm:w-28 flex-col items-center text-center">
             <div class="flex h-8 w-8 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
               <i class="far fa-credit-card text-[13px]"></i>
             </div>
-            <span class="mt-5 text-[13px] font-medium text-slate-700">Payment</span>
+            <span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-slate-700">Payment</span>
           </div>
         </div>
       </div>
 
-      <div class="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-        <div class="rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+      <div class="grid gap-5 sm:gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div class="rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
           <div class="mb-5">
             <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Checkout</p>
-            <h1 class="text-[26px] font-bold text-slate-900">Delivery Address</h1>
+            <h1 class="text-[24px] sm:text-[26px] font-bold text-slate-900">Delivery Address</h1>
             <p class="mt-2 text-sm text-slate-500">Fill in your address details to continue with this order.</p>
           </div>
 
           <form id="checkoutAddressForm" class="space-y-6">
             <div id="addressFormMessage" class="hidden rounded-xl px-4 py-3 text-sm"></div>
             <div id="savedAddressesSection" class="hidden rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
-              <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Saved Addresses</p>
                   <h2 class="text-lg font-bold text-slate-900">Choose an address</h2>
@@ -91,7 +91,7 @@
             </div>
 
             <div id="manualAddressFields" class="space-y-6">
-            <div id="manualAddressHeader" class="hidden items-center justify-between gap-3 rounded-[1rem] border border-sky-100 bg-white px-4 py-3">
+            <div id="manualAddressHeader" class="hidden flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-sky-100 bg-white px-4 py-3">
               <div>
                 <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">New Address</p>
                 <p class="text-sm font-semibold text-slate-900">Enter a different address for this order</p>
@@ -101,7 +101,7 @@
               </button>
             </div>
             <div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
-              <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 1</p>
                   <h2 class="text-lg font-bold text-slate-900">Shipping Address</h2>
@@ -149,12 +149,12 @@
             </div>
 
             <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
-              <div class="mb-4 flex items-center justify-between gap-3">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
                 <div>
                   <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 2</p>
                   <h2 class="text-lg font-bold text-slate-900">Billing Address</h2>
                 </div>
-                <label class="flex items-center gap-2 text-xs text-slate-600">
+                <label class="flex w-full sm:w-auto items-center gap-2 text-xs text-slate-600">
                   <input id="sameAsShippingCheckbox" type="checkbox" class="h-4 w-4 rounded border-sky-200 text-sky-500">
                   Same as shipping
                 </label>
@@ -203,14 +203,14 @@
           </form>
         </div>
 
-        <aside class="h-fit rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
-          <div class="mb-4 flex items-center justify-between gap-3">
+        <aside class="h-fit rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 class="text-lg font-bold text-slate-900">Order Summary</h2>
             <span class="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-sky-700">Current Product</span>
           </div>
 
           <div class="rounded-[1rem] border border-sky-100 bg-white/90 p-3">
-            <div class="flex items-center gap-3">
+            <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center">
               <div class="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[0.8rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100">
                 <img src="${productImage}" alt="${titleText}" class="h-full w-full object-contain">
               </div>
@@ -271,7 +271,7 @@
                 Continue to Shopping
               </a>
             </div>
-            <div class="grid grid-cols-3 gap-3 border-t border-sky-100 pt-4 text-center">
+            <div class="grid grid-cols-1 gap-4 border-t border-sky-100 pt-4 text-center sm:grid-cols-3 sm:gap-3">
               <div class="flex flex-col items-center">
                 <div class="flex h-11 w-11 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm">
                   <i class="fas fa-truck-fast text-[15px]"></i>
