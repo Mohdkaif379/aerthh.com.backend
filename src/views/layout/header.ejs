@@ -1,21 +1,21 @@
 <!-- Fixed Header Wrapper -->
-<div class="fixed top-0 left-0 w-full z-[1200]">
+<div class="fixed top-2 sm:top-0 left-0 w-full z-[1200] px-2 sm:px-0">
   <!-- Banner with reduced height -->
   <div
     class="bg-gradient-to-r from-sky-100 to-blue-50 text-slate-700 text-center py-1 text-xs font-medium overflow-hidden relative">
     <div class="carousel-container whitespace-nowrap animate-marquee">
-      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+      <span class="inline-block px-10 sm:px-16 lg:px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
         Limited time only!</span>
-      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+      <span class="inline-block px-10 sm:px-16 lg:px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
         Limited time only!</span>
-      <span class="inline-block px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
+      <span class="inline-block px-10 sm:px-16 lg:px-32"><i class="fas fa-gift mr-2"></i> Special Offer: Get 20% off on all products!
         Limited time only!</span>
     </div>
   </div>
 
   <!-- Top utility bar (currency/language) -->
   <div class="bg-[linear-gradient(180deg,#eef7ff_0%,#e7f3ff_100%)] border-b border-sky-100 py-0.5">
-    <div class="max-w-7xl mx-auto px-3 flex items-center justify-end gap-3 text-sm">
+    <div class="max-w-7xl mx-auto px-3 flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:gap-3 text-sm">
 
       <!-- Currency Dropdown -->
       <div class="relative" x-data="{ open: false }">
@@ -90,20 +90,20 @@
   </div>
 
   <!-- Full Width Section with White Background -->
-  <div class="w-full bg-[linear-gradient(180deg,#ecf7ff_0%,#dff1ff_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.12)] relative z-[500] overflow-visible border-b border-sky-100/80">
-    <div class="px-6 py-2">
-      <div class="flex items-center justify-between gap-4 overflow-visible">
+  <div class="w-full bg-[linear-gradient(180deg,#ecf7ff_0%,#dff1ff_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.12)] relative z-[500] overflow-visible border-b border-sky-100/80 rounded-2xl sm:rounded-none">
+    <div class="px-3 sm:px-4 lg:px-6 py-2">
+      <div class="flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 sm:gap-4 overflow-visible">
 
         <!-- Left: logo -->
         <a href="/"
-          class="flex items-center gap-2 text-gray-700 font-bold text-sm hover:text-sky-700 transition-colors duration-200">
+          class="flex items-center gap-2 text-gray-700 font-bold text-sm hover:text-sky-700 transition-colors duration-200 shrink-0">
           <img src="https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp" alt="AERTHH logo"
             class="w-10 h-10 rounded-lg object-cover shadow-md">
           <span>AERTHH</span>
         </a>
 
         <!-- Search Bar centered -->
-        <div class="relative flex-1 flex justify-center">
+        <div class="relative order-3 lg:order-none basis-full lg:basis-auto flex-1 flex justify-center">
           <div class="relative w-full max-w-lg">
             <input type="text" placeholder="Search for items..."
               class="w-full pl-10 pr-4 py-2 text-sm bg-sky-50/60 border border-sky-100 rounded-full focus:outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-300 transition-all duration-200" />
@@ -112,7 +112,7 @@
         </div>
 
         <!-- Right Side: Wishlist, User, Cart -->
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-2 sm:gap-3 lg:gap-4 ml-auto">
 
           <!-- Wishlist Icon with Anchor Tag -->
           <a href="/wishlist"
@@ -123,9 +123,9 @@
           </a>
 
           <!-- User Dropdown (on hover) -->
-          <div
+          <div x-data="{ open: false }"
             class="relative group bg-sky-50/80 backdrop-blur-sm border border-sky-200 shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 transition-all duration-200 p-2 rounded-full overflow-visible">
-            <a href="#" class="flex items-center gap-1 cursor-pointer">
+            <a href="#" @click.prevent="open = !open" class="flex items-center gap-1 cursor-pointer">
               <img id="headerUserAvatar" src="" alt="User profile"
                 class="hidden w-8 h-8 rounded-full object-cover border border-sky-200">
               <i id="headerUserIcon"
@@ -134,7 +134,9 @@
 
             <!-- Dropdown Menu -->
             <div
-              class="absolute right-0 top-full mt-2 w-32 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
+              @click.away="open = false"
+              :class="open ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 md:translate-y-0'"
+              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-32 bg-white rounded-lg shadow-lg transition-all duration-200 z-[10000] border border-gray-100 md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible">
               <div class="py-2">
                 <a id="headerSignInLink" href="/auth/customer/signin"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
@@ -153,17 +155,19 @@
           </div>
 
           <!-- Cart Dropdown -->
-          <div
+          <div x-data="{ open: false }"
             class="relative group bg-sky-50/80 backdrop-blur-sm border border-sky-200 shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 transition-all duration-200 p-2 rounded-full overflow-visible">
-            <a href="#" class="flex items-center gap-2 cursor-pointer">
+            <a href="#" @click.prevent="open = !open" class="flex items-center gap-1 sm:gap-2 cursor-pointer">
               <i
                 class="fas fa-shopping-cart text-gray-600 hover:text-gray-900 text-xl transition-colors duration-200"></i>
-              <span class="text-sm font-semibold text-gray-700">0.00</span>
-              <i class="fas fa-chevron-down text-gray-500 text-xs"></i>
+              <span class="hidden sm:inline text-sm font-semibold text-gray-700">0.00</span>
+              <i class="hidden sm:inline fas fa-chevron-down text-gray-500 text-xs"></i>
             </a>
 
             <div
-              class="absolute right-0 top-full mt-2 w-64 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[9999] border border-gray-100">
+              @click.away="open = false"
+              :class="open ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible translate-y-2 md:translate-y-0'"
+              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-[min(16rem,calc(100vw-1.5rem))] sm:w-64 bg-white rounded-lg shadow-lg transition-all duration-200 z-[10000] border border-gray-100 md:opacity-0 md:invisible md:group-hover:opacity-100 md:group-hover:visible">
               <div class="p-4">
                 <div class="text-center py-4">
                   <i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>
@@ -185,10 +189,11 @@
 
 
   <!-- Modern Header with Glassmorphism, reduced height and centered -->
-  <div class="flex justify-center w-full px-4 mt-2">
+  <div class="flex justify-center w-full px-3 sm:px-4 mt-2">
     <header
-      class="sticky top-6 z-[600] bg-[linear-gradient(180deg,rgba(233,245,255,0.96)_0%,rgba(219,239,255,0.92)_100%)] backdrop-blur-md border border-sky-100/80 shadow-[0_14px_36px_rgba(125,211,252,0.16)] w-full max-w-2xl rounded-2xl overflow-visible">
-      <div class="max-w-7xl mx-auto px-4 py-2">
+      x-data="{ mobileNavOpen: false }"
+      class="sticky top-4 sm:top-6 z-[600] bg-[linear-gradient(180deg,rgba(233,245,255,0.96)_0%,rgba(219,239,255,0.92)_100%)] backdrop-blur-md border border-sky-100/80 shadow-[0_14px_36px_rgba(125,211,252,0.16)] w-full max-w-2xl rounded-2xl overflow-visible">
+      <div class="max-w-7xl mx-auto px-3 sm:px-4 py-2">
         <div class="flex items-center justify-between gap-3">
 
           <!-- Logo with IMAGE from URL -->
@@ -199,7 +204,7 @@
           </div>
 
           <!-- Navigation CENTERED -->
-          <nav class="flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
+          <nav class="hidden md:flex items-center gap-6 lg:gap-12 absolute left-1/2 transform -translate-x-1/2">
             <a href="/"
               class="nav-link text-sky-600 hover:text-sky-800 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2">
               <i class="fas fa-home"></i>
@@ -217,10 +222,34 @@
             </a>
           </nav>
 
+          <button type="button" @click="mobileNavOpen = !mobileNavOpen"
+            class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-full border border-sky-200 bg-sky-50/80 text-sky-700 shadow-sm">
+            <i class="fas" :class="mobileNavOpen ? 'fa-times' : 'fa-bars'"></i>
+          </button>
+
           <!-- Empty div to maintain spacing -->
-          <div class="w-[100px]"></div>
+          <div class="hidden md:block w-[100px]"></div>
 
         </div>
+
+        <nav x-show="mobileNavOpen" x-transition @click.away="mobileNavOpen = false"
+          class="md:hidden mt-3 border-t border-sky-100 pt-3 pb-1 flex flex-col gap-2">
+          <a href="/"
+            class="nav-link text-sky-600 hover:text-sky-800 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-sky-50">
+            <i class="fas fa-home"></i>
+            Home
+          </a>
+          <a href="/about"
+            class="nav-link text-sky-600 hover:text-sky-800 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-sky-50">
+            <i class="fas fa-info-circle"></i>
+            About
+          </a>
+          <a href="/products"
+            class="nav-link text-sky-600 hover:text-sky-800 font-semibold text-[14px] transition-colors duration-200 flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-sky-50">
+            <i class="fas fa-box"></i>
+            Products
+          </a>
+        </nav>
       </div>
     </header>
   </div>
