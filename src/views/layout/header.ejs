@@ -1,5 +1,5 @@
 <!-- Fixed Header Wrapper -->
-<div class="fixed top-2 sm:top-0 left-0 w-full z-[1200] px-2 sm:px-0">
+<div class="fixed top-0 left-0 w-full z-[1200] px-0">
   <!-- Banner with reduced height -->
   <div
     class="bg-gradient-to-r from-sky-100 to-blue-50 text-slate-700 text-center py-1 text-xs font-medium overflow-hidden relative">
@@ -90,7 +90,7 @@
   </div>
 
   <!-- Full Width Section with White Background -->
-  <div class="w-full bg-[linear-gradient(180deg,#ecf7ff_0%,#dff1ff_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.12)] relative z-[500] overflow-visible border-b border-sky-100/80 rounded-none">
+  <div class="w-full bg-[linear-gradient(180deg,#ecf7ff_0%,#dff1ff_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.12)] relative z-[900] overflow-visible border-b border-sky-100/80 rounded-none">
     <div class="px-3 sm:px-4 lg:px-6 py-2">
       <div class="flex flex-wrap lg:flex-nowrap items-center justify-between gap-3 sm:gap-4 overflow-visible">
 
@@ -142,7 +142,7 @@
               x-transition:leave-start="opacity-100 translate-y-0"
               x-transition:leave-end="opacity-0 translate-y-2"
               @click.away="open = false"
-              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-32 bg-white rounded-lg shadow-lg transition-all duration-200 z-[10000] border border-gray-100">
+              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-32 bg-white rounded-lg shadow-lg transition-all duration-200 z-[12000] border border-gray-100">
               <div class="py-2">
                 <a id="headerSignInLink" href="/auth/customer/signin"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
@@ -179,7 +179,7 @@
               x-transition:leave-start="opacity-100 translate-y-0"
               x-transition:leave-end="opacity-0 translate-y-2"
               @click.away="open = false"
-              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-[min(16rem,calc(100vw-1.5rem))] sm:w-64 bg-white rounded-lg shadow-lg transition-all duration-200 z-[10000] border border-gray-100">
+              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-[min(16rem,calc(100vw-1.5rem))] sm:w-64 bg-white rounded-lg shadow-lg transition-all duration-200 z-[12000] border border-gray-100">
               <div class="p-4">
                 <div class="text-center py-4">
                   <i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>
@@ -201,7 +201,7 @@
 
 
   <!-- Modern Header with Glassmorphism, reduced height and centered -->
-  <div class="flex justify-center w-full px-3 sm:px-4 mt-2">
+  <div class="flex justify-center w-full px-0 sm:px-4 mt-2 sm:mt-2 relative z-[600]">
     <header
       x-data="{ mobileNavOpen: false }"
       class="sticky top-4 sm:top-6 z-[600] bg-[linear-gradient(180deg,rgba(233,245,255,0.96)_0%,rgba(219,239,255,0.92)_100%)] backdrop-blur-md border border-sky-100/80 shadow-[0_14px_36px_rgba(125,211,252,0.16)] w-full max-w-2xl rounded-2xl overflow-visible">
