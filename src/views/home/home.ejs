@@ -27,13 +27,13 @@
     }
   </style>
   <!-- Banner Carousel Section -->
-  <section class="w-full pt-2 pb-8">
+  <section class="w-full pt-6 sm:pt-2 pb-6 sm:pb-8">
     <div class="w-full px-0">
-      <div class="relative w-full overflow-hidden shadow-xl rounded-2xl">
-        <div class="relative h-64 md:h-96 lg:h-[500px] overflow-hidden rounded-2xl">
+      <div class="relative w-full overflow-hidden shadow-xl rounded-xl sm:rounded-2xl">
+        <div class="relative h-[220px] sm:h-64 md:h-96 lg:h-[500px] overflow-hidden rounded-xl sm:rounded-2xl">
           ${slideHtml}
         </div>
-        <div class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+        <div class="absolute bottom-3 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
           ${dots}
         </div>
       </div>
@@ -42,22 +42,22 @@
 
 
 
-  <section class="py-8 ">
-    <div class="w-full px-4 md:px-6">
-      <h2 class="text-2xl font-bold mb-4">Categories</h2>
+  <section class="py-6 sm:py-8 ">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <h2 class="text-xl sm:text-2xl font-bold mb-4">Categories</h2>
       <div class="relative">
-        <div class="cat-track flex gap-8 overflow-x-auto pb-2 hide-scroll scroll-smooth">
+        <div class="cat-track flex gap-4 sm:gap-6 lg:gap-8 overflow-x-auto pb-2 hide-scroll scroll-smooth">
           <!-- categories will be injected via JS -->
         </div>
       </div>
     </div>
   </section>
 
-  <section class="py-4 pb-10">
-    <div class="w-full px-4 md:px-6">
-      <div class="rounded-[2rem] bg-[linear-gradient(180deg,#edf7ff_0%,#e2f2ff_100%)] p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-4">
-          <h2 class="text-2xl font-bold">Featured Products</h2>
+  <section class="py-4 pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#edf7ff_0%,#e2f2ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <h2 class="text-xl sm:text-2xl font-bold">Featured Products</h2>
           <a href="/products"
             class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 transition hover:text-sky-900">
             <span>View All</span>
@@ -65,7 +65,7 @@
           </a>
         </div>
         <div class="relative">
-          <div class="featured-track grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="featured-track grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <!-- featured products will be injected via JS -->
           </div>
         </div>
@@ -73,9 +73,9 @@
     </div>
   </section>
 
-  <section class="pb-10">
-    <div class="w-full px-4 md:px-6">
-      <div class="grid gap-6 lg:grid-cols-[0.72fr_2.28fr]">
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="grid gap-5 sm:gap-6 lg:grid-cols-[0.72fr_2.28fr]">
         <div class="rounded-[0.8rem] border border-sky-200 bg-[linear-gradient(180deg,#edf7ff_0%,#e2f2ff_100%)] p-3 shadow-sm">
           <div class="mb-4">
             <h2 class="text-[16px] font-bold uppercase tracking-[0.06em] text-sky-700">RECOMMENDED PRODUCT</h2>
@@ -86,7 +86,7 @@
         </div>
 
         <div>
-          <div class="mb-5 flex items-center justify-between gap-4">
+          <div class="mb-5 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
             <h2 class="text-[18px] font-bold text-[#0f172a] md:text-[20px]">Latest Products</h2>
             <a href="/products"
               class="inline-flex items-center gap-2 text-[13px] font-medium text-sky-700 transition hover:text-sky-600">
@@ -95,7 +95,7 @@
             </a>
           </div>
           <div class="relative">
-            <div class="latest-track grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div class="latest-track grid grid-cols-1 gap-3 sm:gap-4 sm:grid-cols-2 xl:grid-cols-4">
               <!-- latest products will be injected via JS -->
             </div>
           </div>
@@ -104,26 +104,26 @@
     </div>
   </section>
 
-  <section class="pb-10">
-    <div class="w-full px-4 md:px-6">
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
       <div class="mb-4 flex items-center justify-between gap-4">
-        <h2 class="text-2xl font-bold">Brands</h2>
+        <h2 class="text-xl sm:text-2xl font-bold">Brands</h2>
       </div>
       <div class="relative">
-        <div class="brand-track flex gap-8 overflow-x-auto pb-2 hide-scroll scroll-smooth">
+        <div class="brand-track flex gap-4 sm:gap-6 lg:gap-8 overflow-x-auto pb-2 hide-scroll scroll-smooth">
           <!-- brands will be injected via JS -->
         </div>
       </div>
     </div>
   </section>
 
-  <section class="pb-10">
-    <div class="w-full px-4 md:px-6">
-      <div class="rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
-        <div class="mb-4 flex items-center justify-between gap-4">
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           <div>
             <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Save More</p>
-            <h2 class="text-2xl font-bold text-slate-900">Top Deals</h2>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Top Deals</h2>
           </div>
           <a href="/products"
             class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 transition hover:text-sky-900">
@@ -133,7 +133,7 @@
         </div>
         <p class="mb-5 text-sm text-slate-600">Products with discounts up to 40% off, picked from the latest catalogue.</p>
         <div class="relative">
-          <div class="top-deals-track grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div class="top-deals-track grid grid-cols-1 gap-4 sm:gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <!-- top deals products will be injected via JS -->
           </div>
         </div>
@@ -141,10 +141,10 @@
     </div>
   </section>
 
-  <section class="pb-10">
-    <div class="w-full px-4 md:px-6">
-      <div class="mx-3 rounded-[0.8rem] bg-[linear-gradient(180deg,#edf7ff_0%,#e2f2ff_100%)] px-4 py-6 md:mx-6 md:px-6 md:py-8 lg:mx-10 xl:mx-14 ring-1 ring-sky-100">
-        <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="mx-0 sm:mx-1 md:mx-3 rounded-[0.8rem] bg-[linear-gradient(180deg,#edf7ff_0%,#e2f2ff_100%)] px-4 py-6 md:px-6 md:py-8 lg:mx-6 xl:mx-10 ring-1 ring-sky-100">
+        <div class="grid gap-5 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
           <div class="flex flex-col items-center justify-center text-center xl:border-r xl:border-[#cfe2ff]">
             <div class="flex h-20 w-20 items-center justify-center rounded-full bg-sky-50 shadow-sm ring-1 ring-sky-100">
               <i class="fas fa-truck-fast text-[28px] text-slate-500"></i>
@@ -177,7 +177,7 @@
   <div id="latestProductModal"
     class="fixed inset-0 z-[1400] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
     <div
-      class="latest-product-modal-panel hide-scroll relative max-h-[78vh] w-full max-w-[1040px] overflow-y-auto rounded-[0.4rem] bg-white shadow-2xl">
+      class="latest-product-modal-panel hide-scroll relative max-h-[84vh] w-full max-w-[1040px] overflow-y-auto rounded-[0.4rem] bg-white shadow-2xl sm:max-h-[78vh]">
       <button id="closeLatestProductModal" type="button"
         class="absolute right-4 top-4 z-20 flex h-10 w-10 items-center justify-center rounded-full text-slate-400 transition hover:bg-slate-100 hover:text-slate-700">
         <i class="fas fa-times text-xl"></i>
@@ -215,7 +215,7 @@
       dots.forEach((dot, i) => dot.addEventListener('click', () => { showSlide(i); resetAutoSlide(); }));
       autoSlideInterval = setInterval(nextSlide, 5000);
       const carousel = document.querySelector('.relative.w-full.overflow-hidden');
-      if (carousel) {
+      if (carousel && window.matchMedia('(hover: hover)').matches) {
         carousel.addEventListener('mouseenter', () => clearInterval(autoSlideInterval));
         carousel.addEventListener('mouseleave', () => { autoSlideInterval = setInterval(nextSlide, 5000); });
       }
@@ -238,8 +238,8 @@
           const categoryId = cat.id || cat.category_id || '';
           const targetHref = '/products?category=' + encodeURIComponent(categoryId) + '&category_name=' + encodeURIComponent(cat.name || '');
           return ''
-            + '<a href=\"' + targetHref + '\" class=\"cat-card min-w-[120px] flex-shrink-0 flex flex-col items-center gap-2  rounded-2xl p-6  transition-transform outline-none\">'
-            + '<div class=\"w-20 h-20 md:w-24 md:h-24 rounded-full  flex items-center justify-center overflow-hidden ring-2 ring-white/50\">'
+            + '<a href=\"' + targetHref + '\" class=\"cat-card min-w-[104px] sm:min-w-[120px] flex-shrink-0 flex flex-col items-center gap-2 rounded-2xl p-3 sm:p-6 transition-transform outline-none\">'
+            + '<div class=\"w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center overflow-hidden ring-2 ring-white/50\">'
             + '<img src=\"' + (cat.image || '') + '\" alt=\"' + (cat.name || '') + '\" class=\"w-full h-full object-cover\">'
             + '</div>'
             + '<span class=\"text-sm font-semibold text-gray-800 text-center leading-tight\">' + (cat.name || '') + '</span>'
@@ -257,8 +257,8 @@
           const targetHref = '/products?brand=' + encodeURIComponent(brandId) + '&brand_name=' + encodeURIComponent(brand.name || '');
 
           return ''
-            + '<a href="' + targetHref + '" class="brand-card min-w-[120px] flex-shrink-0 flex flex-col items-center gap-2 px-3 py-2 transition-transform outline-none">'
-            +   '<div class="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center overflow-hidden bg-transparent">'
+            + '<a href="' + targetHref + '" class="brand-card min-w-[104px] sm:min-w-[120px] flex-shrink-0 flex flex-col items-center gap-2 px-2 sm:px-3 py-2 transition-transform outline-none">'
+            +   '<div class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center overflow-hidden bg-transparent">'
             +     '<img src="' + brandImage + '" alt="' + (brand.name || 'Brand') + '" class="w-full h-full object-cover">'
             +   '</div>'
             +   '<span class="text-sm font-semibold text-gray-800 text-center leading-tight">' + (brand.name || 'Brand') + '</span>'
@@ -295,8 +295,8 @@
           const discountDisplay = discount ? (discountType === 'percent' ? 'Percent' : 'Flat') + '-' + discount.replace(/^-/, '') : '';
 
           return ''
-            + '<a href="' + productHref + '" class="featured-card w-full rounded-3xl bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2.5 transition-transform duration-200 hover:-translate-y-1 ring-1 ring-sky-100">'
-            + '<div class="relative h-[195px] w-full overflow-hidden rounded-2xl bg-sky-50/70 ring-1 ring-sky-100">'
+            + '<a href="' + productHref + '" class="featured-card w-full rounded-[1.25rem] sm:rounded-3xl bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2.5 transition-transform duration-200 hover:-translate-y-1 ring-1 ring-sky-100">'
+            + '<div class="relative h-[170px] sm:h-[195px] w-full overflow-hidden rounded-[1rem] sm:rounded-2xl bg-sky-50/70 ring-1 ring-sky-100">'
             + (discountDisplay ? '<span class="absolute left-2.5 top-2.5 z-10 rounded-md bg-sky-400 px-2 py-1 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
             + '<img src="' + image + '" alt="' + title + '" class="h-full w-full object-contain">'
             + '</div>'
@@ -343,7 +343,7 @@
 
           return ''
             + '<a href="' + productHref + '" class="latest-card w-full rounded-2xl border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2 shadow-sm transition-transform duration-200 hover:-translate-y-1">'
-            + '<div class="relative h-[150px] overflow-hidden rounded-2xl bg-sky-50/70">'
+            + '<div class="relative h-[165px] sm:h-[150px] overflow-hidden rounded-2xl bg-sky-50/70">'
             + (discountDisplay ? '<span class="absolute left-3 top-3 z-10 rounded-md bg-sky-500 px-2.5 py-1.5 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
             + '<button type="button" class="latest-product-view-btn absolute inset-0 z-10 flex items-center justify-center bg-slate-900/0 opacity-0 transition-all duration-200 hover:bg-slate-900/35 hover:opacity-100 focus:bg-slate-900/35 focus:opacity-100" data-product-id="' + (product.id || '') + '" aria-label="View product details">'
             + '<span class="flex h-11 w-11 items-center justify-center rounded-full bg-sky-50 text-sky-600 shadow-lg ring-1 ring-sky-100"><i class="fas fa-eye"></i></span>'
@@ -454,18 +454,18 @@
           : '<p class="text-[12px] leading-5 text-slate-500">Reviews unavailable for this product.</p>';
 
         latestProductModalContent.innerHTML = ''
-          + '<div class="border-b border-slate-200 px-5 py-3.5 md:px-6">'
+          + '<div class="border-b border-slate-200 px-4 py-3.5 sm:px-5 md:px-6">'
           + '<div class="flex items-center gap-3 text-slate-900">'
           + '<h3 class="text-[20px] font-medium tracking-tight">' + title + '</h3>'
           + '<i class="fas fa-angle-right text-[20px] text-sky-500"></i>'
           + '</div>'
           + '</div>'
-          + '<div class="grid gap-3 p-4 md:grid-cols-[0.88fr_1.12fr] md:p-4">'
+          + '<div class="grid gap-3 p-3 sm:p-4 md:grid-cols-[0.88fr_1.12fr] md:p-4">'
           + '<div>'
           + '<div class="rounded-[0.35rem] border border-[#dce8ff] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2">'
-          + '<div class="relative flex h-[290px] items-center justify-center overflow-hidden rounded-[0.3rem] bg-sky-50/70">'
+          + '<div class="relative flex h-[220px] sm:h-[260px] md:h-[290px] items-center justify-center overflow-hidden rounded-[0.3rem] bg-sky-50/70">'
           + (discountDisplay ? '<span class="absolute left-4 top-4 z-10 rounded-md bg-sky-500 px-2.5 py-1 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
-          + '<img id="latestProductMainImage" src="' + image + '" alt="' + title + '" class="h-[250px] w-full object-contain">'
+          + '<img id="latestProductMainImage" src="' + image + '" alt="' + title + '" class="h-[190px] sm:h-[220px] md:h-[250px] w-full object-contain">'
           + '</div>'
           + '</div>'
           + additionalImagesHtml
@@ -477,7 +477,7 @@
           + '<span class="text-[24px] font-bold text-slate-700">' + formatMoney(finalPrice) + '</span>'
           + '</div>'
           + (discountDisplay ? '<p class="mt-1.5 text-[12px] font-semibold text-sky-600">Discount: ' + discountDisplay + '</p>' : '')
-          + '<div class="mt-5 flex items-center gap-3">'
+          + '<div class="mt-5 flex flex-wrap items-center gap-3">'
           + '<span class="text-[14px] font-semibold text-slate-700">Quantity :</span>'
           + '<div class="flex items-center overflow-hidden rounded-[0.35rem] border border-sky-300">'
           + '<button type="button" class="latest-product-qty-btn flex h-[34px] w-[34px] items-center justify-center text-[17px] text-sky-700" data-direction="decrement">-</button>'
@@ -487,13 +487,13 @@
           + '</div>'
           + '<div class="mt-4 text-[13px] font-semibold text-slate-700">Total Price : <span id="latestProductTotalPrice" class="text-[13px] font-bold text-slate-800">' + formatMoney(finalPrice) + '</span></div>'
           + '<div class="mt-4 flex flex-wrap items-center gap-2.5">'
-          + '<a href="/products/buy?id=' + (product.id || '') + '" class="inline-flex items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy now</a>'
-          + '<a href="/products/' + (product.slug || product.id || '') + '" class="inline-flex items-center justify-center rounded-[0.45rem] bg-slate-700 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:bg-slate-800">Add to cart</a>'
+          + '<a href="/products/buy?id=' + (product.id || '') + '" class="inline-flex min-w-[130px] items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy now</a>'
+          + '<a href="/products/' + (product.slug || product.id || '') + '" class="inline-flex min-w-[130px] items-center justify-center rounded-[0.45rem] bg-slate-700 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:bg-slate-800">Add to cart</a>'
           + '<button type="button" class="inline-flex h-[40px] min-w-[70px] items-center justify-center gap-2 rounded-[0.45rem] border border-sky-100 bg-sky-50 px-3 text-[12px] text-slate-500 transition hover:border-sky-200 hover:text-slate-700"><i class="far fa-heart"></i><span>0</span></button>'
           + '</div>'
           + '</div>'
           + '<div class="md:col-span-2 rounded-[0.35rem] border border-[#dce8ff] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-3.5 md:p-4">'
-          + '<div class="flex flex-wrap items-center justify-center gap-8 border-b border-slate-200 pb-3">'
+          + '<div class="flex flex-wrap items-center justify-center gap-5 sm:gap-8 border-b border-slate-200 pb-3">'
           + '<button type="button" class="latest-product-tab-btn border-b-2 border-sky-500 px-1 pb-2 text-[13px] font-semibold text-sky-600 transition" data-tab="description">Description</button>'
           + '<button type="button" class="latest-product-tab-btn border-b-2 border-transparent px-1 pb-2 text-[13px] font-semibold text-slate-500 transition hover:text-sky-600" data-tab="reviews">Reviews</button>'
           + '</div>'
@@ -618,7 +618,7 @@
           + '<div class="rounded-[0.8rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2.5 ring-1 ring-sky-100">'
           + '<div class="relative overflow-hidden rounded-[0.6rem] border border-sky-100 bg-sky-50/70">'
           + (discountDisplay ? '<span class="absolute left-3 top-3 z-10 rounded-md bg-sky-500 px-2.5 py-1.5 text-[11px] font-bold text-white">' + discountDisplay + '</span>' : '')
-          + '<img src="' + image + '" alt="' + title + '" class="h-[185px] w-full object-contain">'
+          + '<img src="' + image + '" alt="' + title + '" class="h-[170px] sm:h-[185px] w-full object-contain">'
           + '</div>'
           + '<div class="pt-2 text-center">'
           + '<h3 class="truncate text-[14px] font-medium uppercase tracking-[0.02em] text-[#0f172a]">' + title + '</h3>'

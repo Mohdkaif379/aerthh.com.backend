@@ -59,15 +59,15 @@
     .animate-marquee { animation: marquee 12s linear infinite; }
   </style>
 </head>
-<body class="bg-white font-sans antialiased">
+<body class="bg-white font-sans antialiased min-w-0">
 
   <%- include('./header') %>
 
   <!-- spacer for fixed header -->
-  <div class="h-[200px]"></div>
+  <div class="h-[220px] sm:h-[230px] md:h-[240px] lg:h-[200px]"></div>
 
-  <main class="max-w-none px-0">
-    <div class="max-w-7xl mx-auto px-2 py-0">
+  <main class="max-w-none px-0 min-w-0">
+    <div class="max-w-7xl mx-auto w-full px-3 sm:px-4 md:px-5 lg:px-2 py-0">
       <%- body || '' %>
     </div>
   </main>
