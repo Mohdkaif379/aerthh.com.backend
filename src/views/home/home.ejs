@@ -188,12 +188,49 @@
     </div>
   </div>
 
+  <div id="termsPolicyModal"
+    class="fixed inset-0 z-[1500] hidden items-center justify-center bg-slate-950/65 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-xl overflow-hidden rounded-[1.2rem] bg-white shadow-2xl ring-1 ring-sky-100">
+      <div class="bg-[linear-gradient(135deg,#0ea5e9_0%,#2563eb_100%)] px-5 py-5 text-white sm:px-6">
+        <p class="text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-100">Welcome</p>
+        <h3 class="mt-2 text-2xl font-bold">Terms & Conditions</h3>
+        <p class="mt-2 text-sm leading-6 text-sky-50">Site use karne se pehle policy accept karna zaroori hai.</p>
+      </div>
+      <div class="space-y-4 px-5 py-5 sm:px-6">
+        <div class="rounded-2xl border border-sky-100 bg-sky-50/70 p-4 text-sm leading-6 text-slate-600">
+          <p>By continuing, you confirm that:</p>
+          <ul class="mt-3 space-y-2 text-slate-600">
+            <li>You agree to this website's terms of use and privacy policy.</li>
+            <li>Product pricing, stock, and offers may change without prior notice.</li>
+            <li>Orders are processed subject to availability and verification.</li>
+          </ul>
+        </div>
+        <label class="flex items-start gap-3 rounded-2xl border border-slate-200 p-4 text-sm text-slate-600">
+          <input id="termsPolicyCheckbox" type="checkbox" class="mt-1 h-4 w-4 rounded border-sky-300 text-sky-500 focus:ring-sky-400">
+          <span>I have read and accept the Terms & Conditions and Privacy Policy.</span>
+        </label>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <button id="rejectTermsPolicyBtn" type="button"
+            class="inline-flex items-center justify-center rounded-[0.9rem] border border-sky-200 bg-sky-50 px-5 py-3 text-sm font-semibold text-sky-700 transition hover:border-sky-300 hover:bg-sky-100">
+            Reject
+          </button>
+          <button id="acceptTermsPolicyBtn" type="button"
+            class="inline-flex items-center justify-center rounded-[0.9rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">
+            Accept
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
+      const termsStorageKey = 'home_terms_policy_accepted';
       let currentSlide = 0;
       const slides = document.querySelectorAll('.carousel-slide');
       const dots = document.querySelectorAll('.carousel-dot');
       let autoSlideInterval;
+      
 
       function showSlide(index) {
         if (index < 0) index = slides.length - 1;
@@ -230,7 +267,58 @@
       const latestProductModal = document.getElementById('latestProductModal');
       const latestProductModalContent = document.getElementById('latestProductModalContent');
       const closeLatestProductModal = document.getElementById('closeLatestProductModal');
+      const termsPolicyModal = document.getElementById('termsPolicyModal');
+      const termsPolicyCheckbox = document.getElementById('termsPolicyCheckbox');
+      const acceptTermsPolicyBtn = document.getElementById('acceptTermsPolicyBtn');
+      const rejectTermsPolicyBtn = document.getElementById('rejectTermsPolicyBtn');
       const latestProductMap = new Map();
+
+      function openTermsPolicyModal() {
+        if (!termsPolicyModal) return;
+        termsPolicyModal.classList.remove('hidden');
+        termsPolicyModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      function closeTermsPolicyModal() {
+        if (!termsPolicyModal) return;
+        termsPolicyModal.classList.add('hidden');
+        termsPolicyModal.classList.remove('flex');
+        if (!latestProductModal || latestProductModal.classList.contains('hidden')) {
+          document.body.classList.remove('overflow-hidden');
+        }
+      }
+
+      function initTermsPolicyModal() {
+        if (!termsPolicyModal) return;
+
+        const isAccepted = window.localStorage.getItem(termsStorageKey) === 'true';
+        if (!isAccepted) {
+          openTermsPolicyModal();
+        }
+
+        if (acceptTermsPolicyBtn) {
+          acceptTermsPolicyBtn.addEventListener('click', function () {
+            if (!termsPolicyCheckbox || !termsPolicyCheckbox.checked) {
+              if (termsPolicyCheckbox) {
+                termsPolicyCheckbox.focus();
+              }
+              window.alert('Please accept Terms & Conditions to continue.');
+              return;
+            }
+
+            window.localStorage.setItem(termsStorageKey, 'true');
+            closeTermsPolicyModal();
+          });
+        }
+
+        if (rejectTermsPolicyBtn) {
+          rejectTermsPolicyBtn.addEventListener('click', function () {
+            window.localStorage.removeItem(termsStorageKey);
+            window.location.href = '/';
+          });
+        }
+      }
 
       function renderCategoriesClient(cats) {
         if (!Array.isArray(cats)) return '';
@@ -779,6 +867,7 @@
         }
       });
 
+      initTermsPolicyModal();
       loadCategories();
       loadBrands();
       loadFeaturedProducts();
