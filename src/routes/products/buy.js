@@ -12,11 +12,23 @@ async function fetchSingleProduct(productId) {
   console.log('[buy-route] api response status:', resp.status);
   console.log('[buy-route] api response body:', JSON.stringify(data));
 
-  if (!resp.ok || !data?.status) {
+  if (!resp.ok) {
     throw new Error(data?.message || `HTTP ${resp.status}`);
   }
 
-  return data.data || null;
+  if (data && typeof data === 'object' && data.data && typeof data.data === 'object') {
+    return data.data;
+  }
+
+  if (data && typeof data === 'object' && (data.id || data.product_name || data.name)) {
+    return data;
+  }
+
+  if (data?.status === false) {
+    throw new Error(data?.message || 'Failed to fetch product.');
+  }
+
+  return null;
 }
 
 async function fetchAllProducts() {
@@ -88,7 +100,7 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/buy', async (req, res) => {
-  const rawProductId = req.query.id || req.params.id || req.query.product_id || '';
+  const rawProductId = req.query.id || req.query.product_id || req.params.id || req.query.slug || '';
   const productId = String(rawProductId).trim();
   let product = null;
   let similarProducts = [];

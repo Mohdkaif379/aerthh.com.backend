@@ -18,8 +18,15 @@ const port = 3000;
 
 // EJS setup
 app.set('view engine', 'ejs');
-// Point to src/views (not project root) so lookups like res.render('home') work
-app.set('views', path.join(__dirname, 'views'));
+// Resolve the views directory defensively so template lookup keeps working
+// even if the app is started from a different entrypoint or working directory.
+const viewDirectories = [
+  path.join(__dirname, 'views'),
+  path.join(process.cwd(), 'src', 'views'),
+  path.join(process.cwd(), 'views')
+];
+const resolvedViewsDir = viewDirectories.find((dirPath) => fs.existsSync(dirPath)) || path.join(__dirname, 'views');
+app.set('views', resolvedViewsDir);
 
 // Static files
 app.use(express.static(path.join(__dirname, '../public')));
