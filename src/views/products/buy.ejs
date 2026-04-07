@@ -1,5 +1,6 @@
 <%
   const item = typeof product !== 'undefined' ? product : null;
+  const requestedProductId = String(typeof selectedProductId !== 'undefined' ? selectedProductId : '');
   const error = typeof errorMessage !== 'undefined' ? errorMessage : '';
   const relatedItems = typeof similarProducts !== 'undefined' && Array.isArray(similarProducts) ? similarProducts : [];
 
@@ -218,7 +219,7 @@
             const reviewsPanel = document.getElementById('buyReviewsPanel');
             const unitPrice = ${JSON.stringify(finalPriceNumber)};
             const taxAmount = ${JSON.stringify(taxAmountNumber)};
-            const productId = ${JSON.stringify(String(item?.id || ''))};
+            const productId = ${JSON.stringify(String(requestedProductId || item?.id || item?.product_id || item?._id || item?.slug || ''))};
 
             function hasCustomerSession() {
               try {

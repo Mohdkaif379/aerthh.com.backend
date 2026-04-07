@@ -1,6 +1,7 @@
 <%
   const item = typeof product !== 'undefined' ? product : null;
   const error = typeof errorMessage !== 'undefined' ? errorMessage : '';
+  const requestedProductId = String(typeof selectedProductId !== 'undefined' ? selectedProductId : '');
   const quantity = Math.max(Number(typeof qty !== 'undefined' ? qty : 1), 1);
   const formatMoney = (value) => new Intl.NumberFormat('en-IN', {
     style: 'currency',
@@ -24,6 +25,7 @@
   const totalPrice = subtotalPrice + taxAmountValue + shippingCostValue;
   const titleText = item?.product_name || item?.name || 'Selected Product';
   const productImage = item?.image || 'https://via.placeholder.com/320x320/eef7ff/64748b?text=Product';
+  const resolvedProductId = String(requestedProductId || item?.id || item?.product_id || item?._id || item?.slug || '');
   const discountLabel = discountValue > 0
     ? (discountType === 'percent'
         ? discountValue + '%'
@@ -216,7 +218,7 @@
               </div>
               <div class="min-w-0 flex-1">
                 <h3 class="line-clamp-2 text-sm font-semibold text-slate-800">${titleText}</h3>
-                <p class="mt-2 text-xs text-slate-500">Product ID: ${item?.id || '--'}</p>
+                <p class="mt-2 text-xs text-slate-500">Product ID: ${resolvedProductId || '--'}</p>
                 <p class="mt-1 text-xs text-slate-500">SKU: ${skuValue}</p>
                 <p class="mt-1 text-xs text-slate-500">Quantity: ${quantity}</p>
               </div>
@@ -306,7 +308,7 @@
       const billingRequiredFields = Array.from(document.querySelectorAll('[data-billing-required="true"]'));
       const checkoutAddressForm = document.getElementById('checkoutAddressForm');
       const checkoutPath = window.location.pathname + window.location.search;
-      const productId = ${JSON.stringify(String(item?.id || ''))};
+      const productId = ${JSON.stringify(resolvedProductId)};
       const quantity = ${JSON.stringify(quantity)};
       const submitBtn = document.querySelector('button[form="checkoutAddressForm"]');
       const messageBox = document.getElementById('addressFormMessage');

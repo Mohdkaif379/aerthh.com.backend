@@ -1,5 +1,7 @@
 <% const item=typeof product !=='undefined' ? product : null; const error=typeof errorMessage !=='undefined' ?
     errorMessage : '' ; const quantity=Math.max(Number(typeof qty !=='undefined' ? qty : 1), 1); const
+    requestedProductId = String(typeof selectedProductId !== 'undefined' ? selectedProductId : '');
+    const
     formatMoney=(value)=> new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
@@ -20,6 +22,7 @@
     const totalPrice = subtotalPrice + taxAmountValue + shippingCostValue;
     const titleText = item?.product_name || item?.name || 'Selected Product';
     const productImage = item?.image || 'https://via.placeholder.com/320x320/eef7ff/64748b?text=Product';
+    const resolvedProductId = String(requestedProductId || item?.id || item?.product_id || item?._id || item?.slug || '');
     const body = `
     <section class="px-3 pt-5 pb-8 sm:px-4 md:px-6 md:pt-5 md:pb-10">
         <div class="mx-auto max-w-[1280px]">
@@ -69,7 +72,7 @@
                         <p class="mt-2 text-sm text-slate-500">Review your product, address details, and payment
                             selection before placing the order.</p>
                     </div>
-                    <a href="/products/address?id=${encodeURIComponent(String(item?.id || ''))}&qty=${encodeURIComponent(String(quantity))}"
+                    <a href="/products/address?id=${encodeURIComponent(resolvedProductId)}&qty=${encodeURIComponent(String(quantity))}"
                         class="inline-flex w-full sm:w-auto items-center justify-center rounded-full bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-700 transition hover:bg-sky-100 hover:text-sky-900">Edit
                         Address</a>
                 </div>
@@ -85,7 +88,7 @@
                             </div>
                             <div class="min-w-0 flex-1">
                                 <h3 class="text-lg font-semibold text-slate-900">${titleText}</h3>
-                                <p class="mt-2 text-sm text-slate-500">Product ID: ${item?.id || '--'}</p>
+                                <p class="mt-2 text-sm text-slate-500">Product ID: ${resolvedProductId || '--'}</p>
                                 <p class="mt-1 text-sm text-slate-500">Quantity: ${quantity}</p>
                                 <p class="mt-1 text-sm font-semibold text-sky-700">Unit Price:
                                     ${formatMoney(finalUnitPrice)}</p>
@@ -247,7 +250,7 @@
             const orderSuccessPayment = document.getElementById('orderSuccessPayment');
             const orderSuccessTotal = document.getElementById('orderSuccessTotal');
         const checkoutPath = window.location.pathname + window.location.search;
-        const productId = ${ JSON.stringify(String(item?.id || ''))
+        const productId = ${ JSON.stringify(resolvedProductId)
         };
         const quantity = ${ JSON.stringify(quantity)};
         const shippingCost = ${ JSON.stringify(shippingCostValue)};

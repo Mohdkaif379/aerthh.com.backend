@@ -3,6 +3,32 @@ const express = require('express');
 const router = express.Router();
 const fetchFn = global.fetch || ((...args) => import('node-fetch').then(({ default: f }) => f(...args)));
 
+function normalizeProductEntity(payload, requestedProductId = '') {
+  const normalizedRequestedId = String(requestedProductId || '').trim();
+
+  if (!payload) return null;
+
+  if (Array.isArray(payload)) {
+    return payload.find((item) => String(item?.id || item?.product_id || item?._id || item?.slug || '') === normalizedRequestedId) || payload[0] || null;
+  }
+
+  if (typeof payload !== 'object') return null;
+
+  if (payload.data) {
+    return normalizeProductEntity(payload.data, requestedProductId);
+  }
+
+  if (payload.product) {
+    return normalizeProductEntity(payload.product, requestedProductId);
+  }
+
+  if (payload.id || payload.product_id || payload._id || payload.slug || payload.product_name || payload.name) {
+    return payload;
+  }
+
+  return null;
+}
+
 async function fetchSingleProduct(productId) {
   const baseUrl = process.env.BASE_URL || 'https://aerthh.newhopeindia17.com/api/';
   const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
@@ -13,11 +39,16 @@ async function fetchSingleProduct(productId) {
     throw new Error(data?.message || `HTTP ${response.status}`);
   }
 
-  return data.data || null;
+  const product = normalizeProductEntity(data, productId);
+  if (product) {
+    return product;
+  }
+
+  throw new Error('Product data was not found in API response.');
 }
 
 router.get('/', async (req, res) => {
-  const productId = String(req.query.id || '').trim();
+  const productId = String(req.query.id || req.query.product_id || req.query.slug || '').trim();
   const qty = Math.max(Number(req.query.qty || 1), 1);
   let product = null;
   let errorMessage = '';
@@ -36,6 +67,7 @@ router.get('/', async (req, res) => {
   res.render('checkout/checkout', {
     title: product?.product_name || 'Checkout',
     product,
+    selectedProductId: productId,
     qty,
     errorMessage
   });
