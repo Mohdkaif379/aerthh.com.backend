@@ -153,7 +153,7 @@
 
             <div class="mt-5 flex flex-wrap items-center gap-3">
               <button type="button" id="buyNowBtn" class="inline-flex min-w-[116px] flex-1 sm:flex-none items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[15px] font-medium text-white transition hover:from-sky-600 hover:to-blue-600">Buy now</button>
-              <button type="button" class="inline-flex min-w-[132px] flex-1 sm:flex-none items-center justify-center rounded-[0.45rem] border border-sky-200 bg-sky-50 px-5 py-2.5 text-[15px] font-medium text-sky-700 transition hover:border-sky-300 hover:bg-sky-100">Add to cart</button>
+              <button type="button" id="buyAddToCartBtn" class="inline-flex min-w-[132px] flex-1 sm:flex-none items-center justify-center rounded-[0.45rem] border border-sky-200 bg-sky-50 px-5 py-2.5 text-[15px] font-medium text-sky-700 transition hover:border-sky-300 hover:bg-sky-100">Add to cart</button>
             </div>
           </div>
 
@@ -215,11 +215,13 @@
             const qtyValueEl = document.getElementById('buyQtyValue');
             const totalPriceEl = document.getElementById('buyTotalPrice');
             const buyNowBtn = document.getElementById('buyNowBtn');
+            const buyAddToCartBtn = document.getElementById('buyAddToCartBtn');
             const descriptionPanel = document.getElementById('buyDescriptionPanel');
             const reviewsPanel = document.getElementById('buyReviewsPanel');
             const unitPrice = ${JSON.stringify(finalPriceNumber)};
             const taxAmount = ${JSON.stringify(taxAmountNumber)};
             const productId = ${JSON.stringify(String(requestedProductId || item?.id || item?.product_id || item?._id || item?.slug || ''))};
+            const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
 
             function hasCustomerSession() {
               try {
@@ -232,6 +234,65 @@
               } catch (error) {
                 return false;
               }
+            }
+
+            function getCustomerAuth() {
+              try {
+                return {
+                  token: localStorage.getItem('customerToken') || '',
+                  tokenType: localStorage.getItem('tokenType') || 'Bearer'
+                };
+              } catch (error) {
+                return { token: '', tokenType: 'Bearer' };
+              }
+            }
+
+            function openCartSuccessModal(message) {
+              const buyCartSuccessModal = document.getElementById('buyCartSuccessModal');
+              const buyCartSuccessMessage = document.getElementById('buyCartSuccessMessage');
+              if (!buyCartSuccessModal || !buyCartSuccessMessage) return;
+              buyCartSuccessMessage.textContent = message || 'Product added to cart successfully.';
+              buyCartSuccessModal.classList.remove('hidden');
+              buyCartSuccessModal.classList.add('flex');
+              document.body.classList.add('overflow-hidden');
+            }
+
+            function closeCartSuccessModal() {
+              const buyCartSuccessModal = document.getElementById('buyCartSuccessModal');
+              if (!buyCartSuccessModal) return;
+              buyCartSuccessModal.classList.add('hidden');
+              buyCartSuccessModal.classList.remove('flex');
+              document.body.classList.remove('overflow-hidden');
+            }
+
+            async function addToCart(quantity) {
+              const auth = getCustomerAuth();
+              if (!auth.token) {
+                const redirectTarget = '/products/buy?id=' + encodeURIComponent(productId);
+                window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent(redirectTarget);
+                return;
+              }
+
+              const response = await fetch(cartAddEndpoint, {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+                },
+                body: JSON.stringify({
+                  product_id: Number(productId),
+                  quantity: quantity
+                })
+              });
+
+              const result = await response.json();
+
+              if (!response.ok || !result?.status) {
+                throw new Error(result?.message || 'Unable to add product to cart.');
+              }
+
+              openCartSuccessModal(result?.message || 'Product added to cart successfully.');
             }
 
             document.querySelectorAll('.buy-gallery-thumb').forEach(function(button) {
@@ -299,6 +360,42 @@
                 window.location.href = checkoutUrl;
               });
             }
+
+            if (buyAddToCartBtn) {
+              buyAddToCartBtn.addEventListener('click', async function() {
+                const qty = Math.max(Number(qtyValueEl ? qtyValueEl.textContent : 1), 1);
+                const originalText = buyAddToCartBtn.innerHTML;
+
+                buyAddToCartBtn.disabled = true;
+                buyAddToCartBtn.innerHTML = 'Adding...';
+
+                try {
+                  await addToCart(qty);
+                } catch (error) {
+                  console.error('Add to cart error:', error);
+                  window.alert(error.message || 'Unable to add product to cart.');
+                } finally {
+                  buyAddToCartBtn.disabled = false;
+                  buyAddToCartBtn.innerHTML = originalText;
+                }
+              });
+            }
+
+            const buyCartSuccessModal = document.getElementById('buyCartSuccessModal');
+
+            if (buyCartSuccessModal) {
+              buyCartSuccessModal.addEventListener('click', function(event) {
+                if (event.target === buyCartSuccessModal) {
+                  closeCartSuccessModal();
+                }
+              });
+            }
+
+            document.addEventListener('click', function(event) {
+              if (event.target && event.target.id === 'buyCartSuccessCloseBtn') {
+                closeCartSuccessModal();
+              }
+            });
           })();
         </script>
       ` : `
@@ -306,6 +403,18 @@
       `}
     </div>
   </section>
+  <div id="buyCartSuccessModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+        <i class="fas fa-check text-xl"></i>
+      </div>
+      <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Added to Cart</h3>
+      <p id="buyCartSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to cart successfully.</p>
+      <div class="mt-5 flex justify-center">
+        <button id="buyCartSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+      </div>
+    </div>
+  </div>
   `; %>
 
 <%- include('../layout/app', { title: title || 'Buy', body }) %>

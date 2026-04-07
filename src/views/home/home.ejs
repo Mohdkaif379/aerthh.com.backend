@@ -223,6 +223,20 @@
     </div>
   </div>
 
+  <div id="homeCartSuccessModal"
+    class="fixed inset-0 z-[1550] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+        <i class="fas fa-check text-xl"></i>
+      </div>
+      <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Added to Cart</h3>
+      <p id="homeCartSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to cart successfully.</p>
+      <div class="mt-5 flex justify-center">
+        <button id="homeCartSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     (function () {
       const termsStorageKey = 'home_terms_policy_accepted';
@@ -271,7 +285,10 @@
       const termsPolicyCheckbox = document.getElementById('termsPolicyCheckbox');
       const acceptTermsPolicyBtn = document.getElementById('acceptTermsPolicyBtn');
       const rejectTermsPolicyBtn = document.getElementById('rejectTermsPolicyBtn');
+      const homeCartSuccessModal = document.getElementById('homeCartSuccessModal');
+      const homeCartSuccessMessage = document.getElementById('homeCartSuccessMessage');
       const latestProductMap = new Map();
+      const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
 
       function openTermsPolicyModal() {
         if (!termsPolicyModal) return;
@@ -318,6 +335,70 @@
             window.location.href = '/';
           });
         }
+      }
+
+      function openCartSuccessModal(message) {
+        if (!homeCartSuccessModal || !homeCartSuccessMessage) return;
+        homeCartSuccessMessage.textContent = message || 'Product added to cart successfully.';
+        homeCartSuccessModal.classList.remove('hidden');
+        homeCartSuccessModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+      }
+
+      function closeCartSuccessModal() {
+        if (!homeCartSuccessModal) return;
+        homeCartSuccessModal.classList.add('hidden');
+        homeCartSuccessModal.classList.remove('flex');
+        if ((!latestProductModal || latestProductModal.classList.contains('hidden')) &&
+            (!termsPolicyModal || termsPolicyModal.classList.contains('hidden'))) {
+          document.body.classList.remove('overflow-hidden');
+        }
+      }
+
+      function getCustomerAuth() {
+        try {
+          return {
+            token: localStorage.getItem('customerToken') || '',
+            tokenType: localStorage.getItem('tokenType') || 'Bearer'
+          };
+        } catch (error) {
+          return { token: '', tokenType: 'Bearer' };
+        }
+      }
+
+      function hasCustomerSession() {
+        const auth = getCustomerAuth();
+        return !!auth.token;
+      }
+
+      async function addProductToCart(productId, quantity) {
+        const auth = getCustomerAuth();
+        if (!auth.token) {
+          window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/products/buy?id=' + encodeURIComponent(String(productId || '')));
+          return false;
+        }
+
+        const response = await fetch(cartAddEndpoint, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          },
+          body: JSON.stringify({
+            product_id: Number(productId),
+            quantity: quantity
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to add product to cart.');
+        }
+
+        openCartSuccessModal(result?.message || 'Product added to cart successfully.');
+        return true;
       }
 
       function renderCategoriesClient(cats) {
@@ -576,7 +657,7 @@
           + '<div class="mt-4 text-[13px] font-semibold text-slate-700">Total Price : <span id="latestProductTotalPrice" class="text-[13px] font-bold text-slate-800">' + formatMoney(finalPrice) + '</span></div>'
           + '<div class="mt-4 flex flex-wrap items-center gap-2.5">'
           + '<a href="/products/buy?id=' + (product.id || '') + '" class="inline-flex min-w-[130px] items-center justify-center rounded-[0.45rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy now</a>'
-          + '<a href="/products/' + (product.slug || product.id || '') + '" class="inline-flex min-w-[130px] items-center justify-center rounded-[0.45rem] bg-slate-700 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:bg-slate-800">Add to cart</a>'
+          + '<button type="button" class="latest-product-add-to-cart-btn inline-flex min-w-[130px] items-center justify-center rounded-[0.45rem] bg-slate-700 px-5 py-2.5 text-[12px] font-semibold text-white transition hover:bg-slate-800" data-product-id="' + (product.id || '') + '">Add to cart</button>'
           + '<button type="button" class="inline-flex h-[40px] min-w-[70px] items-center justify-center gap-2 rounded-[0.45rem] border border-sky-100 bg-sky-50 px-3 text-[12px] text-slate-500 transition hover:border-sky-200 hover:text-slate-700"><i class="far fa-heart"></i><span>0</span></button>'
           + '</div>'
           + '</div>'
@@ -671,6 +752,27 @@
                 tabButton.classList.toggle('border-transparent', !isActive);
                 tabButton.classList.toggle('text-slate-500', !isActive);
               });
+            });
+          });
+
+          latestProductModalContent.querySelectorAll('.latest-product-add-to-cart-btn').forEach(function (button) {
+            button.addEventListener('click', async function () {
+              const modalQty = Math.max(Number(qtyValueEl ? qtyValueEl.textContent : 1), 1);
+              const currentProductId = this.getAttribute('data-product-id') || product.id || '';
+              const originalText = this.innerHTML;
+
+              this.disabled = true;
+              this.innerHTML = 'Adding...';
+
+              try {
+                await addProductToCart(currentProductId, modalQty);
+              } catch (error) {
+                console.error('Add to cart error:', error);
+                window.alert(error.message || 'Unable to add product to cart.');
+              } finally {
+                this.disabled = false;
+                this.innerHTML = originalText;
+              }
             });
           });
         }
@@ -861,9 +963,24 @@
         });
       }
 
+      if (homeCartSuccessModal) {
+        homeCartSuccessModal.addEventListener('click', function (event) {
+          if (event.target === homeCartSuccessModal) {
+            closeCartSuccessModal();
+          }
+        });
+      }
+
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'homeCartSuccessCloseBtn') {
+          closeCartSuccessModal();
+        }
+      });
+
       document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape') {
           closeProductModal();
+          closeCartSuccessModal();
         }
       });
 

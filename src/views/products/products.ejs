@@ -51,7 +51,7 @@
       : '';
 
     return `
-      <article class="product-card group overflow-hidden rounded-[1.1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_10px_26px_rgba(148,163,184,0.10)] transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_18px_34px_rgba(125,211,252,0.16)]" data-price="${finalPrice}" data-title="${String(title).toLowerCase()}">
+      <article class="product-card group overflow-hidden rounded-[1.1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_10px_26px_rgba(148,163,184,0.10)] transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_18px_34px_rgba(125,211,252,0.16)]" data-price="${finalPrice}" data-title="${String(title).toLowerCase()}" data-product-id="${String(productIdentifier)}">
         <div class="relative overflow-hidden bg-[radial-gradient(circle_at_top,#dbeafe,transparent_56%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-1.5">
           ${hasDiscount ? `<span class="absolute left-2.5 top-2.5 z-10 rounded-full bg-sky-500 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white shadow-sm">${discountDisplay}</span>` : ''}
           <a href="/products/buy?id=${encodeURIComponent(String(productIdentifier))}" class="block overflow-hidden rounded-[0.8rem] bg-white/90 p-1.5 ring-1 ring-slate-100">
@@ -71,7 +71,7 @@
           </div>
           <div class="mt-3 flex items-center justify-between gap-2">
             <a href="/products/buy?id=${encodeURIComponent(String(productIdentifier))}" class="inline-flex min-w-[92px] items-center justify-center rounded-[0.75rem] bg-gradient-to-r from-sky-500 to-blue-500 px-3 py-1.5 text-[11px] lg:px-2.5 lg:py-1 lg:text-[10px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy Now</a>
-            <button type="button" class="inline-flex min-w-[72px] items-center justify-center rounded-[0.75rem] border border-sky-200 bg-sky-50 px-3 py-1.5 text-[11px] lg:px-2.5 lg:py-1 lg:text-[10px] font-semibold text-sky-700 transition hover:bg-sky-100">Add</button>
+            <button type="button" class="product-add-to-cart-btn inline-flex min-w-[72px] items-center justify-center rounded-[0.75rem] border border-sky-200 bg-sky-50 px-3 py-1.5 text-[11px] lg:px-2.5 lg:py-1 lg:text-[10px] font-semibold text-sky-700 transition hover:bg-sky-100">Add</button>
           </div>
         </div>
       </article>
@@ -150,6 +150,18 @@
       `}
     </div>
   </section>
+  <div id="productsCartSuccessModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+        <i class="fas fa-check text-xl"></i>
+      </div>
+      <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Added to Cart</h3>
+      <p id="productsCartSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to cart successfully.</p>
+      <div class="mt-5 flex justify-center">
+        <button id="productsCartSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+      </div>
+    </div>
+  </div>
 
   ${!error && items.length ? `
     <script>
@@ -162,6 +174,65 @@
         const productsGrid = document.getElementById('productsGrid');
         const productCards = Array.from(document.querySelectorAll('.product-card'));
         const maxPrice = ${JSON.stringify(maxFilterPrice)};
+        const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
+
+        function getCustomerAuth() {
+          try {
+            return {
+              token: localStorage.getItem('customerToken') || '',
+              tokenType: localStorage.getItem('tokenType') || 'Bearer'
+            };
+          } catch (error) {
+            return { token: '', tokenType: 'Bearer' };
+          }
+        }
+
+        function openCartSuccessModal(message) {
+          const productsCartSuccessModal = document.getElementById('productsCartSuccessModal');
+          const productsCartSuccessMessage = document.getElementById('productsCartSuccessMessage');
+          if (!productsCartSuccessModal || !productsCartSuccessMessage) return;
+          productsCartSuccessMessage.textContent = message || 'Product added to cart successfully.';
+          productsCartSuccessModal.classList.remove('hidden');
+          productsCartSuccessModal.classList.add('flex');
+          document.body.classList.add('overflow-hidden');
+        }
+
+        function closeCartSuccessModal() {
+          const productsCartSuccessModal = document.getElementById('productsCartSuccessModal');
+          if (!productsCartSuccessModal) return;
+          productsCartSuccessModal.classList.add('hidden');
+          productsCartSuccessModal.classList.remove('flex');
+          document.body.classList.remove('overflow-hidden');
+        }
+
+        async function addProductToCart(productId, quantity) {
+          const auth = getCustomerAuth();
+          if (!auth.token) {
+            window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/products');
+            return;
+          }
+
+          const response = await fetch(cartAddEndpoint, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+            },
+            body: JSON.stringify({
+              product_id: Number(productId),
+              quantity: quantity
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result?.status) {
+            throw new Error(result?.message || 'Unable to add product to cart.');
+          }
+
+          openCartSuccessModal(result?.message || 'Product added to cart successfully.');
+        }
 
         function sortProducts(sortType) {
           if (!productsGrid) return;
@@ -230,6 +301,45 @@
             applyPriceFilter(maxPrice);
           });
         }
+
+        productCards.forEach(function(card) {
+          const addButton = card.querySelector('.product-add-to-cart-btn');
+          const productId = card.dataset.productId || '';
+
+          if (!addButton || !productId) return;
+
+          addButton.addEventListener('click', async function() {
+            const originalText = addButton.innerHTML;
+            addButton.disabled = true;
+            addButton.innerHTML = 'Adding...';
+
+            try {
+              await addProductToCart(productId, 1);
+            } catch (error) {
+              console.error('Add to cart error:', error);
+              window.alert(error.message || 'Unable to add product to cart.');
+            } finally {
+              addButton.disabled = false;
+              addButton.innerHTML = originalText;
+            }
+          });
+        });
+
+        const productsCartSuccessModal = document.getElementById('productsCartSuccessModal');
+
+        if (productsCartSuccessModal) {
+          productsCartSuccessModal.addEventListener('click', function(event) {
+            if (event.target === productsCartSuccessModal) {
+              closeCartSuccessModal();
+            }
+          });
+        }
+
+        document.addEventListener('click', function(event) {
+          if (event.target && event.target.closest && event.target.closest('#productsCartSuccessCloseBtn')) {
+            closeCartSuccessModal();
+          }
+        });
 
         applyPriceFilter(maxPrice);
       })();
