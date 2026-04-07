@@ -14,11 +14,11 @@
   </div>
 
   <!-- Top utility bar (currency/language) -->
-  <div class="bg-[linear-gradient(180deg,#eef7ff_0%,#e7f3ff_100%)] border-b border-sky-100 py-0.5">
-    <div class="max-w-7xl mx-auto px-3 flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:gap-3 text-sm">
+  <!-- <div class="bg-[linear-gradient(180deg,#eef7ff_0%,#e7f3ff_100%)] border-b border-sky-100 py-0.5">
+    <div class="max-w-7xl mx-auto px-3 flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:gap-3 text-sm"> -->
 
       <!-- Currency Dropdown -->
-      <div class="relative" x-data="{ open: false }">
+      <!-- <div class="relative" x-data="{ open: false }">
         <div @click="open = !open"
           class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-sky-50/80 backdrop-blur-sm border border-sky-200 rounded-full shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 transition-all duration-300">
           <span class="text-gray-700 text-sm font-semibold">INR</span>
@@ -55,10 +55,10 @@
             <span class="font-medium">GBP</span>
           </a>
         </div>
-      </div>
+      </div> -->
 
       <!-- Language Dropdown with PNG flags -->
-      <div class="relative" x-data="{ open: false }">
+      <!-- <div class="relative" x-data="{ open: false }">
         <div @click="open = !open"
           class="flex items-center gap-2 cursor-pointer px-3 py-1 bg-sky-50/80 backdrop-blur-sm border border-sky-200 rounded-2xl shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 hover:bg-sky-50 transition-all duration-200">
           <img src="https://flagcdn.com/w20/us.png" alt="US flag" class="w-5 h-3 rounded-sm shadow-sm object-cover">
@@ -84,10 +84,10 @@
             Français
           </a>
         </div>
-      </div>
+      </div> -->
 
-    </div>
-  </div>
+    <!-- </div>
+  </div> -->
 
   <!-- Full Width Section with White Background -->
   <div class="w-full bg-[linear-gradient(180deg,#ecf7ff_0%,#dff1ff_100%)] shadow-[0_10px_30px_rgba(148,163,184,0.12)] relative z-[900] overflow-visible border-b border-sky-100/80 rounded-none">
@@ -142,7 +142,7 @@
               x-transition:leave-start="opacity-100 translate-y-0"
               x-transition:leave-end="opacity-0 translate-y-2"
               @click.away="open = false"
-              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-32 bg-white rounded-lg shadow-lg transition-all duration-200 z-[12000] border border-gray-100">
+              class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-40 bg-white rounded-lg shadow-lg transition-all duration-200 z-[12000] border border-gray-100">
               <div class="py-2">
                 <a id="headerSignInLink" href="/auth/customer/signin"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
@@ -151,6 +151,10 @@
                 <a id="headerSignUpLink" href="/auth/customer/signup"
                   class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
                   <i class="fas fa-user-plus mr-2 w-4"></i> Sign Up
+                </a>
+                <a id="headerOrdersLink" href="/orders"
+                  class="hidden px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+                  <i class="fas fa-box-open mr-2 w-4"></i> Orders
                 </a>
                 <button id="headerLogoutButton" type="button"
                   class="hidden w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150">
@@ -334,9 +338,10 @@
       const iconEl = document.getElementById('headerUserIcon');
       const signInLink = document.getElementById('headerSignInLink');
       const signUpLink = document.getElementById('headerSignUpLink');
+      const ordersLink = document.getElementById('headerOrdersLink');
       const logoutButton = document.getElementById('headerLogoutButton');
 
-      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !logoutButton) return;
+      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !ordersLink || !logoutButton) return;
 
       function getImageFromUserData() {
         const storageKeys = ['userData', 'customerData', 'authData'];
@@ -373,6 +378,7 @@
       function setLoggedInState(profileImage) {
         signInLink.classList.add('hidden');
         signUpLink.classList.add('hidden');
+        ordersLink.classList.remove('hidden');
         logoutButton.classList.remove('hidden');
 
         if (profileImage) {
@@ -391,6 +397,7 @@
         iconEl.classList.remove('hidden');
         signInLink.classList.remove('hidden');
         signUpLink.classList.remove('hidden');
+        ordersLink.classList.add('hidden');
         logoutButton.classList.add('hidden');
       }
 
