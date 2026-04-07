@@ -1,0 +1,252 @@
+<%
+const body = `
+<section class="px-3 pt-6 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="rounded-[1.1rem] sm:rounded-[1.4rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-5 shadow-[0_18px_38px_rgba(148,163,184,0.14)] md:p-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Cart</p>
+          <h1 class="mt-2 text-[24px] sm:text-[28px] font-bold text-slate-900">My Cart</h1>
+          <p class="mt-2 text-sm text-slate-500">Review products added to your cart before checkout.</p>
+        </div>
+        <a href="/products" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Continue Shopping</a>
+      </div>
+
+      <div id="cartMessage" class="mt-6 hidden rounded-[1rem] px-4 py-3 text-sm"></div>
+      <div class="mt-8 grid gap-6 lg:grid-cols-[1.45fr_0.85fr]">
+        <div id="cartList" class="space-y-4">
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">Loading cart items...</div>
+        </div>
+
+        <aside class="h-fit rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Summary</p>
+          <div class="mt-4 space-y-3 text-sm text-slate-600">
+            <div class="flex items-center justify-between gap-3"><span>Items</span><span id="cartItemCount" class="font-semibold text-slate-900">0</span></div>
+            <div class="flex items-center justify-between gap-3"><span>Subtotal</span><span id="cartSubtotal" class="font-semibold text-slate-900">₹0.00</span></div>
+            <div class="flex items-center justify-between gap-3"><span>Shipping</span><span id="cartShippingTotal" class="font-semibold text-slate-900">₹0.00</span></div>
+            <div class="flex items-center justify-between gap-3"><span>Tax</span><span id="cartTaxTotal" class="font-semibold text-slate-900">₹0.00</span></div>
+          </div>
+          <div class="mt-4 border-t border-sky-100 pt-4">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-base font-semibold text-slate-900">Grand Total</span>
+              <span id="cartGrandTotal" class="text-lg font-bold text-sky-700">₹0.00</span>
+            </div>
+          </div>
+          <button id="cartCheckoutBtn" type="button" class="mt-5 inline-flex w-full items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600 disabled:cursor-not-allowed disabled:opacity-60">
+            Continue to Pay
+          </button>
+        </aside>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const cartList = document.getElementById('cartList');
+    const cartMessage = document.getElementById('cartMessage');
+    const cartItemCount = document.getElementById('cartItemCount');
+    const cartSubtotal = document.getElementById('cartSubtotal');
+    const cartShippingTotal = document.getElementById('cartShippingTotal');
+    const cartTaxTotal = document.getElementById('cartTaxTotal');
+    const cartGrandTotal = document.getElementById('cartGrandTotal');
+    const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
+    let currentCartItems = [];
+
+    if (!cartList || !cartMessage || !cartItemCount || !cartSubtotal || !cartShippingTotal || !cartTaxTotal || !cartGrandTotal || !cartCheckoutBtn) return;
+
+    function getCustomerAuth() {
+      try {
+        return {
+          token: localStorage.getItem('customerToken') || '',
+          tokenType: localStorage.getItem('tokenType') || 'Bearer'
+        };
+      } catch (error) {
+        return { token: '', tokenType: 'Bearer' };
+      }
+    }
+
+    function showMessage(text, isError) {
+      cartMessage.textContent = text;
+      cartMessage.className = 'mt-6 rounded-[1rem] px-4 py-3 text-sm ' + (isError
+        ? 'border border-rose-200 bg-rose-50 text-rose-600'
+        : 'border border-sky-200 bg-sky-50 text-sky-700');
+      cartMessage.classList.remove('hidden');
+    }
+
+    function getClearedCartItemIds() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem('clearedCartItemIds') || '[]');
+        return Array.isArray(parsed) ? parsed.map(function (value) { return String(value); }) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function getVisibleCartItems(items) {
+      const clearedIds = getClearedCartItemIds();
+      if (!clearedIds.length) return Array.isArray(items) ? items : [];
+      return (Array.isArray(items) ? items : []).filter(function (item) {
+        return !clearedIds.includes(String(item?.id || ''));
+      });
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(Number(value || 0));
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getFinalUnitPrice(product) {
+      const unitPrice = Number(product?.unit_price || 0);
+      const discountValue = Number(product?.discount || 0);
+      const discountType = product?.discount_type || '';
+      return discountValue > 0
+        ? (discountType === 'percent'
+          ? unitPrice - ((unitPrice * discountValue) / 100)
+          : Math.max(unitPrice - discountValue, 0))
+        : unitPrice;
+    }
+
+    function renderCart(items) {
+      currentCartItems = getVisibleCartItems(items);
+
+      if (!currentCartItems.length) {
+        cartItemCount.textContent = '0';
+        cartSubtotal.textContent = formatMoney(0);
+        cartShippingTotal.textContent = formatMoney(0);
+        cartTaxTotal.textContent = formatMoney(0);
+        cartGrandTotal.textContent = formatMoney(0);
+        cartCheckoutBtn.disabled = true;
+        cartList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500">Your cart is empty.</div>';
+        return;
+      }
+
+      const totals = currentCartItems.reduce(function (acc, item) {
+        const product = item?.product || {};
+        const quantity = Number(item?.quantity || 0);
+        const finalUnitPrice = getFinalUnitPrice(product);
+        const shippingCost = Number(product?.shipping_cost || 0);
+        const taxAmount = Number(product?.tax_amount || 0);
+
+        acc.count += quantity;
+        acc.subtotal += finalUnitPrice * quantity;
+        acc.shipping += shippingCost * quantity;
+        acc.tax += taxAmount * quantity;
+        return acc;
+      }, { count: 0, subtotal: 0, shipping: 0, tax: 0 });
+
+      cartItemCount.textContent = String(totals.count);
+      cartSubtotal.textContent = formatMoney(totals.subtotal);
+      cartShippingTotal.textContent = formatMoney(totals.shipping);
+      cartTaxTotal.textContent = formatMoney(totals.tax);
+      cartGrandTotal.textContent = formatMoney(totals.subtotal + totals.shipping + totals.tax);
+      cartCheckoutBtn.disabled = false;
+
+      cartList.innerHTML = currentCartItems.map(function (item) {
+        const product = item?.product || {};
+        const productId = product?.id || item?.product_id || '';
+        const title = product?.product_name || 'Product';
+        const image = product?.image || 'https://via.placeholder.com/120x120/eef7ff/64748b?text=Item';
+        const quantity = Number(item?.quantity || 0);
+        const sku = product?.sku || '--';
+        const finalUnitPrice = getFinalUnitPrice(product);
+        const shippingCost = Number(product?.shipping_cost || 0);
+        const taxAmount = Number(product?.tax_amount || 0);
+        const lineTotal = (finalUnitPrice + shippingCost + taxAmount) * quantity;
+
+        return ''
+          + '<div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_26px_rgba(148,163,184,0.10)] sm:p-5">'
+          + '<div class="flex flex-col gap-4 sm:flex-row sm:items-start">'
+          + '<a href="/products/buy?id=' + encodeURIComponent(String(productId)) + '" class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[0.9rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] ring-1 ring-sky-100">'
+          + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-full w-full object-contain">'
+          + '</a>'
+          + '<div class="min-w-0 flex-1">'
+          + '<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">'
+          + '<div>'
+          + '<h2 class="text-base font-semibold text-slate-900">' + escapeHtml(title) + '</h2>'
+          + '<p class="mt-1 text-sm text-slate-500">SKU: ' + escapeHtml(sku) + '</p>'
+          + '</div>'
+          + '<p class="text-base font-bold text-sky-700">' + escapeHtml(formatMoney(lineTotal)) + '</p>'
+          + '</div>'
+          + '<div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">'
+          + '<div class="rounded-[0.85rem] border border-sky-100 bg-sky-50/60 px-3 py-2 text-sm text-slate-600"><span class="font-semibold text-slate-800">Qty:</span> ' + escapeHtml(quantity) + '</div>'
+          + '<div class="rounded-[0.85rem] border border-sky-100 bg-sky-50/60 px-3 py-2 text-sm text-slate-600"><span class="font-semibold text-slate-800">Unit Price:</span> ' + escapeHtml(formatMoney(finalUnitPrice)) + '</div>'
+          + '<div class="rounded-[0.85rem] border border-sky-100 bg-sky-50/60 px-3 py-2 text-sm text-slate-600"><span class="font-semibold text-slate-800">Shipping:</span> ' + escapeHtml(formatMoney(shippingCost)) + '</div>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+          + '</div>';
+      }).join('');
+    }
+
+    async function loadCart() {
+      const auth = getCustomerAuth();
+      if (!auth.token) {
+        showMessage('Please sign in to view your cart.', true);
+        renderCart([]);
+        return;
+      }
+
+      try {
+        const response = await fetch('https://aerthh.newhopeindia17.com/api/cart', {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          }
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to fetch cart items.');
+        }
+
+        renderCart(Array.isArray(result?.data) ? result.data : []);
+      } catch (error) {
+        console.error('Cart fetch error:', error);
+        showMessage(error.message || 'Unable to fetch cart items.', true);
+        renderCart([]);
+      }
+    }
+
+    cartCheckoutBtn.addEventListener('click', function () {
+      const auth = getCustomerAuth();
+      if (!auth.token) {
+        window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/cart');
+        return;
+      }
+
+      if (!currentCartItems.length) {
+        showMessage('Your cart is empty.', true);
+        return;
+      }
+
+      try {
+        sessionStorage.setItem('cartCheckoutItems', JSON.stringify(currentCartItems));
+      } catch (error) {
+        console.warn('Unable to store cart checkout items:', error);
+      }
+
+      window.location.href = '/products/address?cart=1';
+    });
+
+    loadCart();
+  })();
+</script>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Cart', body }) %>

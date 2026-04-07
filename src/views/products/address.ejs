@@ -1,4 +1,144 @@
 <%
+  const isCartMode = typeof cartMode !== 'undefined' ? !!cartMode : false;
+  if (isCartMode) {
+    const body = `
+  <section class="px-3 pt-4 pb-8 sm:px-4 md:px-6 md:pt-5 md:pb-10">
+    <div class="mx-auto max-w-[1280px]">
+      <div class="mt-2 mb-6 rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] px-3 py-5 sm:px-5 sm:py-6 shadow-[0_14px_34px_rgba(148,163,184,0.10)]">
+        <div class="relative mx-auto flex max-w-4xl items-start justify-between gap-2 sm:gap-4">
+          <div class="absolute left-[24px] right-[24px] top-[15px] h-[4px] bg-sky-100 sm:left-[36px] sm:right-[36px]"></div>
+          <div class="absolute left-[24px] top-[15px] h-[4px] w-[50%] bg-gradient-to-r from-sky-400 to-blue-400 sm:left-[36px]"></div>
+          <div class="relative z-10 flex w-20 sm:w-28 flex-col items-center text-center"><div class="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm"><i class="fas fa-cart-arrow-down text-[13px]"></i></div><span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-slate-700">Cart</span></div>
+          <div class="relative z-10 flex w-28 sm:w-40 flex-col items-center text-center"><div class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-sky-300 bg-gradient-to-br from-sky-400 to-blue-500 text-white shadow-sm"><i class="fas fa-box-open text-[12px]"></i></div><span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-sky-700">Shipping And Billing</span></div>
+          <div class="relative z-10 flex w-20 sm:w-28 flex-col items-center text-center"><div class="flex h-8 w-8 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-400 shadow-sm"><i class="far fa-credit-card text-[13px]"></i></div><span class="mt-4 sm:mt-5 text-[11px] sm:text-[13px] font-medium text-slate-700">Payment</span></div>
+        </div>
+      </div>
+
+      <div class="grid gap-5 sm:gap-6 lg:grid-cols-[1.15fr_0.85fr]">
+        <div class="rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+          <div class="mb-5">
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Checkout</p>
+            <h1 class="text-[24px] sm:text-[26px] font-bold text-slate-900">Delivery Address</h1>
+            <p class="mt-2 text-sm text-slate-500">Fill in your address details to continue with cart checkout.</p>
+          </div>
+          <form id="cartAddressForm" class="space-y-6">
+            <div id="addressFormMessage" class="hidden rounded-xl px-4 py-3 text-sm"></div>
+            <div id="savedAddressesSection" class="hidden rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
+              <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Saved Addresses</p>
+                  <h2 class="text-lg font-bold text-slate-900">Choose an address</h2>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100">Quick Checkout</span>
+              </div>
+              <div id="savedAddressesList" class="space-y-3"></div>
+              <div class="mt-4 border-t border-sky-100 pt-4"><button id="showNewAddressFormBtn" type="button" class="inline-flex items-center justify-center rounded-[0.75rem] border border-sky-200 bg-white px-4 py-2.5 text-sm font-semibold text-sky-700 transition hover:border-sky-300 hover:bg-sky-50 hover:text-sky-900">Add New Address</button></div>
+            </div>
+
+            <div id="manualAddressFields" class="space-y-6">
+              <div id="manualAddressHeader" class="hidden flex-wrap items-center justify-between gap-3 rounded-[1rem] border border-sky-100 bg-white px-4 py-3">
+                <div><p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">New Address</p><p class="text-sm font-semibold text-slate-900">Enter a different address for this order</p></div>
+                <button id="backToSavedAddressesBtn" type="button" class="inline-flex items-center justify-center rounded-[0.75rem] border border-sky-200 bg-sky-50 px-4 py-2.5 text-sm font-semibold text-sky-700 transition hover:border-sky-300 hover:bg-sky-100 hover:text-sky-900">Back to Saved</button>
+              </div>
+              <div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4">
+                <div class="mb-4 flex flex-wrap items-center justify-between gap-3"><div><p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 1</p><h2 class="text-lg font-bold text-slate-900">Shipping Address</h2></div><span class="rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-sky-700 ring-1 ring-sky-100">Primary</span></div>
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">First Name <span class="text-rose-500">*</span></label><input id="shippingFirstName" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="First name"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Last Name <span class="text-rose-500">*</span></label><input id="shippingLastName" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Last name"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Email <span class="text-rose-500">*</span></label><input id="shippingEmail" type="email" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="name@example.com"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Phone <span class="text-rose-500">*</span></label><input id="shippingPhone" type="tel" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Phone number"></div>
+                  <div class="md:col-span-2"><label class="mb-1 block text-sm font-medium text-slate-700">Address Line <span class="text-rose-500">*</span></label><input id="shippingAddressLine" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="House no, street, area"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">City <span class="text-rose-500">*</span></label><input id="shippingCity" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="City"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">State <span class="text-rose-500">*</span></label><input id="shippingState" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="State"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Postal Code <span class="text-rose-500">*</span></label><input id="shippingZipCode" type="text" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Postal code"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Country</label><input id="shippingCountry" type="text" value="India" class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Country"></div>
+                </div>
+              </div>
+              <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+                <div class="mb-4 flex flex-wrap items-center justify-between gap-3"><div><p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Step 2</p><h2 class="text-lg font-bold text-slate-900">Billing Address</h2></div><label class="flex w-full sm:w-auto items-center gap-2 text-xs text-slate-600"><input id="sameAsShippingCheckbox" type="checkbox" class="h-4 w-4 rounded border-sky-200 text-sky-500">Same as shipping</label></div>
+                <div id="billingAddressFields" class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">First Name <span class="text-rose-500">*</span></label><input id="billingFirstName" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="First name"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Last Name <span class="text-rose-500">*</span></label><input id="billingLastName" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Last name"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Email <span class="text-rose-500">*</span></label><input id="billingEmail" type="email" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="name@example.com"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Phone <span class="text-rose-500">*</span></label><input id="billingPhone" type="tel" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Phone number"></div>
+                  <div class="md:col-span-2"><label class="mb-1 block text-sm font-medium text-slate-700">Address Line <span class="text-rose-500">*</span></label><input id="billingAddressLine" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="House no, street, area"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">City <span class="text-rose-500">*</span></label><input id="billingCity" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="City"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">State <span class="text-rose-500">*</span></label><input id="billingState" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="State"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Postal Code <span class="text-rose-500">*</span></label><input id="billingZipCode" type="text" data-billing-required="true" required class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Postal code"></div>
+                  <div><label class="mb-1 block text-sm font-medium text-slate-700">Country</label><input id="billingCountry" type="text" value="India" class="w-full rounded-lg border border-sky-100 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-sky-400 focus:ring-1 focus:ring-sky-100" placeholder="Country"></div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <aside class="h-fit rounded-[1rem] sm:rounded-[1.2rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-[0_14px_34px_rgba(148,163,184,0.12)] md:p-6">
+          <div class="mb-4 flex flex-wrap items-center justify-between gap-3"><h2 class="text-lg font-bold text-slate-900">Cart Summary</h2><span class="rounded-full bg-sky-100 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-sky-700">Current Cart</span></div>
+          <div id="cartAddressSummaryList" class="space-y-3"></div>
+          <div class="mt-4 space-y-3 rounded-[1rem] border border-sky-100 bg-white/90 p-4 text-sm">
+            <div class="flex items-center justify-between gap-3 text-slate-600"><span>Items</span><span id="cartAddressCount" class="font-medium text-slate-800">0</span></div>
+            <div class="flex items-center justify-between gap-3 text-slate-600"><span>Total</span><span id="cartAddressTotal" class="font-medium text-slate-800">Rs 0.00</span></div>
+            <div class="border-t border-sky-100 pt-4 space-y-3"><button type="submit" form="cartAddressForm" class="inline-flex w-full items-center justify-center rounded-[0.7rem] bg-gradient-to-r from-sky-500 to-blue-500 px-6 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Proceed to Checkout</button><a href="/cart" class="inline-flex w-full items-center justify-center gap-2 rounded-[0.7rem] px-6 py-3 text-sm font-semibold text-sky-700 transition hover:text-sky-900"><i class="fas fa-arrow-left text-[12px]"></i>Back to Cart</a></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const cartAddressForm = document.getElementById('cartAddressForm');
+      const sameAsShippingCheckbox = document.getElementById('sameAsShippingCheckbox');
+      const billingAddressFields = document.getElementById('billingAddressFields');
+      const billingRequiredFields = Array.from(document.querySelectorAll('[data-billing-required="true"]'));
+      const messageBox = document.getElementById('addressFormMessage');
+      const savedAddressesSection = document.getElementById('savedAddressesSection');
+      const savedAddressesList = document.getElementById('savedAddressesList');
+      const manualAddressFields = document.getElementById('manualAddressFields');
+      const manualAddressHeader = document.getElementById('manualAddressHeader');
+      const showNewAddressFormBtn = document.getElementById('showNewAddressFormBtn');
+      const backToSavedAddressesBtn = document.getElementById('backToSavedAddressesBtn');
+      const manualAddressInputs = Array.from(document.querySelectorAll('#manualAddressFields input'));
+      const submitBtn = document.querySelector('button[form="cartAddressForm"]');
+      const cartAddressSummaryList = document.getElementById('cartAddressSummaryList');
+      const cartAddressCount = document.getElementById('cartAddressCount');
+      const cartAddressTotal = document.getElementById('cartAddressTotal');
+      let cartItems = [];
+      let savedAddresses = [];
+      let selectedSavedAddressId = null;
+      let isManualEntryMode = false;
+
+      function formatMoney(value) { return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Number(value || 0)); }
+      function showMessage(text, isError) { if (!messageBox) return; messageBox.textContent = text; messageBox.className = 'rounded-xl px-4 py-3 text-sm ' + (isError ? 'border border-rose-200 bg-rose-50 text-rose-600' : 'border border-sky-200 bg-sky-50 text-sky-700'); messageBox.classList.remove('hidden'); }
+      function hasCustomerSession() { try { return !!(localStorage.getItem('customerToken') || localStorage.getItem('authData') || localStorage.getItem('customerData') || localStorage.getItem('userData')); } catch (error) { return false; } }
+      if (!hasCustomerSession()) { window.location.replace('/auth/customer/signin?redirect=' + encodeURIComponent('/products/address?cart=1')); return; }
+      try { cartItems = JSON.parse(sessionStorage.getItem('cartCheckoutItems') || '[]'); } catch (error) { cartItems = []; }
+      if (!cartItems.length) { window.location.href = '/cart'; return; }
+      function getCustomerAuth() { try { const token = localStorage.getItem('customerToken') || ''; const tokenType = localStorage.getItem('tokenType') || 'Bearer'; const customerData = JSON.parse(localStorage.getItem('customerData') || localStorage.getItem('userData') || '{}'); return { token, tokenType, customerData }; } catch (error) { return { token: '', tokenType: 'Bearer', customerData: {} }; } }
+      function getFinalUnitPrice(product) { const unitPrice = Number(product?.unit_price || 0); const discountValue = Number(product?.discount || 0); const discountType = product?.discount_type || ''; return discountValue > 0 ? (discountType === 'percent' ? unitPrice - ((unitPrice * discountValue) / 100) : Math.max(unitPrice - discountValue, 0)) : unitPrice; }
+      function renderCartSummary() { const totals = cartItems.reduce(function (acc, item) { const product = item?.product || {}; const quantity = Number(item?.quantity || 0); const shippingCost = Number(product?.shipping_cost || 0); const taxAmount = Number(product?.tax_amount || 0); const finalUnitPrice = getFinalUnitPrice(product); acc.count += quantity; acc.total += (finalUnitPrice + shippingCost + taxAmount) * quantity; return acc; }, { count: 0, total: 0 }); cartAddressCount.textContent = String(totals.count); cartAddressTotal.textContent = formatMoney(totals.total); cartAddressSummaryList.innerHTML = cartItems.map(function (item) { const product = item?.product || {}; const image = product?.image || 'https://via.placeholder.com/120x120/eef7ff/64748b?text=Item'; const title = product?.product_name || 'Product'; const quantity = Number(item?.quantity || 0); return '<div class="flex items-center gap-3 rounded-[0.9rem] border border-sky-100 bg-white/90 p-3"><img src="' + image + '" alt="' + title + '" class="h-14 w-14 rounded-lg object-contain bg-sky-50 ring-1 ring-sky-100"><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-slate-800">' + title + '</p><p class="mt-1 text-xs text-slate-500">Qty: ' + quantity + '</p></div></div>'; }).join(''); }
+      function getAddressPayload(prefix) { return { type: prefix, first_name: document.getElementById(prefix + 'FirstName').value.trim(), last_name: document.getElementById(prefix + 'LastName').value.trim(), email: document.getElementById(prefix + 'Email').value.trim(), phone: document.getElementById(prefix + 'Phone').value.trim(), address_line: document.getElementById(prefix + 'AddressLine').value.trim(), city: document.getElementById(prefix + 'City').value.trim(), state: document.getElementById(prefix + 'State').value.trim(), zip_code: document.getElementById(prefix + 'ZipCode').value.trim(), country: document.getElementById(prefix + 'Country').value.trim() || 'India' }; }
+      async function createAddress(payload, auth) { const response = await fetch('https://aerthh.newhopeindia17.com/api/address/create', { method: 'POST', headers: { 'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token }, body: JSON.stringify(payload) }); const result = await response.json(); if (!response.ok || !result?.status) throw new Error(result?.message || result?.error || 'Unable to save address.'); return result; }
+      async function fetchSavedAddresses(auth) { const response = await fetch('https://aerthh.newhopeindia17.com/api/addresses', { method: 'GET', headers: { 'Accept': 'application/json', 'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token } }); const result = await response.json(); if (!response.ok || !result?.status) throw new Error(result?.message || result?.error || 'Unable to load saved addresses.'); return Array.isArray(result?.data) ? result.data : []; }
+      function renderSavedAddresses(addresses) { if (!savedAddressesList) return; savedAddressesList.innerHTML = addresses.map(function (address, index) { const fullName = [address.first_name, address.last_name].filter(Boolean).join(' '); const cityStateZip = [address.city, address.state, address.zip_code].filter(Boolean).join(', '); return '' + '<div class="saved-address-option rounded-[0.95rem] border border-sky-200 bg-white px-4 py-4 transition hover:border-sky-300 hover:bg-sky-50/60">' + '<div class="flex items-start gap-3">' + '<input type="radio" name="selectedSavedAddress" value="' + String(address.id || '') + '" ' + (index === 0 ? 'checked' : '') + ' class="mt-1 h-4 w-4 border-sky-300 text-sky-500 focus:ring-sky-400">' + '<div class="min-w-0 flex-1">' + '<div class="flex flex-wrap items-center justify-between gap-2">' + '<p class="text-sm font-semibold text-slate-900">' + (fullName || 'Address') + '</p>' + '<span class="rounded-full bg-sky-50 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.14em] text-sky-700 ring-1 ring-sky-100">' + String(address.type || 'shipping') + '</span>' + '</div>' + (address.phone ? '<p class="mt-1 text-xs font-medium text-slate-600">' + address.phone + '</p>' : '') + '<div class="mt-2 text-sm leading-6 text-slate-600"><p>' + (address.address_line || '') + '</p>' + (cityStateZip ? '<p>' + cityStateZip + '</p>' : '') + (address.country ? '<p>' + address.country + '</p>' : '') + '</div>' + '</div></div></div>'; }).join(''); selectedSavedAddressId = addresses[0] ? Number(addresses[0].id) : null; Array.from(document.querySelectorAll('input[name="selectedSavedAddress"]')).forEach(function (input) { input.addEventListener('change', function () { selectedSavedAddressId = Number(this.value); syncSavedAddressSelection(); }); }); syncSavedAddressSelection(); }
+      function syncSavedAddressSelection() { document.querySelectorAll('.saved-address-option').forEach(function (option) { const radio = option.querySelector('input[name="selectedSavedAddress"]'); const isActive = !!(radio && radio.checked); option.classList.toggle('border-sky-400', isActive); option.classList.toggle('bg-sky-50', isActive); }); }
+      function toggleAddressMode(hasSavedAddresses, showManualEntry) { const useManualEntry = !hasSavedAddresses || !!showManualEntry; if (savedAddressesSection) savedAddressesSection.classList.toggle('hidden', !hasSavedAddresses || useManualEntry); if (manualAddressFields) manualAddressFields.classList.toggle('hidden', hasSavedAddresses && !useManualEntry); if (manualAddressHeader) { manualAddressHeader.classList.toggle('hidden', !hasSavedAddresses || !useManualEntry); manualAddressHeader.classList.toggle('flex', hasSavedAddresses && useManualEntry); } manualAddressInputs.forEach(function (input) { if (hasSavedAddresses && !useManualEntry) { input.dataset.wasRequired = input.required ? 'true' : 'false'; input.required = false; } else if (input.dataset.wasRequired === 'true') { input.required = true; } }); isManualEntryMode = useManualEntry; }
+      function syncBillingVisibility() { billingAddressFields.classList.toggle('hidden', sameAsShippingCheckbox.checked); billingRequiredFields.forEach(function (field) { field.required = !sameAsShippingCheckbox.checked; if (sameAsShippingCheckbox.checked) field.setCustomValidity(''); }); }
+      sameAsShippingCheckbox.addEventListener('change', syncBillingVisibility);
+      if (showNewAddressFormBtn) showNewAddressFormBtn.addEventListener('click', function () { toggleAddressMode(savedAddresses.length > 0, true); showMessage('Enter a new address to continue.', false); });
+      if (backToSavedAddressesBtn) backToSavedAddressesBtn.addEventListener('click', function () { toggleAddressMode(savedAddresses.length > 0, false); showMessage('Select a saved address to continue.', false); });
+      cartAddressForm.addEventListener('submit', async function (event) { event.preventDefault(); const auth = getCustomerAuth(); if (!auth.token) { window.location.replace('/auth/customer/signin?redirect=' + encodeURIComponent('/products/address?cart=1')); return; } if (savedAddresses.length > 0 && !isManualEntryMode) { const selectedAddress = savedAddresses.find(function (address) { return Number(address.id) === Number(selectedSavedAddressId); }); if (!selectedAddress) { showMessage('Please select an address to continue.', true); return; } sessionStorage.setItem('checkoutState', JSON.stringify({ cartMode: true, shippingAddress: { ...selectedAddress, type: 'shipping' }, billingAddress: { ...selectedAddress, type: 'billing' }, sameAsShipping: true })); showMessage('Saved address selected. Redirecting to checkout...', false); window.location.href = '/checkout?cart=1'; return; } if (!cartAddressForm.checkValidity()) { cartAddressForm.reportValidity(); return; } const originalBtnText = submitBtn ? submitBtn.innerHTML : ''; if (submitBtn) { submitBtn.disabled = true; submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2 text-xs"></i> Saving Address'; } try { const shippingResult = await createAddress({ ...getAddressPayload('shipping'), type: 'shipping' }, auth); let billingResult = null; if (!sameAsShippingCheckbox.checked) { billingResult = await createAddress({ ...getAddressPayload('billing'), type: 'billing' }, auth); } sessionStorage.setItem('checkoutState', JSON.stringify({ cartMode: true, shippingAddress: shippingResult?.data || null, billingAddress: sameAsShippingCheckbox.checked ? (shippingResult?.data ? { ...shippingResult.data, type: 'billing' } : null) : (billingResult?.data || null), sameAsShipping: sameAsShippingCheckbox.checked })); showMessage('Address saved successfully. Redirecting to checkout...', false); window.location.href = '/checkout?cart=1'; } catch (error) { console.error('Cart address save error:', error); showMessage(error.message || 'Unable to save address. Please try again.', true); } finally { if (submitBtn) { submitBtn.disabled = false; submitBtn.innerHTML = originalBtnText; } } });
+      syncBillingVisibility();
+      renderCartSummary();
+      (async function initSavedAddresses() { const auth = getCustomerAuth(); if (!auth.token) return; try { savedAddresses = await fetchSavedAddresses(auth); if (savedAddresses.length > 0) { toggleAddressMode(true, false); renderSavedAddresses(savedAddresses); showMessage('Saved addresses found. Select one to continue to checkout.', false); } else { toggleAddressMode(false, true); } } catch (error) { console.error('Saved addresses fetch error:', error); toggleAddressMode(false, true); } })();
+    })();
+  </script>
+  `;
+%>
+<%- include('../layout/app', { title: title || 'Cart Address', body }) %>
+<%
+  } else {
+%>
+<%
   const item = typeof product !== 'undefined' ? product : null;
   const error = typeof errorMessage !== 'undefined' ? errorMessage : '';
   const requestedProductId = String(typeof selectedProductId !== 'undefined' ? selectedProductId : '');
@@ -680,3 +820,4 @@
   `; %>
 
 <%- include('../layout/app', { title: title || 'Address', body }) %>
+<% } %>

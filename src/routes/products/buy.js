@@ -159,6 +159,19 @@ router.get('/buy', async (req, res) => {
 });
 
 router.get('/address', async (req, res) => {
+  const isCartMode = String(req.query.cart || '').trim() === '1';
+  if (isCartMode) {
+    res.render('products/address', {
+      title: 'Cart Address',
+      product: null,
+      selectedProductId: '',
+      qty: 1,
+      errorMessage: '',
+      cartMode: true
+    });
+    return;
+  }
+
   const productId = String(req.query.id || req.query.product_id || req.query.slug || '').trim();
   const qty = Math.max(Number(req.query.qty || 1), 1);
   let product = null;

@@ -165,12 +165,12 @@
           </div>
 
           <!-- Cart Dropdown -->
-          <div x-data="{ open: false }"
+          <div x-data="{ open: false }" @mouseenter="open = true" @mouseleave="open = false"
             class="relative group bg-sky-50/80 backdrop-blur-sm border border-sky-200 shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 transition-all duration-200 p-2 rounded-full overflow-visible">
-            <a href="#" @click.prevent="open = !open" class="flex items-center gap-1 sm:gap-2 cursor-pointer">
+            <a href="/cart" class="flex items-center gap-1 sm:gap-2 cursor-pointer">
               <i
                 class="fas fa-shopping-cart text-gray-600 hover:text-gray-900 text-xl transition-colors duration-200"></i>
-              <span class="hidden sm:inline text-sm font-semibold text-gray-700">0.00</span>
+              <span id="headerCartTotal" class="hidden sm:inline text-sm font-semibold text-gray-700">0.00</span>
               <i class="hidden sm:inline fas fa-chevron-down text-gray-500 text-xs"></i>
             </a>
 
@@ -182,9 +182,8 @@
               x-transition:leave="transition ease-in duration-150"
               x-transition:leave-start="opacity-100 translate-y-0"
               x-transition:leave-end="opacity-0 translate-y-2"
-              @click.away="open = false"
               class="absolute right-0 sm:right-0 max-sm:-right-2 top-full mt-2 w-[min(16rem,calc(100vw-1.5rem))] sm:w-64 bg-white rounded-lg shadow-lg transition-all duration-200 z-[12000] border border-gray-100">
-              <div class="p-4">
+              <div id="headerCartDropdownContent" class="p-4">
                 <div class="text-center py-4">
                   <i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>
                   <p class="text-gray-500 text-sm">Your cart is empty</p>
@@ -340,8 +339,10 @@
       const signUpLink = document.getElementById('headerSignUpLink');
       const ordersLink = document.getElementById('headerOrdersLink');
       const logoutButton = document.getElementById('headerLogoutButton');
+      const headerCartTotal = document.getElementById('headerCartTotal');
+      const headerCartDropdownContent = document.getElementById('headerCartDropdownContent');
 
-      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !ordersLink || !logoutButton) return;
+      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !ordersLink || !logoutButton || !headerCartTotal || !headerCartDropdownContent) return;
 
       function getImageFromUserData() {
         const storageKeys = ['userData', 'customerData', 'authData'];
@@ -401,6 +402,128 @@
         logoutButton.classList.add('hidden');
       }
 
+      function getCustomerAuth() {
+        try {
+          return {
+            token: localStorage.getItem('customerToken') || '',
+            tokenType: localStorage.getItem('tokenType') || 'Bearer'
+          };
+        } catch (error) {
+          return { token: '', tokenType: 'Bearer' };
+        }
+      }
+
+      function getClearedCartItemIds() {
+        try {
+          const parsed = JSON.parse(localStorage.getItem('clearedCartItemIds') || '[]');
+          return Array.isArray(parsed) ? parsed.map(function (value) { return String(value); }) : [];
+        } catch (error) {
+          return [];
+        }
+      }
+
+      function getVisibleCartItems(items) {
+        const clearedIds = getClearedCartItemIds();
+        if (!clearedIds.length) return Array.isArray(items) ? items : [];
+        return (Array.isArray(items) ? items : []).filter(function (item) {
+          return !clearedIds.includes(String(item?.id || ''));
+        });
+      }
+
+      function formatMoney(value) {
+        return new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(Number(value || 0));
+      }
+
+      function calculateLineTotal(item) {
+        const product = item?.product || {};
+        const quantity = Number(item?.quantity || 0);
+        const unitPrice = Number(product?.unit_price || 0);
+        const discountValue = Number(product?.discount || 0);
+        const discountType = product?.discount_type || '';
+        const shippingCost = Number(product?.shipping_cost || 0);
+        const taxAmount = Number(product?.tax_amount || 0);
+        const finalUnitPrice = discountValue > 0
+          ? (discountType === 'percent'
+            ? unitPrice - ((unitPrice * discountValue) / 100)
+            : Math.max(unitPrice - discountValue, 0))
+          : unitPrice;
+
+        return ((finalUnitPrice + taxAmount + shippingCost) * quantity);
+      }
+
+      function renderHeaderCart(items) {
+        const visibleItems = getVisibleCartItems(items);
+
+        if (!visibleItems.length) {
+          headerCartTotal.textContent = '0.00';
+          headerCartDropdownContent.innerHTML = ''
+            + '<div class="text-center py-4">'
+            + '<i class="fas fa-shopping-bag text-gray-300 text-4xl mb-2"></i>'
+            + '<p class="text-gray-500 text-sm">Your cart is empty</p>'
+            + '<a href="/products" class="inline-block mt-3 px-4 py-2 bg-sky-500 text-white text-sm rounded-lg hover:bg-sky-600 transition-colors duration-200">Start Shopping</a>'
+            + '</div>';
+          return;
+        }
+
+        const cartTotal = visibleItems.reduce(function (sum, item) {
+          return sum + calculateLineTotal(item);
+        }, 0);
+
+        headerCartTotal.textContent = formatMoney(cartTotal);
+        headerCartDropdownContent.innerHTML = ''
+          + '<div class="space-y-3">'
+          + visibleItems.slice(0, 3).map(function (item) {
+            const product = item?.product || {};
+            const productId = product?.id || item?.product_id || '';
+            const image = product?.image || 'https://via.placeholder.com/80x80/eef7ff/64748b?text=Item';
+            const title = product?.product_name || 'Product';
+            const quantity = Number(item?.quantity || 0);
+            return ''
+              + '<a href="/products/buy?id=' + encodeURIComponent(String(productId)) + '" class="flex items-center gap-3 rounded-xl border border-sky-100 bg-sky-50/40 p-2 transition hover:bg-sky-50">'
+              + '<img src="' + image + '" alt="' + title + '" class="h-12 w-12 rounded-lg object-contain bg-white ring-1 ring-sky-100">'
+              + '<div class="min-w-0 flex-1">'
+              + '<p class="truncate text-sm font-semibold text-slate-800">' + title + '</p>'
+              + '<p class="mt-1 text-xs text-slate-500">Qty: ' + quantity + '</p>'
+              + '</div>'
+              + '</a>';
+          }).join('')
+          + '<a href="/cart" class="inline-flex w-full items-center justify-center rounded-lg bg-sky-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-600">View Cart</a>'
+          + '</div>';
+      }
+
+      async function loadHeaderCart() {
+        const auth = getCustomerAuth();
+        if (!auth.token) {
+          renderHeaderCart([]);
+          return;
+        }
+
+        try {
+          const response = await fetch('https://aerthh.newhopeindia17.com/api/cart', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+            }
+          });
+
+          const result = await response.json();
+          if (!response.ok || !result?.status) {
+            throw new Error(result?.message || 'Unable to fetch cart.');
+          }
+
+          renderHeaderCart(Array.isArray(result?.data) ? result.data : []);
+        } catch (error) {
+          console.error('Header cart fetch error:', error);
+          renderHeaderCart([]);
+        }
+      }
+
       const hasStoredSession = !!(localStorage.getItem('userData') || localStorage.getItem('customerData') || localStorage.getItem('authData'));
       const profileImage = getImageFromUserData();
 
@@ -410,13 +533,17 @@
         setLoggedOutState();
       }
 
+      loadHeaderCart();
+
       logoutButton.addEventListener('click', function () {
         localStorage.removeItem('userData');
         localStorage.removeItem('customerData');
         localStorage.removeItem('authData');
         localStorage.removeItem('customerToken');
         localStorage.removeItem('tokenType');
+        localStorage.removeItem('clearedCartItemIds');
         setLoggedOutState();
+        renderHeaderCart([]);
         window.location.href = '/';
       });
     })();
