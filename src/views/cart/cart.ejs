@@ -52,6 +52,7 @@ const body = `
     const cartGrandTotal = document.getElementById('cartGrandTotal');
     const cartCheckoutBtn = document.getElementById('cartCheckoutBtn');
     let currentCartItems = [];
+    let removingProductId = '';
 
     if (!cartList || !cartMessage || !cartItemCount || !cartSubtotal || !cartShippingTotal || !cartTaxTotal || !cartGrandTotal || !cartCheckoutBtn) return;
 
@@ -74,6 +75,11 @@ const body = `
       cartMessage.classList.remove('hidden');
     }
 
+    function hideMessage() {
+      cartMessage.textContent = '';
+      cartMessage.className = 'mt-6 hidden rounded-[1rem] px-4 py-3 text-sm';
+    }
+
     function getClearedCartItemIds() {
       try {
         const parsed = JSON.parse(localStorage.getItem('clearedCartItemIds') || '[]');
@@ -87,8 +93,23 @@ const body = `
       const clearedIds = getClearedCartItemIds();
       if (!clearedIds.length) return Array.isArray(items) ? items : [];
       return (Array.isArray(items) ? items : []).filter(function (item) {
-        return !clearedIds.includes(String(item?.id || ''));
+        const cartItemId = String(item?.id || '');
+        const productId = String(item?.product?.id || item?.product_id || '');
+        return !clearedIds.includes(cartItemId) && !clearedIds.includes(productId);
       });
+    }
+
+    function setClearedCartItem(productId) {
+      if (!productId) return;
+
+      try {
+        const existing = getClearedCartItemIds();
+        const normalizedId = String(productId);
+        if (existing.includes(normalizedId)) return;
+        localStorage.setItem('clearedCartItemIds', JSON.stringify(existing.concat(normalizedId)));
+      } catch (error) {
+        console.warn('Unable to update cleared cart item ids:', error);
+      }
     }
 
     function formatMoney(value) {
@@ -166,6 +187,7 @@ const body = `
         const shippingCost = Number(product?.shipping_cost || 0);
         const taxAmount = Number(product?.tax_amount || 0);
         const lineTotal = (finalUnitPrice + shippingCost + taxAmount) * quantity;
+        const isRemoving = String(removingProductId) === String(productId);
 
         return ''
           + '<div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_26px_rgba(148,163,184,0.10)] sm:p-5">'
@@ -179,7 +201,12 @@ const body = `
           + '<h2 class="text-base font-semibold text-slate-900">' + escapeHtml(title) + '</h2>'
           + '<p class="mt-1 text-sm text-slate-500">SKU: ' + escapeHtml(sku) + '</p>'
           + '</div>'
+          + '<div class="flex flex-col items-start gap-3 sm:items-end">'
           + '<p class="text-base font-bold text-sky-700">' + escapeHtml(formatMoney(lineTotal)) + '</p>'
+          + '<button type="button" class="inline-flex items-center justify-center rounded-[0.8rem] border border-rose-200 px-3 py-2 text-sm font-semibold text-rose-600 transition hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60" data-remove-cart-item="' + escapeHtml(productId) + '" ' + (isRemoving ? 'disabled' : '') + '>'
+          + escapeHtml(isRemoving ? 'Removing...' : 'Remove')
+          + '</button>'
+          + '</div>'
           + '</div>'
           + '<div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-3">'
           + '<div class="rounded-[0.85rem] border border-sky-100 bg-sky-50/60 px-3 py-2 text-sm text-slate-600"><span class="font-semibold text-slate-800">Qty:</span> ' + escapeHtml(quantity) + '</div>'
@@ -222,6 +249,58 @@ const body = `
       }
     }
 
+    async function removeCartItem(productId) {
+      const normalizedProductId = String(productId || '').trim();
+      if (!normalizedProductId) {
+        showMessage('Unable to remove this product from cart.', true);
+        return;
+      }
+
+      const auth = getCustomerAuth();
+      if (!auth.token) {
+        window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/cart');
+        return;
+      }
+
+      removingProductId = normalizedProductId;
+      hideMessage();
+      renderCart(currentCartItems);
+
+      try {
+        const response = await fetch('https://aerthh.newhopeindia17.com/api/cart/remove/' + encodeURIComponent(normalizedProductId), {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          }
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to remove product from cart.');
+        }
+
+        setClearedCartItem(normalizedProductId);
+        currentCartItems = currentCartItems.filter(function (item) {
+          const itemProductId = item?.product?.id || item?.product_id || '';
+          return String(itemProductId) !== normalizedProductId;
+        });
+        removingProductId = '';
+        renderCart(currentCartItems);
+        window.dispatchEvent(new CustomEvent('cart:updated', {
+          detail: {
+            items: currentCartItems
+          }
+        }));
+        showMessage(result?.message || 'Product removed from cart successfully.', false);
+      } catch (error) {
+        removingProductId = '';
+        renderCart(currentCartItems);
+        console.error('Cart remove error:', error);
+        showMessage(error.message || 'Unable to remove product from cart.', true);
+      }
+    }
+
     cartCheckoutBtn.addEventListener('click', function () {
       const auth = getCustomerAuth();
       if (!auth.token) {
@@ -241,6 +320,27 @@ const body = `
       }
 
       window.location.href = '/products/address?cart=1';
+    });
+
+    cartList.addEventListener('click', function (event) {
+      const removeButton = event.target.closest('[data-remove-cart-item]');
+      if (!removeButton) return;
+
+      const productId = removeButton.getAttribute('data-remove-cart-item') || '';
+      if (!productId || removingProductId) return;
+      removeCartItem(productId);
+    });
+
+    window.addEventListener('cart:updated', function (event) {
+      const items = event?.detail?.items;
+      if (Array.isArray(items)) {
+        removingProductId = '';
+        hideMessage();
+        renderCart(items);
+        return;
+      }
+
+      loadCart();
     });
 
     loadCart();

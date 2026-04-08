@@ -371,6 +371,21 @@
         return !!auth.token;
       }
 
+      function clearClearedCartItem(productId) {
+        try {
+          const normalizedId = String(productId || '').trim();
+          if (!normalizedId) return;
+          const parsed = JSON.parse(localStorage.getItem('clearedCartItemIds') || '[]');
+          if (!Array.isArray(parsed) || !parsed.length) return;
+          const nextIds = parsed
+            .map(function (value) { return String(value); })
+            .filter(function (value) { return value !== normalizedId; });
+          localStorage.setItem('clearedCartItemIds', JSON.stringify(nextIds));
+        } catch (error) {
+          console.warn('Unable to update cleared cart item ids:', error);
+        }
+      }
+
       async function addProductToCart(productId, quantity) {
         const auth = getCustomerAuth();
         if (!auth.token) {
@@ -397,6 +412,8 @@
           throw new Error(result?.message || 'Unable to add product to cart.');
         }
 
+        clearClearedCartItem(productId);
+        window.dispatchEvent(new CustomEvent('cart:updated'));
         openCartSuccessModal(result?.message || 'Product added to cart successfully.');
         return true;
       }
