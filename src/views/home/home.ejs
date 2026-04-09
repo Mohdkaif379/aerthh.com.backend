@@ -122,6 +122,30 @@
       <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           <div>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Trusted Vendors</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Best Sellers</h2>
+          </div>
+          <a href="/vendors"
+            class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 transition hover:text-sky-900">
+            <span>View All</span>
+            <i class="fas fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+        <p class="mb-5 text-sm text-slate-600">Top performing vendors based on total sold products and completed orders.</p>
+        <div class="relative">
+          <div class="best-seller-track grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <!-- best seller vendors will be injected via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div>
             <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Save More</p>
             <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Top Deals</h2>
           </div>
@@ -274,6 +298,7 @@
       // auto-scroll categories horizontally
       const catTrack = document.querySelector('.cat-track');
       const brandTrack = document.querySelector('.brand-track');
+      const bestSellerTrack = document.querySelector('.best-seller-track');
       const featuredTrack = document.querySelector('.featured-track');
       const topDealsTrack = document.querySelector('.top-deals-track');
       const latestTrack = document.querySelector('.latest-track');
@@ -448,6 +473,46 @@
             +     '<img src="' + brandImage + '" alt="' + (brand.name || 'Brand') + '" class="w-full h-full object-cover">'
             +   '</div>'
             +   '<span class="text-sm font-semibold text-gray-800 text-center leading-tight">' + (brand.name || 'Brand') + '</span>'
+            + '</a>';
+        }).join('');
+      }
+
+      function renderBestSellersClient(vendors) {
+        if (!Array.isArray(vendors)) return '';
+        return vendors.map(function (vendor) {
+          const vendorName = vendor.name || 'Vendor';
+          const vendorImage = vendor.image || 'https://via.placeholder.com/300x300/eef7ff/0369a1?text=Vendor';
+          const city = vendor.city || 'City unavailable';
+          const state = vendor.state || '';
+          const location = state ? city + ', ' + state : city;
+          const totalSold = Number(vendor.total_sold || 0);
+          const totalOrders = Number(vendor.total_orders || 0);
+          const vendorStatus = vendor.status ? 'Active Seller' : 'Seller';
+
+          return ''
+            + '<a href="/vendors" class="block rounded-[1.15rem] border border-sky-100 bg-white/80 p-3 shadow-[0_12px_28px_rgba(14,116,144,0.10)] transition-transform duration-200 hover:-translate-y-1">'
+            + '<div class="rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-3 ring-1 ring-sky-100">'
+            + '<div class="flex items-center gap-3">'
+            + '<div class="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white ring-2 ring-sky-100">'
+            + '<img src="' + vendorImage + '" alt="' + vendorName + '" class="h-full w-full object-cover">'
+            + '</div>'
+            + '<div class="min-w-0 flex-1">'
+            + '<p class="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">' + vendorStatus + '</p>'
+            + '<h3 class="truncate text-[15px] font-bold text-slate-900">' + vendorName + '</h3>'
+            + '<p class="mt-1 truncate text-[12px] text-slate-500"><i class="fas fa-location-dot mr-1 text-[11px] text-sky-500"></i>' + location + '</p>'
+            + '</div>'
+            + '</div>'
+            + '<div class="mt-4 grid grid-cols-2 gap-2">'
+            + '<div class="rounded-[0.85rem] border border-sky-100 bg-white px-3 py-2">'
+            + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Sold</p>'
+            + '<p class="mt-1 text-[16px] font-bold text-slate-900">' + totalSold + '</p>'
+            + '</div>'
+            + '<div class="rounded-[0.85rem] border border-sky-100 bg-white px-3 py-2">'
+            + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Orders</p>'
+            + '<p class="mt-1 text-[16px] font-bold text-slate-900">' + totalOrders + '</p>'
+            + '</div>'
+            + '</div>'
+            + '</div>'
             + '</a>';
         }).join('');
       }
@@ -870,6 +935,23 @@
         }
       }
 
+      async function loadBestSellers() {
+        if (!bestSellerTrack || !apiBaseClient) return;
+        const endpoint = apiBaseClient + 'best-sellers';
+        try {
+          const resp = await fetch(endpoint);
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const data = await resp.json();
+          const list = Array.isArray(data.data) ? data.data : [];
+          bestSellerTrack.innerHTML = list.length
+            ? renderBestSellersClient(list)
+            : '<div class="text-sm text-slate-500">Best sellers unavailable right now.</div>';
+        } catch (err) {
+          console.error('Failed to load best sellers:', err.message || err);
+          bestSellerTrack.innerHTML = '<div class="text-sm text-gray-500">Best sellers unavailable</div>';
+        }
+      }
+
       async function loadFeaturedProducts() {
         if (!featuredTrack || !apiBaseClient || featuredTrack.dataset.loaded === 'true') return;
         featuredTrack.dataset.loaded = 'true';
@@ -1004,6 +1086,7 @@
       initTermsPolicyModal();
       loadCategories();
       loadBrands();
+      loadBestSellers();
       loadFeaturedProducts();
     })();
   </script>
