@@ -482,28 +482,39 @@
         return vendors.map(function (vendor) {
           const vendorName = vendor.name || 'Vendor';
           const vendorImage = vendor.image || 'https://via.placeholder.com/300x300/eef7ff/0369a1?text=Vendor';
+          const vendorId = String(vendor.id || vendor.vendor_id || '').trim();
           const totalSold = Number(vendor.total_sold || 0);
           const totalOrders = Number(vendor.total_orders || 0);
           const vendorStatus = vendor.status ? 'Active Seller' : 'Seller';
+          const vendorBadge = vendor.status ? 'Verified' : 'Pending';
 
           return ''
-            + '<a href="/vendors" class="block rounded-[1.15rem] bg-white/80 p-3 shadow-[0_12px_28px_rgba(14,116,144,0.10)] transition-transform duration-200 hover:-translate-y-1">'
-            + '<div class="overflow-hidden rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)]">'
+            + '<a href="/vendors' + (vendorId ? '/' + encodeURIComponent(vendorId) : '') + '" class="group block overflow-hidden rounded-[1.35rem] bg-white shadow-[0_14px_32px_rgba(148,163,184,0.10)] ring-1 ring-sky-100 transition-transform duration-200 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(125,211,252,0.16)]">'
+            + '<div class="relative overflow-hidden bg-[radial-gradient(circle_at_top,#dbeafe,transparent_52%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)]">'
             + '<div class="h-28 w-full">'
-            + '<img src="' + vendorImage + '" alt="' + vendorName + '" class="block h-full w-full object-cover object-center">'
+            + '<img src="' + vendorImage + '" alt="' + vendorName + '" class="block h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.03]">'
             + '</div>'
-            + '<div class="p-3">'
-            + '<p class="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">' + vendorStatus + '</p>'
-            + '<h3 class="truncate text-[15px] font-bold text-slate-900">' + vendorName + '</h3>'
+            + '<div class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur-sm">' + vendorBadge + '</div>'
+            + '<div class="absolute bottom-3 left-3 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">' + vendorStatus + '</div>'
             + '</div>'
-            + '<div class="grid grid-cols-2 gap-2 px-3 pb-3">'
-            + '<div class="rounded-[0.85rem] border border-sky-100 bg-white px-3 py-2">'
+            + '<div class="p-4">'
+            + '<div class="flex items-start justify-between gap-3">'
+            + '<div class="min-w-0">'
+            + '<h3 class="truncate text-[16px] font-semibold text-slate-900">' + vendorName + '</h3>'
+            + '<p class="mt-1 text-[11px] font-medium uppercase tracking-[0.18em] text-sky-600">Best Seller</p>'
+            + '</div>'
+            + '<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100 transition duration-300 group-hover:bg-sky-100">'
+            + '<i class="fas fa-arrow-right text-[12px] transition-transform duration-300 group-hover:translate-x-0.5"></i>'
+            + '</span>'
+            + '</div>'
+            + '<div class="mt-4 grid grid-cols-2 gap-2">'
+            + '<div class="rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-3 py-2.5 ring-1 ring-sky-100">'
             + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Sold</p>'
-            + '<p class="mt-1 text-[16px] font-bold text-slate-900">' + totalSold + '</p>'
+            + '<p class="mt-1 flex items-baseline gap-1 text-[16px] font-bold text-slate-900"><span class="text-sky-600"><i class="fas fa-box-open text-[11px]"></i></span><span>' + totalSold + '</span></p>'
             + '</div>'
-            + '<div class="rounded-[0.85rem] border border-sky-100 bg-white px-3 py-2">'
+            + '<div class="rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-3 py-2.5 ring-1 ring-sky-100">'
             + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Orders</p>'
-            + '<p class="mt-1 text-[16px] font-bold text-slate-900">' + totalOrders + '</p>'
+            + '<p class="mt-1 flex items-baseline gap-1 text-[16px] font-bold text-slate-900"><span class="text-sky-600"><i class="fas fa-receipt text-[11px]"></i></span><span>' + totalOrders + '</span></p>'
             + '</div>'
             + '</div>'
             + '</div>'
