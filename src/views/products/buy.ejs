@@ -10,6 +10,22 @@
   const brandImage = item?.brand?.image
     ? (String(item.brand.image).startsWith('http') ? item.brand.image : `https://aerthh.newhopeindia17.com/public/brand/${item.brand.image}`)
     : 'https://aerthh.com/storage/app/public/company/2025-03-26-67e3da8f9b411.webp';
+  const vendorDetails = typeof vendor !== 'undefined' && vendor ? vendor : null;
+  const vendorId = String(vendorDetails?.id || vendorDetails?.vendor_id || item?.vendor_id || item?.vendor?.id || item?.vendor?.vendor_id || '').trim();
+  const vendorName = vendorDetails?.name || item?.vendor?.name || 'Vendor';
+  const vendorImage = vendorDetails?.image
+    ? (String(vendorDetails.image).startsWith('http') ? vendorDetails.image : `https://aerthh.newhopeindia17.com/storage/app/public/vendors/images/${vendorDetails.image}`)
+    : (item?.vendor?.image || 'https://via.placeholder.com/300x300/eef7ff/0369a1?text=Vendor');
+  const vendorLocation = [vendorDetails?.city || item?.vendor?.city || '', vendorDetails?.state || item?.vendor?.state || ''].filter(Boolean).join(', ');
+  const vendorStatus = vendorDetails?.status ? 'Active Seller' : 'Seller';
+  const vendorBadge = vendorDetails?.status ? 'Verified' : 'Pending';
+  const rawDescription = item?.description || '';
+  const cleanDescription = String(rawDescription)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>\s*<p>/gi, '\n\n')
+    .replace(/<[^>]*>/g, '')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   const additionalImages = Array.isArray(item?.additional_image)
     ? item.additional_image.filter(Boolean)
     : typeof item?.additional_image === 'string'
@@ -189,11 +205,15 @@
             <button type="button" class="buy-detail-tab border-b-2 border-sky-500 px-1 pb-2 text-[14px] font-semibold text-sky-600" data-tab="description">Description</button>
             <button type="button" class="buy-detail-tab border-b-2 border-transparent px-1 pb-2 text-[14px] font-semibold text-slate-500" data-tab="reviews">Reviews</button>
           </div>
-          <div id="buyDescriptionPanel" class="pt-4 text-[14px] leading-6 text-slate-600">
-            ${item?.description || 'Description unavailable'}
-          </div>
-          <div id="buyReviewsPanel" class="hidden pt-4 text-[14px] leading-6 text-slate-600">
-            Reviews unavailable for this product.
+          <div class="pt-4">
+            <div class="rounded-[0.9rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+              <div id="buyDescriptionPanel" class="text-[14px] leading-6 text-slate-600 whitespace-pre-line">
+                ${cleanDescription || 'Description unavailable'}
+              </div>
+            </div>
+            <div id="buyReviewsPanel" class="hidden pt-4 text-[14px] leading-6 text-slate-600">
+              Reviews unavailable for this product.
+            </div>
           </div>
         </div>
 

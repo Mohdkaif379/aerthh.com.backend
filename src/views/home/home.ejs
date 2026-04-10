@@ -146,6 +146,30 @@
       <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
         <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
           <div>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Top Performer</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Top Selling Products</h2>
+          </div>
+          <a href="/products"
+            class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-sky-700 transition hover:text-sky-900">
+            <span>View All</span>
+            <i class="fas fa-arrow-right text-[10px]"></i>
+          </a>
+        </div>
+        <p class="mb-5 text-sm text-slate-600">Top selling products fetched from the live API.</p>
+        <div class="relative">
+          <div class="top-selling-track grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <!-- top selling product will be injected via JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pb-8 sm:pb-10">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="rounded-[1.25rem] sm:rounded-[2rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-4 sm:p-5 shadow-xl ring-1 ring-sky-100 md:p-6">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div>
             <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Save More</p>
             <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Top Deals</h2>
           </div>
@@ -299,6 +323,7 @@
       const catTrack = document.querySelector('.cat-track');
       const brandTrack = document.querySelector('.brand-track');
       const bestSellerTrack = document.querySelector('.best-seller-track');
+      const topSellingTrack = document.querySelector('.top-selling-track');
       const featuredTrack = document.querySelector('.featured-track');
       const topDealsTrack = document.querySelector('.top-deals-track');
       const latestTrack = document.querySelector('.latest-track');
@@ -495,7 +520,7 @@
             + '<img src="' + vendorImage + '" alt="' + vendorName + '" class="block h-full w-full object-cover object-center transition duration-300 group-hover:scale-[1.03]">'
             + '</div>'
             + '<div class="absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur-sm">' + vendorBadge + '</div>'
-            + '<div class="absolute bottom-3 left-3 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">' + vendorStatus + '</div>'
+            + '<div class="absolute right-3 top-3 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white backdrop-blur-sm">' + vendorStatus + '</div>'
             + '</div>'
             + '<div class="p-4">'
             + '<div class="flex items-start justify-between gap-3">'
@@ -520,6 +545,132 @@
             + '</div>'
             + '</a>';
         }).join('');
+      }
+
+      function renderTopSellingProductClient(product) {
+        if (!product) return '';
+
+        const escapeText = (value) => String(value == null ? '' : value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        const stripHtml = (value) => String(value == null ? '' : value).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+        const title = escapeText(product.product_name || product.name || product.title || 'Product');
+        const image = escapeText(product.image || product.thumbnail || product.featured_image || 'https://via.placeholder.com/1200x800/eaf5ff/0f172a?text=Product');
+        const unitPrice = Number(product.unit_price || product.price || product.sale_price || product.base_price || 0);
+        const discountValue = Number(product.discount || 0);
+        const discountType = product.discount_type || '';
+        const finalPrice = discountValue > 0
+          ? (discountType === 'percent'
+            ? unitPrice - ((unitPrice * discountValue) / 100)
+            : Math.max(unitPrice - discountValue, 0))
+          : unitPrice;
+        const stockQty = product.stock_quantity || 'N/A';
+        const vendorName = escapeText(product.vendor?.name || product.vendor_name || 'Vendor');
+        const categoryName = escapeText(product.category?.name || product.category_name || 'Category');
+        const description = stripHtml(product.description || product.short_description || product.meta_description || '');
+        const descriptionText = description ? (description.length > 150 ? description.slice(0, 150) + '…' : description) : 'Top selling product from the live catalogue.';
+        const productUnit = escapeText(product.product_unit || 'item');
+
+        return ''
+          + '<article class="group w-full max-w-[980px] overflow-hidden rounded-[1.6rem] bg-white shadow-[0_16px_40px_rgba(148,163,184,0.12)] ring-1 ring-sky-100 transition duration-300 hover:-translate-y-1 hover:shadow-[0_22px_50px_rgba(125,211,252,0.18)]">'
+          + '<div class="grid gap-0 lg:grid-cols-[1.08fr_0.92fr]">'
+          + '<div class="relative flex min-h-[260px] items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,#dbeafe,transparent_56%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 sm:p-6">'
+          + '<img src="' + image + '" alt="' + title + '" class="h-[220px] w-full object-contain transition duration-300 group-hover:scale-[1.03]">'
+          + '<div class="absolute left-4 top-4 rounded-full bg-white/90 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur-sm">Top Seller</div>'
+          + '<div class="absolute right-4 top-4 rounded-full bg-slate-950/70 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-white shadow-sm backdrop-blur-sm">' + productUnit + '</div>'
+          + '</div>'
+          + '<div class="flex flex-col justify-between p-4 sm:p-5 lg:p-6">'
+          + '<div>'
+          + '<div class="flex flex-wrap items-center gap-2">'
+          + '<span class="inline-flex items-center rounded-full bg-sky-50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-700 ring-1 ring-sky-100">Top Selling Product</span>'
+          + '<span class="inline-flex items-center rounded-full bg-white px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600 ring-1 ring-slate-100">' + categoryName + '</span>'
+          + '</div>'
+          + '<h3 class="mt-3 text-[22px] font-semibold leading-tight text-slate-900 sm:text-[24px]">' + title + '</h3>'
+          + '<p class="mt-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-sky-600">' + vendorName + '</p>'
+          + '<p class="mt-4 max-w-xl text-sm leading-6 text-slate-600">' + escapeText(descriptionText) + '</p>'
+          + '</div>'
+          + '<div class="mt-5 grid gap-3 sm:grid-cols-2">'
+          + '<div class="rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-3 py-2.5 ring-1 ring-sky-100">'
+          + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Price</p>'
+          + '<p class="mt-1 text-[18px] font-bold text-slate-900">&#8377;' + finalPrice.toFixed(2) + '</p>'
+          + '</div>'
+          + '<div class="rounded-[1rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-3 py-2.5 ring-1 ring-sky-100">'
+          + '<p class="text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Stock</p>'
+          + '<p class="mt-1 text-[18px] font-bold text-slate-900">' + escapeText(stockQty) + '</p>'
+          + '</div>'
+          + '</div>'
+          + '<div class="mt-5 flex flex-wrap items-center gap-2.5">'
+          + '<a href="/products/buy?id=' + (product.id || '') + '" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-[11px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy Now</a>'
+          + '<span class="inline-flex items-center rounded-full bg-slate-50 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-600 ring-1 ring-slate-100">Featured</span>'
+          + '</div>'
+          + '</div>'
+          + '</div>'
+          + '</article>';
+      }
+
+      function renderTopSellingProductCompactClient(product) {
+        if (!product) return '';
+
+        const escapeText = (value) => String(value == null ? '' : value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+        const title = escapeText(product.product_name || product.name || product.title || 'Product');
+        const image = escapeText(product.image || product.thumbnail || product.featured_image || 'https://via.placeholder.com/1200x800/eaf5ff/0f172a?text=Product');
+        const unitPrice = Number(product.unit_price || product.price || product.sale_price || product.base_price || 0);
+        const discountValue = Number(product.discount || 0);
+        const discountType = product.discount_type || '';
+        const finalPrice = discountValue > 0
+          ? (discountType === 'percent'
+            ? unitPrice - ((unitPrice * discountValue) / 100)
+            : Math.max(unitPrice - discountValue, 0))
+          : unitPrice;
+        const stockQty = product.stock_quantity || 'N/A';
+        const vendorName = escapeText(product.vendor?.name || product.vendor_name || 'Vendor');
+        const categoryName = escapeText(product.category?.name || product.category_name || 'Category');
+        const description = String(product.description || product.short_description || product.meta_description || '')
+          .replace(/<[^>]*>/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+        const descriptionText = description ? (description.length > 110 ? description.slice(0, 110) + '...' : description) : 'Top selling product from the live catalogue.';
+        const productUnit = escapeText(product.product_unit || 'item');
+        const productHref = '/products/buy?id=' + encodeURIComponent(String(product.id || ''));
+
+        return ''
+          + '<article class="group h-full cursor-pointer overflow-hidden rounded-[1.15rem] bg-white shadow-[0_12px_30px_rgba(148,163,184,0.10)] ring-1 ring-sky-100 transition duration-300 hover:-translate-y-1 hover:shadow-[0_18px_40px_rgba(125,211,252,0.16)]" role="link" tabindex="0" aria-label="View product ' + title + '" data-product-href="' + escapeText(productHref) + '">'
+          + '<div class="relative h-[150px] overflow-hidden bg-[radial-gradient(circle_at_top,#dbeafe,transparent_56%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-3">'
+          + '<img src="' + image + '" alt="' + title + '" class="h-full w-full object-contain transition duration-300 group-hover:scale-[1.03]">'
+          + '<div class="absolute left-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.14em] text-sky-700 shadow-sm backdrop-blur-sm">Top Seller</div>'
+          + '<div class="absolute right-2.5 top-2.5 rounded-full bg-slate-950/70 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white shadow-sm backdrop-blur-sm">' + productUnit + '</div>'
+          + '</div>'
+          + '<div class="p-3.5">'
+          + '<div class="flex flex-wrap items-center gap-2">'
+          + '<span class="inline-flex items-center rounded-full bg-sky-50 px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-sky-700 ring-1 ring-sky-100">Top Selling</span>'
+          + '<span class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-600 ring-1 ring-slate-100">' + categoryName + '</span>'
+          + '</div>'
+          + '<h3 class="mt-2 truncate text-[15px] font-semibold leading-tight text-slate-900">' + title + '</h3>'
+          + '<p class="mt-1 truncate text-[10px] font-semibold uppercase tracking-[0.16em] text-sky-600">' + vendorName + '</p>'
+          + '<p class="mt-2 line-clamp-2 min-h-[34px] text-[11px] leading-5 text-slate-600">' + escapeText(descriptionText) + '</p>'
+          + '<div class="mt-3 grid grid-cols-2 gap-2">'
+          + '<div class="rounded-[0.85rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-2.5 py-2 ring-1 ring-sky-100">'
+          + '<p class="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-400">Price</p>'
+          + '<p class="mt-1 text-[13px] font-bold text-slate-900">&#8377;' + finalPrice.toFixed(2) + '</p>'
+          + '</div>'
+          + '<div class="rounded-[0.85rem] bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] px-2.5 py-2 ring-1 ring-sky-100">'
+          + '<p class="text-[9px] font-semibold uppercase tracking-[0.14em] text-slate-400">Stock</p>'
+          + '<p class="mt-1 text-[13px] font-bold text-slate-900">' + escapeText(stockQty) + '</p>'
+          + '</div>'
+          + '</div>'
+          + '<div class="mt-3 flex items-center justify-end gap-2">'
+          + '<a href="' + productHref + '" class="inline-flex items-center justify-center rounded-[0.75rem] bg-gradient-to-r from-sky-500 to-blue-500 px-3.5 py-2 text-[10px] font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Buy Now</a>'
+          + '</div>'
+          + '</div>'
+          + '</article>';
       }
 
       function renderFeaturedProductsClient(products) {
@@ -1010,6 +1161,37 @@
         }
       }
 
+      async function loadTopSellingProduct() {
+        if (!topSellingTrack || !apiBaseClient) return;
+        const endpoint = apiBaseClient + 'top-selling';
+        try {
+          const resp = await fetch(endpoint);
+          if (!resp.ok) throw new Error('HTTP ' + resp.status);
+          const data = await resp.json();
+          const list = Array.isArray(data) ? data : Array.isArray(data.data) ? data.data : [];
+          const products = list.slice(0, 4);
+          topSellingTrack.innerHTML = products.length
+            ? products.map(renderTopSellingProductCompactClient).join('')
+            : '<div class="text-sm text-slate-500">Top selling product unavailable right now.</div>';
+          topSellingTrack.querySelectorAll('[data-product-href]').forEach(function (card) {
+            const href = card.getAttribute('data-product-href') || '';
+            if (!href) return;
+            card.addEventListener('click', function () {
+              window.location.href = href;
+            });
+            card.addEventListener('keydown', function (event) {
+              if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                window.location.href = href;
+              }
+            });
+          });
+        } catch (err) {
+          console.error('Failed to load top selling product:', err.message || err);
+          topSellingTrack.innerHTML = '<div class="text-sm text-gray-500">Top selling product unavailable</div>';
+        }
+      }
+
       function initInfiniteCarousel(track, itemClassName) {
         const items = Array.from(track.children).filter(el => el.classList.contains(itemClassName));
         if (!items.length || track.dataset.carouselReady === 'true') return;
@@ -1092,6 +1274,7 @@
       loadCategories();
       loadBrands();
       loadBestSellers();
+      loadTopSellingProduct();
       loadFeaturedProducts();
     })();
   </script>

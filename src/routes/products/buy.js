@@ -67,6 +67,41 @@ async function fetchAllProducts() {
   return Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
 }
 
+async function fetchVendorById(vendorId) {
+  const normalizedVendorId = String(vendorId || '').trim();
+  if (!normalizedVendorId) return null;
+
+  const baseUrl = process.env.BASE_URL || 'https://aerthh.newhopeindia17.com/api/';
+  const normalizedBaseUrl = baseUrl.endsWith('/') ? baseUrl : baseUrl + '/';
+  const endpoints = [
+    `${normalizedBaseUrl}vendors/${encodeURIComponent(normalizedVendorId)}`,
+    `${normalizedBaseUrl}vendors?id=${encodeURIComponent(normalizedVendorId)}`
+  ];
+
+  for (const endpoint of endpoints) {
+    try {
+      const resp = await fetchFn(endpoint);
+      const data = await resp.json().catch(() => null);
+      if (!resp.ok) continue;
+      const candidate = normalizeProductEntity(data, normalizedVendorId);
+      if (candidate && String(candidate.id || candidate.vendor_id || '') === normalizedVendorId) {
+        return candidate;
+      }
+    } catch (error) {
+      // Try next endpoint.
+    }
+  }
+
+  try {
+    const resp = await fetchFn(`${normalizedBaseUrl}vendors`);
+    const data = await resp.json().catch(() => null);
+    const list = Array.isArray(data?.data) ? data.data : Array.isArray(data) ? data : [];
+    return list.find((vendor) => String(vendor?.id || vendor?.vendor_id || '') === normalizedVendorId) || null;
+  } catch (error) {
+    return null;
+  }
+}
+
 function buildSimilarProducts(product, products) {
   if (!product || !Array.isArray(products)) return [];
 
@@ -126,6 +161,7 @@ router.get('/buy', async (req, res) => {
   const rawProductId = req.query.id || req.query.product_id || req.params.id || req.query.slug || '';
   const productId = String(rawProductId).trim();
   let product = null;
+  let vendor = null;
   let similarProducts = [];
   let errorMessage = '';
   console.log('[buy-route] /buy payload id:', productId);
@@ -135,6 +171,12 @@ router.get('/buy', async (req, res) => {
   } else {
     try {
       product = await fetchSingleProduct(productId);
+      const vendorId = String(product?.vendor_id || product?.vendor?.id || product?.vendor?.vendor_id || '').trim();
+      if (product?.vendor && typeof product.vendor === 'object') {
+        vendor = product.vendor;
+      } else if (vendorId) {
+        vendor = await fetchVendorById(vendorId);
+      }
       try {
         const allProducts = await fetchAllProducts();
         similarProducts = buildSimilarProducts(product, allProducts);
@@ -152,6 +194,7 @@ router.get('/buy', async (req, res) => {
   res.render('products/buy', {
     title: product?.product_name || 'Buy',
     product,
+    vendor,
     selectedProductId: productId,
     similarProducts,
     errorMessage
@@ -200,6 +243,7 @@ router.get('/address', async (req, res) => {
 router.get('/:id', async (req, res) => {
   const productId = String(req.params.id || '').trim();
   let product = null;
+  let vendor = null;
   let similarProducts = [];
   let errorMessage = '';
   console.log('[buy-route] /:id payload id:', productId);
@@ -209,6 +253,12 @@ router.get('/:id', async (req, res) => {
   } else {
     try {
       product = await fetchSingleProduct(productId);
+      const vendorId = String(product?.vendor_id || product?.vendor?.id || product?.vendor?.vendor_id || '').trim();
+      if (product?.vendor && typeof product.vendor === 'object') {
+        vendor = product.vendor;
+      } else if (vendorId) {
+        vendor = await fetchVendorById(vendorId);
+      }
       try {
         const allProducts = await fetchAllProducts();
         similarProducts = buildSimilarProducts(product, allProducts);
@@ -226,6 +276,7 @@ router.get('/:id', async (req, res) => {
   res.render('products/buy', {
     title: product?.product_name || 'Buy',
     product,
+    vendor,
     selectedProductId: productId,
     similarProducts,
     errorMessage
