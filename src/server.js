@@ -3,7 +3,6 @@ const path = require('path');
 const routes = require('./routes'); // routes import
 const fs = require('fs');
 
-// load .env manually
 const envPath = path.join(__dirname, '../.env');
 if (fs.existsSync(envPath)) {
   fs.readFileSync(envPath, 'utf8')
@@ -18,8 +17,6 @@ const port = 3000;
 
 // EJS setup
 app.set('view engine', 'ejs');
-// Resolve the views directory defensively so template lookup keeps working
-// even if the app is started from a different entrypoint or working directory.
 const viewDirectories = [
   path.join(__dirname, 'views'),
   path.join(process.cwd(), 'src', 'views'),
