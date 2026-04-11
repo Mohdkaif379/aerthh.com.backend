@@ -1,0 +1,342 @@
+<%
+const body = `
+<style>
+  .wishlist-glow {
+    background:
+      radial-gradient(circle at top left, rgba(14, 165, 233, 0.18), transparent 34%),
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.14), transparent 28%),
+      linear-gradient(135deg, #f8fcff 0%, #ffffff 52%, #eef7ff 100%);
+  }
+</style>
+
+<section class="px-3 pt-5 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-7xl">
+    <div class="wishlist-glow overflow-hidden rounded-[1.4rem] sm:rounded-[2rem] border border-sky-100 p-4 shadow-[0_20px_70px_rgba(148,163,184,0.12)] sm:p-6 md:p-8">
+      <div class="grid gap-5 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sky-600">Wishlist</p>
+          <h1 class="mt-2 text-[28px] sm:text-3xl md:text-4xl font-bold tracking-tight text-slate-900">My Wishlist</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-6 text-slate-600">A neatly curated space for products you want to revisit, compare, or buy later. Everything stays in one clean, modern view.</p>
+        </div>
+        <div class="ml-auto flex w-fit items-center justify-end gap-3">
+          <div class="flex items-center justify-between gap-4 rounded-[1rem] border border-sky-100 bg-white/90 px-4 py-3 shadow-sm ring-1 ring-sky-50 sm:min-w-[180px]">
+            <p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-500">Saved</p>
+            <p id="wishlistCountBadge" class="text-2xl font-bold text-slate-900">0</p>
+          </div>
+          <a href="/products" class="inline-flex h-12 w-12 items-center justify-center justify-self-end rounded-full bg-gradient-to-r from-sky-500 to-blue-500 text-white shadow-[0_10px_24px_rgba(14,165,233,0.22)] transition hover:from-sky-600 hover:to-blue-600" aria-label="Continue shopping" title="Continue shopping">
+            <i class="fas fa-arrow-right text-sm"></i>
+          </a>
+        </div>
+      </div>
+
+      <div id="wishlistMessage" class="mt-6 hidden rounded-[1rem] px-4 py-3 text-sm"></div>
+
+      <div class="mt-7 rounded-[1.25rem] border border-sky-100 bg-white/70 p-3 sm:p-4 ring-1 ring-sky-50">
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-sky-100 pb-3">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Saved Products</p>
+            <h2 class="mt-1 text-lg font-bold text-slate-900">Wishlist Items</h2>
+          </div>
+          <span class="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-700 ring-1 ring-sky-100">Quick access</span>
+        </div>
+
+        <div id="wishlistGrid" class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div class="rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-5 text-sm text-slate-500">
+            Loading wishlist items...
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="wishlistRemoveSuccessModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+  <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+      <i class="fas fa-trash-check text-xl"></i>
+    </div>
+    <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Removed from Wishlist</h3>
+    <p id="wishlistRemoveSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product removed from wishlist successfully.</p>
+    <div class="mt-5 flex justify-center">
+      <button id="wishlistRemoveSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    const wishlistGrid = document.getElementById('wishlistGrid');
+    const wishlistMessage = document.getElementById('wishlistMessage');
+    const wishlistCountBadge = document.getElementById('wishlistCountBadge');
+    const wishlistRemoveSuccessModal = document.getElementById('wishlistRemoveSuccessModal');
+    const wishlistRemoveSuccessMessage = document.getElementById('wishlistRemoveSuccessMessage');
+    const wishlistEndpoint = 'https://aerthh.newhopeindia17.com/api/wishlist';
+    let currentWishlistItems = [];
+    let removingWishlistProductId = '';
+
+    if (!wishlistGrid || !wishlistMessage || !wishlistCountBadge || !wishlistRemoveSuccessModal || !wishlistRemoveSuccessMessage) return;
+
+    function getCustomerAuth() {
+      try {
+        return {
+          token: localStorage.getItem('customerToken') || '',
+          tokenType: localStorage.getItem('tokenType') || 'Bearer'
+        };
+      } catch (error) {
+        return { token: '', tokenType: 'Bearer' };
+      }
+    }
+
+    function showMessage(text, isError) {
+      wishlistMessage.textContent = text;
+      wishlistMessage.className = 'mt-6 rounded-[1rem] px-4 py-3 text-sm ' + (isError
+        ? 'border border-rose-200 bg-rose-50 text-rose-600'
+        : 'border border-sky-200 bg-sky-50 text-sky-700');
+      wishlistMessage.classList.remove('hidden');
+    }
+
+    function hideMessage() {
+      wishlistMessage.textContent = '';
+      wishlistMessage.className = 'mt-6 hidden rounded-[1rem] px-4 py-3 text-sm';
+    }
+
+    function setCount(count) {
+      wishlistCountBadge.textContent = String(count || 0);
+    }
+
+    function openRemoveSuccessModal(message) {
+      wishlistRemoveSuccessMessage.textContent = message || 'Product removed from wishlist successfully.';
+      wishlistRemoveSuccessModal.classList.remove('hidden');
+      wishlistRemoveSuccessModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeRemoveSuccessModal() {
+      wishlistRemoveSuccessModal.classList.add('hidden');
+      wishlistRemoveSuccessModal.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function setEmptyState() {
+      wishlistGrid.innerHTML = ''
+        + '<div class="sm:col-span-2 xl:col-span-3 rounded-[1.15rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-6 text-center shadow-[0_10px_26px_rgba(148,163,184,0.10)]">'
+        + '<div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">'
+        + '<i class="fas fa-heart text-xl"></i>'
+        + '</div>'
+        + '<h3 class="mt-4 text-lg font-bold text-slate-900">Your wishlist is empty</h3>'
+        + '<p class="mt-2 text-sm leading-6 text-slate-500">Tap the heart icon on any product to save it here for later.</p>'
+        + '<a href="/products" class="mt-5 inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Browse Products</a>'
+        + '</div>';
+    }
+
+    function setSignInState() {
+      wishlistGrid.innerHTML = ''
+        + '<div class="sm:col-span-2 xl:col-span-3 rounded-[1.15rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-6 text-center shadow-[0_10px_26px_rgba(148,163,184,0.10)]">'
+        + '<div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">'
+        + '<i class="fas fa-user-lock text-xl"></i>'
+        + '</div>'
+        + '<h3 class="mt-4 text-lg font-bold text-slate-900">Sign in to see your wishlist</h3>'
+        + '<p class="mt-2 text-sm leading-6 text-slate-500">Your saved items are linked to your customer account.</p>'
+        + '<a href="/auth/customer/signin?redirect=' + encodeURIComponent('/wishlist') + '" class="mt-5 inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">Sign In</a>'
+        + '</div>';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('en-IN', {
+        style: 'currency',
+        currency: 'INR',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(Number(value || 0));
+    }
+
+    function getFinalPrice(product) {
+      const unitPrice = Number(product?.unit_price || 0);
+      const discountValue = Number(product?.discount || 0);
+      const discountType = product?.discount_type || '';
+      return discountValue > 0
+        ? (discountType === 'percent'
+          ? unitPrice - ((unitPrice * discountValue) / 100)
+          : Math.max(unitPrice - discountValue, 0))
+        : unitPrice;
+    }
+
+    function renderWishlist(items) {
+      if (!Array.isArray(items) || !items.length) {
+        currentWishlistItems = [];
+        setCount(0);
+        setEmptyState();
+        return;
+      }
+
+      currentWishlistItems = Array.isArray(items) ? items : [];
+      setCount(items.length);
+      wishlistGrid.innerHTML = items.map(function (item) {
+        const product = item?.product || {};
+        const productId = product?.id || item?.product_id || '';
+        const normalizedProductId = String(productId || '').trim();
+        const image = product?.image || 'https://via.placeholder.com/240x240/eef7ff/64748b?text=Item';
+        const title = product?.product_name || 'Product';
+        const price = getFinalPrice(product);
+        const sku = product?.sku || '--';
+        const isRemoving = String(removingWishlistProductId) === normalizedProductId;
+        return ''
+          + '<article class="group overflow-hidden rounded-[1.15rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_10px_26px_rgba(148,163,184,0.10)] transition duration-300 hover:-translate-y-1 hover:border-sky-200 hover:shadow-[0_18px_34px_rgba(125,211,252,0.16)]">'
+          + '<div class="relative p-3">'
+          + '<a href="/products/buy?id=' + encodeURIComponent(String(productId)) + '" class="block">'
+          + '<div class="overflow-hidden rounded-[1rem] bg-[radial-gradient(circle_at_top,#dbeafe,transparent_56%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-2.5 ring-1 ring-sky-100">'
+          + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-48 w-full object-contain transition duration-300 group-hover:scale-[1.03]">'
+          + '</div>'
+          + '</a>'
+          + '<button type="button" class="absolute right-5 top-5 flex h-9 w-9 items-center justify-center rounded-full border border-rose-100 bg-white text-rose-500 shadow-sm opacity-0 translate-y-1 pointer-events-none transition duration-200 hover:bg-rose-50 disabled:cursor-not-allowed disabled:opacity-60 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto" data-remove-wishlist-item="' + escapeHtml(normalizedProductId) + '" aria-label="Remove from wishlist" title="Remove" ' + (isRemoving ? 'disabled' : '') + '>'
+          + '<i class="fas ' + (isRemoving ? 'fa-spinner fa-spin' : 'fa-trash-alt') + ' text-[11px]"></i>'
+          + '</button>'
+          + '</div>'
+          + '<div class="p-4">'
+          + '<div class="flex items-start justify-between gap-3">'
+          + '<div class="min-w-0">'
+          + '<p class="text-[10px] font-bold uppercase tracking-[0.18em] text-sky-500">Wishlist Pick</p>'
+          + '<h2 class="mt-1 line-clamp-2 text-base font-semibold leading-6 text-slate-900">' + escapeHtml(title) + '</h2>'
+          + '</div>'
+          + '<button type="button" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-sky-100 bg-sky-50 text-sky-600 transition hover:bg-sky-100" aria-label="Wishlisted item">'
+          + '<i class="fas fa-heart text-xs"></i>'
+          + '</button>'
+          + '</div>'
+          + '<div class="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">'
+          + '<span class="rounded-full bg-sky-50 px-2.5 py-1 font-medium text-sky-700 ring-1 ring-sky-100">SKU: ' + escapeHtml(sku) + '</span>'
+          + '<span class="rounded-full bg-slate-50 px-2.5 py-1 font-medium text-slate-600 ring-1 ring-slate-100">Ready to buy later</span>'
+          + '</div>'
+          + '<div class="mt-4 flex items-end justify-between gap-3 border-t border-sky-100 pt-4">'
+          + '<span class="text-lg font-bold text-sky-700">' + escapeHtml(formatMoney(price)) + '</span>'
+          + '<a href="/products/buy?id=' + encodeURIComponent(String(productId)) + '" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">View</a>'
+          + '</div>'
+          + '</div>'
+          + '</article>';
+      }).join('');
+    }
+
+    async function removeWishlistItem(productId) {
+      const normalizedProductId = String(productId || '').trim();
+      if (!normalizedProductId || removingWishlistProductId) return;
+
+      const auth = getCustomerAuth();
+      if (!auth.token) {
+        window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/wishlist');
+        return;
+      }
+
+      removingWishlistProductId = normalizedProductId;
+      renderWishlist(currentWishlistItems);
+
+      try {
+        const response = await fetch(wishlistEndpoint + '/remove/' + encodeURIComponent(normalizedProductId), {
+          method: 'DELETE',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          }
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to remove item from wishlist.');
+        }
+
+        currentWishlistItems = currentWishlistItems.filter(function (item) {
+          const itemProductId = String(item?.product?.id || item?.product_id || '');
+          return itemProductId !== normalizedProductId;
+        });
+
+        showMessage(result?.message || 'Item removed from wishlist successfully.', false);
+        setCount(currentWishlistItems.length);
+        renderWishlist(currentWishlistItems);
+        window.dispatchEvent(new CustomEvent('wishlist:updated'));
+        openRemoveSuccessModal(result?.message || 'Product removed from wishlist successfully.');
+      } catch (error) {
+        console.error('Wishlist remove error:', error);
+        showMessage(error.message || 'Unable to remove item from wishlist.', true);
+      } finally {
+        removingWishlistProductId = '';
+        renderWishlist(currentWishlistItems);
+      }
+    }
+
+    async function loadWishlist() {
+      const auth = getCustomerAuth();
+        if (!auth.token) {
+          setCount(0);
+          currentWishlistItems = [];
+          setSignInState();
+        return;
+      }
+
+      try {
+        const response = await fetch(wishlistEndpoint, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          }
+        });
+
+        const result = await response.json();
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to fetch wishlist.');
+        }
+
+        hideMessage();
+        renderWishlist(Array.isArray(result?.data) ? result.data : []);
+      } catch (error) {
+        console.error('Wishlist fetch error:', error);
+        showMessage(error.message || 'Unable to load wishlist items.', true);
+        setCount(0);
+        currentWishlistItems = [];
+        wishlistGrid.innerHTML = ''
+          + '<div class="sm:col-span-2 xl:col-span-3 rounded-[1.15rem] border border-rose-100 bg-rose-50 p-6 text-center shadow-[0_10px_26px_rgba(244,63,94,0.08)]">'
+          + '<div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-white text-rose-500 ring-1 ring-rose-100">'
+          + '<i class="fas fa-triangle-exclamation text-xl"></i>'
+          + '</div>'
+          + '<h3 class="mt-4 text-lg font-bold text-rose-700">Unable to load wishlist items</h3>'
+          + '<p class="mt-2 text-sm leading-6 text-rose-600/80">Please try again in a moment.</p>'
+          + '</div>';
+      }
+    }
+
+    wishlistGrid.addEventListener('click', function (event) {
+      const removeButton = event.target.closest('[data-remove-wishlist-item]');
+      if (!removeButton) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      const productId = removeButton.getAttribute('data-remove-wishlist-item') || '';
+      removeWishlistItem(productId);
+    });
+
+    wishlistRemoveSuccessModal.addEventListener('click', function (event) {
+      if (event.target === wishlistRemoveSuccessModal) {
+        closeRemoveSuccessModal();
+      }
+    });
+
+    document.addEventListener('click', function (event) {
+      if (event.target && event.target.id === 'wishlistRemoveSuccessCloseBtn') {
+        closeRemoveSuccessModal();
+      }
+    });
+
+    loadWishlist();
+  })();
+</script>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Wishlist', body }) %>

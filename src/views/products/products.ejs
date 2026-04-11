@@ -61,7 +61,7 @@
         <div class="p-3 sm:p-3.5 lg:p-2.5">
           <div class="flex items-start justify-between gap-2.5">
             <h2 class="line-clamp-2 text-[13px] sm:text-[14px] lg:text-[12px] font-semibold leading-5 lg:leading-4 text-slate-900">${title}</h2>
-            <button type="button" class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-sky-100 bg-sky-50 text-sky-600 transition hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700">
+            <button type="button" class="product-wishlist-btn flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full border border-sky-100 bg-sky-50 text-sky-600 transition hover:border-sky-200 hover:bg-sky-100 hover:text-sky-700" aria-label="Add to wishlist">
               <i class="far fa-heart text-[11px]"></i>
             </button>
           </div>
@@ -163,6 +163,19 @@
     </div>
   </div>
 
+  <div id="productsWishlistSuccessModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-600 ring-1 ring-rose-100">
+        <i class="fas fa-heart text-xl"></i>
+      </div>
+      <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Added to Wishlist</h3>
+      <p id="productsWishlistSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to wishlist successfully.</p>
+      <div class="mt-5 flex justify-center">
+        <button id="productsWishlistSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+      </div>
+    </div>
+  </div>
+
   ${!error && items.length ? `
     <script>
       (function() {
@@ -175,6 +188,7 @@
         const productCards = Array.from(document.querySelectorAll('.product-card'));
         const maxPrice = ${JSON.stringify(maxFilterPrice)};
         const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
+        const wishlistAddEndpoint = 'https://aerthh.newhopeindia17.com/api/wishlist/add';
 
         function getCustomerAuth() {
           try {
@@ -202,6 +216,24 @@
           if (!productsCartSuccessModal) return;
           productsCartSuccessModal.classList.add('hidden');
           productsCartSuccessModal.classList.remove('flex');
+          document.body.classList.remove('overflow-hidden');
+        }
+
+        function openWishlistSuccessModal(message) {
+          const productsWishlistSuccessModal = document.getElementById('productsWishlistSuccessModal');
+          const productsWishlistSuccessMessage = document.getElementById('productsWishlistSuccessMessage');
+          if (!productsWishlistSuccessModal || !productsWishlistSuccessMessage) return;
+          productsWishlistSuccessMessage.textContent = message || 'Product added to wishlist successfully.';
+          productsWishlistSuccessModal.classList.remove('hidden');
+          productsWishlistSuccessModal.classList.add('flex');
+          document.body.classList.add('overflow-hidden');
+        }
+
+        function closeWishlistSuccessModal() {
+          const productsWishlistSuccessModal = document.getElementById('productsWishlistSuccessModal');
+          if (!productsWishlistSuccessModal) return;
+          productsWishlistSuccessModal.classList.add('hidden');
+          productsWishlistSuccessModal.classList.remove('flex');
           document.body.classList.remove('overflow-hidden');
         }
 
@@ -249,6 +281,35 @@
           clearClearedCartItem(productId);
           window.dispatchEvent(new CustomEvent('cart:updated'));
           openCartSuccessModal(result?.message || 'Product added to cart successfully.');
+        }
+
+        async function addProductToWishlist(productId) {
+          const auth = getCustomerAuth();
+          if (!auth.token) {
+            window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/products');
+            return;
+          }
+
+          const response = await fetch(wishlistAddEndpoint, {
+            method: 'POST',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+              'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+            },
+            body: JSON.stringify({
+              product_id: Number(productId)
+            })
+          });
+
+          const result = await response.json();
+
+          if (!response.ok || !result?.status) {
+            throw new Error(result?.message || 'Unable to add product to wishlist.');
+          }
+
+          window.dispatchEvent(new CustomEvent('wishlist:updated'));
+          openWishlistSuccessModal(result?.message || 'Product added to wishlist successfully.');
         }
 
         function sortProducts(sortType) {
@@ -321,28 +382,50 @@
 
         productCards.forEach(function(card) {
           const addButton = card.querySelector('.product-add-to-cart-btn');
+          const wishlistButton = card.querySelector('.product-wishlist-btn');
           const productId = card.dataset.productId || '';
 
-          if (!addButton || !productId) return;
+          if (!productId) return;
 
-          addButton.addEventListener('click', async function() {
-            const originalText = addButton.innerHTML;
-            addButton.disabled = true;
-            addButton.innerHTML = 'Adding...';
+          if (addButton) {
+            addButton.addEventListener('click', async function() {
+              const originalText = addButton.innerHTML;
+              addButton.disabled = true;
+              addButton.innerHTML = 'Adding...';
 
-            try {
-              await addProductToCart(productId, 1);
-            } catch (error) {
-              console.error('Add to cart error:', error);
-              window.alert(error.message || 'Unable to add product to cart.');
-            } finally {
-              addButton.disabled = false;
-              addButton.innerHTML = originalText;
-            }
-          });
+              try {
+                await addProductToCart(productId, 1);
+              } catch (error) {
+                console.error('Add to cart error:', error);
+                window.alert(error.message || 'Unable to add product to cart.');
+              } finally {
+                addButton.disabled = false;
+                addButton.innerHTML = originalText;
+              }
+            });
+          }
+
+          if (wishlistButton) {
+            wishlistButton.addEventListener('click', async function() {
+              const originalText = wishlistButton.innerHTML;
+              wishlistButton.disabled = true;
+              wishlistButton.innerHTML = '<i class="fas fa-spinner fa-spin text-[11px]"></i>';
+
+              try {
+                await addProductToWishlist(productId);
+              } catch (error) {
+                console.error('Add to wishlist error:', error);
+                window.alert(error.message || 'Unable to add product to wishlist.');
+              } finally {
+                wishlistButton.disabled = false;
+                wishlistButton.innerHTML = originalText;
+              }
+            });
+          }
         });
 
         const productsCartSuccessModal = document.getElementById('productsCartSuccessModal');
+        const productsWishlistSuccessModal = document.getElementById('productsWishlistSuccessModal');
 
         if (productsCartSuccessModal) {
           productsCartSuccessModal.addEventListener('click', function(event) {
@@ -352,9 +435,20 @@
           });
         }
 
+        if (productsWishlistSuccessModal) {
+          productsWishlistSuccessModal.addEventListener('click', function(event) {
+            if (event.target === productsWishlistSuccessModal) {
+              closeWishlistSuccessModal();
+            }
+          });
+        }
+
         document.addEventListener('click', function(event) {
           if (event.target && event.target.closest && event.target.closest('#productsCartSuccessCloseBtn')) {
             closeCartSuccessModal();
+          }
+          if (event.target && event.target.closest && event.target.closest('#productsWishlistSuccessCloseBtn')) {
+            closeWishlistSuccessModal();
           }
         });
 

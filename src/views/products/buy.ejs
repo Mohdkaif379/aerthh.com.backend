@@ -110,7 +110,7 @@
           <div>
             <div class="group overflow-hidden rounded-[1rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
               <div class="relative flex min-h-[250px] sm:min-h-[300px] items-center justify-center bg-[radial-gradient(circle_at_top,#dbeafe,transparent_58%),linear-gradient(180deg,#f8fcff_0%,#eef7ff_100%)] p-3 md:min-h-[330px]">
-                <button type="button" class="absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-sky-200 bg-white/95 text-sky-600 shadow-sm transition hover:border-sky-300 hover:text-sky-700 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto">
+                <button type="button" class="buy-wishlist-btn absolute right-3 top-3 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-sky-200 bg-white/95 text-sky-600 shadow-sm transition hover:border-sky-300 hover:text-sky-700 sm:opacity-0 sm:pointer-events-none sm:group-hover:opacity-100 sm:group-hover:pointer-events-auto" aria-label="Add to wishlist">
                   <i class="far fa-heart text-[15px]"></i>
                 </button>
                 <img id="buyMainImage" src="${galleryImages[0] || ''}" alt="${titleText}" class="max-h-[230px] sm:max-h-[300px] w-full object-contain">
@@ -238,10 +238,12 @@
             const buyAddToCartBtn = document.getElementById('buyAddToCartBtn');
             const descriptionPanel = document.getElementById('buyDescriptionPanel');
             const reviewsPanel = document.getElementById('buyReviewsPanel');
+            const wishlistButton = document.querySelector('.buy-wishlist-btn');
             const unitPrice = ${JSON.stringify(finalPriceNumber)};
             const taxAmount = ${JSON.stringify(taxAmountNumber)};
             const productId = ${JSON.stringify(String(requestedProductId || item?.id || item?.product_id || item?._id || item?.slug || ''))};
             const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
+            const wishlistAddEndpoint = 'https://aerthh.newhopeindia17.com/api/wishlist/add';
 
             function hasCustomerSession() {
               try {
@@ -282,6 +284,24 @@
               if (!buyCartSuccessModal) return;
               buyCartSuccessModal.classList.add('hidden');
               buyCartSuccessModal.classList.remove('flex');
+              document.body.classList.remove('overflow-hidden');
+            }
+
+            function openWishlistSuccessModal(message) {
+              const buyWishlistSuccessModal = document.getElementById('buyWishlistSuccessModal');
+              const buyWishlistSuccessMessage = document.getElementById('buyWishlistSuccessMessage');
+              if (!buyWishlistSuccessModal || !buyWishlistSuccessMessage) return;
+              buyWishlistSuccessMessage.textContent = message || 'Product added to wishlist successfully.';
+              buyWishlistSuccessModal.classList.remove('hidden');
+              buyWishlistSuccessModal.classList.add('flex');
+              document.body.classList.add('overflow-hidden');
+            }
+
+            function closeWishlistSuccessModal() {
+              const buyWishlistSuccessModal = document.getElementById('buyWishlistSuccessModal');
+              if (!buyWishlistSuccessModal) return;
+              buyWishlistSuccessModal.classList.add('hidden');
+              buyWishlistSuccessModal.classList.remove('flex');
               document.body.classList.remove('overflow-hidden');
             }
 
@@ -330,6 +350,36 @@
               clearClearedCartItem(productId);
               window.dispatchEvent(new CustomEvent('cart:updated'));
               openCartSuccessModal(result?.message || 'Product added to cart successfully.');
+            }
+
+            async function addToWishlist() {
+              const auth = getCustomerAuth();
+              if (!auth.token) {
+                const redirectTarget = '/products/buy?id=' + encodeURIComponent(productId);
+                window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent(redirectTarget);
+                return;
+              }
+
+              const response = await fetch(wishlistAddEndpoint, {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json',
+                  'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+                },
+                body: JSON.stringify({
+                  product_id: Number(productId)
+                })
+              });
+
+              const result = await response.json();
+
+              if (!response.ok || !result?.status) {
+                throw new Error(result?.message || 'Unable to add product to wishlist.');
+              }
+
+              window.dispatchEvent(new CustomEvent('wishlist:updated'));
+              openWishlistSuccessModal(result?.message || 'Product added to wishlist successfully.');
             }
 
             document.querySelectorAll('.buy-gallery-thumb').forEach(function(button) {
@@ -418,7 +468,26 @@
               });
             }
 
+            if (wishlistButton) {
+              wishlistButton.addEventListener('click', async function() {
+                const originalText = wishlistButton.innerHTML;
+                wishlistButton.disabled = true;
+                wishlistButton.innerHTML = '<i class="fas fa-spinner fa-spin text-[15px]"></i>';
+
+                try {
+                  await addToWishlist();
+                } catch (error) {
+                  console.error('Add to wishlist error:', error);
+                  window.alert(error.message || 'Unable to add product to wishlist.');
+                } finally {
+                  wishlistButton.disabled = false;
+                  wishlistButton.innerHTML = originalText;
+                }
+              });
+            }
+
             const buyCartSuccessModal = document.getElementById('buyCartSuccessModal');
+            const buyWishlistSuccessModal = document.getElementById('buyWishlistSuccessModal');
 
             if (buyCartSuccessModal) {
               buyCartSuccessModal.addEventListener('click', function(event) {
@@ -428,9 +497,20 @@
               });
             }
 
+            if (buyWishlistSuccessModal) {
+              buyWishlistSuccessModal.addEventListener('click', function(event) {
+                if (event.target === buyWishlistSuccessModal) {
+                  closeWishlistSuccessModal();
+                }
+              });
+            }
+
             document.addEventListener('click', function(event) {
               if (event.target && event.target.id === 'buyCartSuccessCloseBtn') {
                 closeCartSuccessModal();
+              }
+              if (event.target && event.target.id === 'buyWishlistSuccessCloseBtn') {
+                closeWishlistSuccessModal();
               }
             });
           })();
@@ -449,6 +529,19 @@
       <p id="buyCartSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to cart successfully.</p>
       <div class="mt-5 flex justify-center">
         <button id="buyCartSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="buyWishlistSuccessModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
+    <div class="w-full max-w-sm rounded-[1.2rem] bg-white p-6 shadow-2xl ring-1 ring-sky-100">
+      <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-rose-50 text-rose-600 ring-1 ring-rose-100">
+        <i class="fas fa-heart text-xl"></i>
+      </div>
+      <h3 class="mt-4 text-center text-xl font-bold text-slate-900">Added to Wishlist</h3>
+      <p id="buyWishlistSuccessMessage" class="mt-2 text-center text-sm text-slate-600">Product added to wishlist successfully.</p>
+      <div class="mt-5 flex justify-center">
+        <button id="buyWishlistSuccessCloseBtn" type="button" class="inline-flex items-center justify-center rounded-[0.85rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">OK</button>
       </div>
     </div>
   </div>

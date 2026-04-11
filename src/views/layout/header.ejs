@@ -118,7 +118,7 @@
           <a href="/wishlist"
             class="relative group bg-sky-50/80 backdrop-blur-sm border border-sky-200 shadow-lg hover:shadow-sky-100/60 hover:border-sky-300 transition-all duration-200 p-2 rounded-full">
             <i class="fas fa-heart  text-xl transition-colors duration-200"></i>
-            <span
+            <span id="headerWishlistCount"
               class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">0</span>
           </a>
 
@@ -341,10 +341,12 @@
       const logoutButton = document.getElementById('headerLogoutButton');
       const headerCartTotal = document.getElementById('headerCartTotal');
       const headerCartDropdownContent = document.getElementById('headerCartDropdownContent');
+      const headerWishlistCount = document.getElementById('headerWishlistCount');
       let currentHeaderCartItems = [];
+      let currentHeaderWishlistItems = [];
       let removingHeaderProductId = '';
 
-      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !ordersLink || !logoutButton || !headerCartTotal || !headerCartDropdownContent) return;
+      if (!avatarEl || !iconEl || !signInLink || !signUpLink || !ordersLink || !logoutButton || !headerCartTotal || !headerCartDropdownContent || !headerWishlistCount) return;
 
       function getImageFromUserData() {
         const storageKeys = ['userData', 'customerData', 'authData'];
@@ -529,6 +531,11 @@
           + '</div>';
       }
 
+      function renderHeaderWishlist(items) {
+        currentHeaderWishlistItems = Array.isArray(items) ? items : [];
+        headerWishlistCount.textContent = String(currentHeaderWishlistItems.length);
+      }
+
       async function removeHeaderCartItem(productId) {
         const normalizedProductId = String(productId || '').trim();
         if (!normalizedProductId || removingHeaderProductId) return;
@@ -603,6 +610,34 @@
         }
       }
 
+      async function loadHeaderWishlist() {
+        const auth = getCustomerAuth();
+        if (!auth.token) {
+          renderHeaderWishlist([]);
+          return;
+        }
+
+        try {
+          const response = await fetch('https://aerthh.newhopeindia17.com/api/wishlist', {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+            }
+          });
+
+          const result = await response.json();
+          if (!response.ok || !result?.status) {
+            throw new Error(result?.message || 'Unable to fetch wishlist.');
+          }
+
+          renderHeaderWishlist(Array.isArray(result?.data) ? result.data : []);
+        } catch (error) {
+          console.error('Header wishlist fetch error:', error);
+          renderHeaderWishlist([]);
+        }
+      }
+
       window.addEventListener('cart:updated', function (event) {
         const items = event?.detail?.items;
         if (Array.isArray(items)) {
@@ -611,6 +646,10 @@
         }
 
         loadHeaderCart();
+      });
+
+      window.addEventListener('wishlist:updated', function () {
+        loadHeaderWishlist();
       });
 
       const hasStoredSession = !!(localStorage.getItem('userData') || localStorage.getItem('customerData') || localStorage.getItem('authData'));
@@ -623,6 +662,7 @@
       }
 
       loadHeaderCart();
+      loadHeaderWishlist();
 
       headerCartDropdownContent.addEventListener('click', function (event) {
         const removeButton = event.target.closest('[data-header-remove-cart-item]');
