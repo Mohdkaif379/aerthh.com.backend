@@ -56,8 +56,51 @@
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
   }).format(Number(value || 0));
+  const escapeHtml = (value) => String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
   const discountDisplay = discountValue > 0
     ? (discountType === 'percent' ? discountValue + '%' : formatMoney(discountValue))
+    : '';
+  const reviews = Array.isArray(item?.reviews) ? item.reviews : [];
+  const reviewCount = reviews.length;
+  const reviewAverage = reviewCount
+    ? reviews.reduce(function(total, review) {
+        return total + Number(review?.rating || 0);
+      }, 0) / reviewCount
+    : 0;
+  const reviewAverageLabel = reviewCount ? reviewAverage.toFixed(1) : '0.0';
+  const reviewStarsHtml = function(value) {
+    const numericRating = Math.max(0, Math.min(Number(value || 0), 5));
+    return Array.from({ length: 5 }, function(_, index) {
+      const starNumber = index + 1;
+      return `<i class="fas fa-star ${starNumber <= numericRating ? 'text-amber-400' : 'text-slate-300'} text-[12px]"></i>`;
+    }).join('');
+  };
+  const reviewListHtml = reviewCount
+    ? reviews.map(function(review) {
+        const reviewRating = Number(review?.rating || 0);
+        const reviewComment = String(review?.comment || '');
+        const reviewDate = review?.created_at
+          ? new Date(review.created_at).toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric'
+            })
+          : '';
+        return `
+          <div class="border-b border-sky-100 py-4 last:border-b-0 last:pb-0 first:pt-0">
+            <div class="flex items-center gap-1 text-amber-400">
+              ${reviewStarsHtml(reviewRating)}
+            </div>
+            <p class="mt-3 text-sm leading-6 text-slate-600">${escapeHtml(reviewComment || 'No comment provided.')}</p>
+            ${reviewDate ? `<p class="mt-2 text-[11px] font-medium text-slate-400">${escapeHtml(reviewDate)}</p>` : ''}
+          </div>
+        `;
+      }).join('')
     : '';
   const similarProductsHtml = relatedItems.length
     ? relatedItems.map(function(relatedItem) {
@@ -129,14 +172,10 @@
             <h1 class="text-[22px] sm:text-[24px] font-bold leading-tight text-slate-900">${titleText}</h1>
             <div class="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 text-[12px] text-slate-600">
               <div class="flex items-center gap-1 text-orange-400">
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
-                <i class="far fa-star"></i>
+                ${reviewStarsHtml(Math.round(reviewAverage))}
               </div>
-              <span class="font-semibold text-slate-500">(0)</span>
-              <span class="font-medium text-slate-700">0 Reviews</span>
+              <span class="font-semibold text-slate-500">(${reviewAverageLabel})</span>
+              <span class="font-medium text-slate-700">${reviewCount} Review${reviewCount === 1 ? '' : 's'}</span>
               <span>|</span>
               <span class="font-medium text-slate-700">0 Orders</span>
               <span>|</span>
@@ -206,13 +245,22 @@
             <button type="button" class="buy-detail-tab border-b-2 border-transparent px-1 pb-2 text-[14px] font-semibold text-slate-500" data-tab="reviews">Reviews</button>
           </div>
           <div class="pt-4">
-            <div class="rounded-[0.9rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
+            <div id="buyDescriptionCard" class="rounded-[0.9rem] border border-sky-100 bg-[linear-gradient(180deg,#ffffff_0%,#f8fbff_100%)] p-4 sm:p-5 shadow-[0_12px_28px_rgba(148,163,184,0.10)]">
               <div id="buyDescriptionPanel" class="text-[14px] leading-6 text-slate-600 whitespace-pre-line">
                 ${cleanDescription || 'Description unavailable'}
               </div>
             </div>
-            <div id="buyReviewsPanel" class="hidden pt-4 text-[14px] leading-6 text-slate-600">
-              Reviews unavailable for this product.
+            <div id="buyReviewsPanel" class="hidden bg-white px-2 pt-4 text-[14px] leading-6 text-slate-600 sm:px-4 md:px-6">
+              ${reviewCount ? `
+                <div class="space-y-0">
+                  ${reviewListHtml}
+                </div>
+              ` : `
+                <div class="rounded-[0.95rem] border border-dashed border-sky-200 bg-white p-5 text-sm text-slate-500">
+                  <p class="text-base font-semibold text-slate-900">No reviews yet</p>
+                  <p class="mt-1 text-sm text-slate-500">Be the first to share your experience with this product.</p>
+                </div>
+              `}
             </div>
           </div>
         </div>
@@ -236,6 +284,7 @@
             const totalPriceEl = document.getElementById('buyTotalPrice');
             const buyNowBtn = document.getElementById('buyNowBtn');
             const buyAddToCartBtn = document.getElementById('buyAddToCartBtn');
+            const descriptionCard = document.getElementById('buyDescriptionCard');
             const descriptionPanel = document.getElementById('buyDescriptionPanel');
             const reviewsPanel = document.getElementById('buyReviewsPanel');
             const wishlistButton = document.querySelector('.buy-wishlist-btn');
@@ -419,6 +468,7 @@
                 const selectedTab = this.dataset.tab || 'description';
                 const isDescription = selectedTab === 'description';
 
+                if (descriptionCard) descriptionCard.classList.toggle('hidden', !isDescription);
                 if (descriptionPanel) descriptionPanel.classList.toggle('hidden', !isDescription);
                 if (reviewsPanel) reviewsPanel.classList.toggle('hidden', isDescription);
 

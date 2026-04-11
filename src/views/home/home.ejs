@@ -222,6 +222,35 @@
     </div>
   </section>
 
+  <section class="pb-10 sm:pb-12">
+    <div class="w-full px-3 sm:px-4 md:px-6">
+      <div class="mx-0 sm:mx-2 md:mx-6 lg:mx-10">
+        <div class="mb-4 flex flex-wrap items-end justify-between gap-3 sm:gap-4">
+          <div>
+            <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Real Feedback</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Customer Reviews</h2>
+            <p class="mt-1 text-sm text-slate-600">Latest reviews from customers across the store.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="homeReviewsPrevBtn" type="button" class="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-700 transition hover:border-sky-200 hover:bg-sky-50" aria-label="Previous reviews">
+              <i class="fas fa-arrow-left text-sm"></i>
+            </button>
+            <button id="homeReviewsNextBtn" type="button" class="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-700 transition hover:border-sky-200 hover:bg-sky-50" aria-label="Next reviews">
+              <i class="fas fa-arrow-right text-sm"></i>
+            </button>
+          </div>
+        </div>
+        <div class="relative">
+            <div id="homeReviewsTrack" class="flex gap-4 overflow-x-auto pb-2 hide-scroll snap-x snap-mandatory scroll-smooth">
+              <div class="flex min-w-[280px] items-center justify-center rounded-[1rem] border border-dashed border-sky-200 bg-white px-5 py-10 text-sm text-slate-500">
+                Loading reviews...
+              </div>
+            </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <div id="latestProductModal"
     class="fixed inset-0 z-[1400] hidden items-center justify-center bg-slate-900/55 px-4 py-6 backdrop-blur-sm">
     <div
@@ -328,6 +357,9 @@
       const topDealsTrack = document.querySelector('.top-deals-track');
       const latestTrack = document.querySelector('.latest-track');
       const recommendedCard = document.querySelector('.recommended-product-card');
+      const homeReviewsTrack = document.getElementById('homeReviewsTrack');
+      const homeReviewsPrevBtn = document.getElementById('homeReviewsPrevBtn');
+      const homeReviewsNextBtn = document.getElementById('homeReviewsNextBtn');
       const latestProductModal = document.getElementById('latestProductModal');
       const latestProductModalContent = document.getElementById('latestProductModalContent');
       const closeLatestProductModal = document.getElementById('closeLatestProductModal');
@@ -339,6 +371,8 @@
       const homeCartSuccessMessage = document.getElementById('homeCartSuccessMessage');
       const latestProductMap = new Map();
       const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
+      const reviewsApiEndpoint = 'https://aerthh.newhopeindia17.com/api/reviews';
+      let homeReviewsAutoScrollInterval = null;
 
       function openTermsPolicyModal() {
         if (!termsPolicyModal) return;
@@ -805,6 +839,122 @@
           }
         }
         return [];
+      }
+
+      function escapeReviewHtml(value) {
+        return String(value || '')
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function renderHomeReviewStars(value) {
+        const rating = Math.max(0, Math.min(5, Number(value || 0)));
+        let stars = '';
+        for (let index = 1; index <= 5; index += 1) {
+          stars += '<i class="fas fa-star ' + (index <= Math.round(rating) ? 'text-amber-400' : 'text-slate-300') + ' text-[11px]"></i>';
+        }
+        return stars;
+      }
+
+      function formatReviewDate(value) {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('en-IN', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+      }
+
+      function renderHomeReviewCard(review) {
+        const customerFirst = String(review?.customer?.first_name || '').trim();
+        const customerLast = String(review?.customer?.last_name || '').trim();
+        const reviewerName = (customerFirst || customerLast)
+          ? [customerFirst, customerLast].filter(Boolean).join(' ')
+          : (review?.customer_id ? 'Customer #' + String(review.customer_id) : 'Customer');
+        const customerInitial = (reviewerName.charAt(0) || 'C').toUpperCase();
+        const customerImage = String(review?.customer?.profile_image || review?.customer?.image || '').trim();
+        const reviewText = String(review?.comment || review?.review || review?.description || '').trim();
+        const reviewDate = formatReviewDate(review?.created_at || review?.updated_at);
+
+        return ''
+          + '<article class="snap-start shrink-0 basis-full rounded-[1rem] border border-sky-100 bg-white p-4 sm:basis-[calc(50%-0.5rem)] xl:basis-[calc(33.333%-0.95rem)]">'
+          + '<div class="flex items-center gap-3">'
+          + (customerImage
+            ? '<img src="' + customerImage + '" alt="' + escapeReviewHtml(reviewerName) + '" class="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-sky-100">'
+            : '<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-sky-500 to-blue-500 text-sm font-bold text-white ring-2 ring-sky-100">' + escapeReviewHtml(customerInitial) + '</div>')
+          + '<div class="min-w-0 flex-1">'
+          + '<p class="truncate text-sm font-semibold text-slate-900">' + escapeReviewHtml(reviewerName) + '</p>'
+          + '<div class="mt-1 flex items-center gap-1">' + renderHomeReviewStars(review?.rating || review?.stars || review?.score) + '</div>'
+          + '</div>'
+          + '</div>'
+          + '<p class="mt-3 text-sm leading-6 text-slate-600">' + escapeReviewHtml(reviewText || 'Review unavailable') + '</p>'
+          + (reviewDate ? '<p class="mt-3 text-[11px] font-medium text-slate-400">' + escapeReviewHtml(reviewDate) + '</p>' : '')
+          + '</article>';
+      }
+
+      function renderHomeReviews(reviews) {
+        if (!homeReviewsTrack) return;
+        if (!Array.isArray(reviews) || !reviews.length) {
+          homeReviewsTrack.innerHTML = '<div class="flex min-w-full items-center justify-center rounded-[1rem] border border-dashed border-sky-200 bg-white px-5 py-10 text-sm text-slate-500">No reviews available right now.</div>';
+          return;
+        }
+        homeReviewsTrack.innerHTML = reviews.slice(0, 12).map(renderHomeReviewCard).join('');
+      }
+
+      async function loadHomeReviews() {
+        if (!homeReviewsTrack) return;
+        try {
+          const response = await fetch(reviewsApiEndpoint, {
+            headers: { 'Accept': 'application/json' }
+          });
+          const result = await response.json();
+          const reviews = Array.isArray(result?.data) ? result.data : [];
+          renderHomeReviews(reviews);
+          startHomeReviewsAutoScroll();
+        } catch (error) {
+          console.error('Failed to load home reviews:', error);
+          homeReviewsTrack.innerHTML = '<div class="flex min-w-full items-center justify-center rounded-[1rem] border border-dashed border-rose-200 bg-white px-5 py-10 text-sm text-rose-600">Unable to load reviews.</div>';
+        }
+      }
+
+      function scrollHomeReviews(direction) {
+        if (!homeReviewsTrack) return;
+        const amount = Math.max(320, Math.floor(homeReviewsTrack.clientWidth * 0.85));
+        const maxScrollLeft = homeReviewsTrack.scrollWidth - homeReviewsTrack.clientWidth;
+        if (direction > 0 && homeReviewsTrack.scrollLeft >= maxScrollLeft - 8) {
+          homeReviewsTrack.scrollTo({ left: 0, behavior: 'smooth' });
+          return;
+        }
+        homeReviewsTrack.scrollBy({ left: amount * direction, behavior: 'smooth' });
+      }
+
+      function startHomeReviewsAutoScroll() {
+        if (!homeReviewsTrack) return;
+        if (homeReviewsAutoScrollInterval) {
+          clearInterval(homeReviewsAutoScrollInterval);
+        }
+        homeReviewsAutoScrollInterval = setInterval(function () {
+          scrollHomeReviews(1);
+        }, 4500);
+      }
+
+      if (homeReviewsPrevBtn) {
+        homeReviewsPrevBtn.addEventListener('click', function () {
+          scrollHomeReviews(-1);
+          startHomeReviewsAutoScroll();
+        });
+      }
+
+      if (homeReviewsNextBtn) {
+        homeReviewsNextBtn.addEventListener('click', function () {
+          scrollHomeReviews(1);
+          startHomeReviewsAutoScroll();
+        });
       }
 
       function renderReviewStars(value) {
@@ -1276,6 +1426,7 @@
       loadBestSellers();
       loadTopSellingProduct();
       loadFeaturedProducts();
+      loadHomeReviews();
     })();
   </script>
   `; %>
