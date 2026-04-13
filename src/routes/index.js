@@ -7,6 +7,9 @@ const checkoutRoutes = require('./checkout/checkout');
 const orderRoutes = require('./order/order');
 const cartRoutes = require('./cart/cart');
 const wishlistRoutes = require('./wishlist/wishlist');
+const aboutRoutes = require('./about/about');
+const contactRoutes = require('./contactus/contact');
+const trackorderRoutes = require('./trackorder/trackorder');
 const router = express.Router();
 
 // Mount route modules
@@ -18,5 +21,8 @@ router.use('/checkout', checkoutRoutes);
 router.use('/orders', orderRoutes);
 router.use('/cart', cartRoutes);
 router.use('/wishlist', wishlistRoutes);
+router.use('/about', aboutRoutes);
+router.use('/contact', contactRoutes);
+router.use('/trackorder', trackorderRoutes);
 
 module.exports = router;

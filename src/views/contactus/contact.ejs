@@ -1,0 +1,147 @@
+<% const body=` <section class="px-3 pt-6 pb-10 sm:px-4 md:px-6">
+    <div class="mx-auto max-w-7xl">
+        <div
+            class="overflow-hidden rounded-[1.4rem] border border-sky-100 bg-[radial-gradient(circle_at_top_left,rgba(14,165,233,0.16),transparent_32%),radial-gradient(circle_at_top_right,rgba(59,130,246,0.12),transparent_28%),linear-gradient(180deg,#ffffff_0%,#f7fbff_55%,#edf7ff_100%)] shadow-[0_20px_70px_rgba(148,163,184,0.12)]">
+            <div class="grid gap-8 px-5 py-8 sm:px-6 sm:py-10 lg:grid-cols-[1fr_0.9fr] lg:px-8 lg:py-12">
+                <div class="flex flex-col h-full w-full">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.28em] text-sky-600">Contact Us</p>
+                    <h1 class="mt-3 max-w-2xl text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl">
+                        We're here to help with orders, products, and support.
+                    </h1>
+                    <p class="mt-4 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
+                        If you have a question about a product, need help with your order, or want to connect with our
+                        team, use the details below or send us a message. We'll do our best to respond as soon as
+                        possible.
+                    </p>
+
+                    <div
+                        class="mt-6 rounded-[1.15rem] border border-sky-100 bg-white p-6 shadow-sm flex flex-col flex-1">
+
+                        <h3 class="text-lg font-semibold text-slate-900 mb-4">Contact Support</h3>
+
+                        <ul class="space-y-3 text-sm text-slate-600">
+
+                            <li class="flex items-center gap-3">
+                                <i class="fa-solid fa-envelope text-sky-500"></i>
+                                <span>
+                                    Email:
+                                    <span class="font-semibold text-slate-900">info@aerthh.com</span>
+                                </span>
+                            </li>
+
+                            <li class="flex items-center gap-3">
+                                <i class="fa-solid fa-phone text-sky-500"></i>
+                                <span>
+                                    Phone:
+                                    <span class="font-semibold text-slate-900">+13174780215</span>
+                                </span>
+                            </li>
+
+                            <li class="flex items-center gap-3">
+                                <i class="fa-solid fa-clock text-sky-500"></i>
+                                <span>
+                                    Working Hours:
+                                    <span class="font-semibold text-slate-900">Mon - Sat, 10:00 AM - 7:00 PM</span>
+                                </span>
+                            </li>
+
+                            <!-- Location -->
+                            <li class="flex items-start gap-3">
+                                <i class="fa-solid fa-location-dot text-sky-500 mt-1"></i>
+                                <span>
+                                    Location:
+                                    <span class="font-semibold text-slate-900">1004C Sierra Madre Drive Greenwood
+                                        Indiana Zip Code 46143</span>
+                                </span>
+                            </li>
+
+                        </ul>
+
+                        <!-- Map -->
+                        <div class="mt-5 rounded-lg overflow-hidden border border-slate-200 flex-1 min-h-[250px]">
+                            <iframe
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3073.770921393662!2d-86.08434862402872!3d39.609842571580764!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x886b42c64f62ebab%3A0x590a6b8fcf0939fa!2s1004%20Sierra%20Madre%20Dr%2C%20Greenwood%2C%20IN%2046143%2C%20USA!5e0!3m2!1sen!2sin!4v1776059947420!5m2!1sen!2sin"
+                                class="w-full h-full" style="border:0;" allowfullscreen="" loading="lazy"
+                                referrerpolicy="no-referrer-when-downgrade"></iframe>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="rounded-[1.4rem] border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(148,163,184,0.10)] sm:p-6 flex flex-col h-full">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Send a Message</p>
+                    <h2 class="mt-2 text-2xl font-bold text-slate-900">Tell us what you need.</h2>
+                    <form class="mt-5 space-y-4">
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700" for="contactName">Full
+                                Name</label>
+                            <input id="contactName" type="text" placeholder="Your name"
+                                class="w-full rounded-[0.9rem] border border-sky-100 bg-sky-50/40 px-4 py-3 text-sm text-slate-700 outline-none focus:border-sky-400 focus:bg-white focus:ring-1 focus:ring-sky-100">
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700" for="contactEmail">Email
+                                Address</label>
+                            <input id="contactEmail" type="email" placeholder="name@example.com"
+                                class="w-full rounded-[0.9rem] border border-sky-100 bg-sky-50/40 px-4 py-3 text-sm text-slate-700 outline-none focus:border-sky-400 focus:bg-white focus:ring-1 focus:ring-sky-100">
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700"
+                                for="contactSubject">Subject</label>
+                            <input id="contactSubject" type="text" placeholder="How can we help?"
+                                class="w-full rounded-[0.9rem] border border-sky-100 bg-sky-50/40 px-4 py-3 text-sm text-slate-700 outline-none focus:border-sky-400 focus:bg-white focus:ring-1 focus:ring-sky-100">
+                        </div>
+                        <div>
+                            <label class="mb-2 block text-sm font-medium text-slate-700"
+                                for="contactMessage">Message</label>
+                            <textarea id="contactMessage" rows="10" placeholder="Write your message here..."
+                                class="w-full rounded-[0.9rem] border border-sky-100 bg-sky-50/40 px-4 py-3 text-sm text-slate-700 outline-none focus:border-sky-400 focus:bg-white focus:ring-1 focus:ring-sky-100"></textarea>
+                        </div>
+                        <button type="button"
+                            class="inline-flex w-50% items-center justify-center rounded-[0.9rem] bg-gradient-to-r from-sky-500 to-blue-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-sky-600 hover:to-blue-600">
+                            Send Message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <section class="py-8 sm:py-10">
+            <div class="grid gap-4 md:grid-cols-3">
+                <div
+                    class="rounded-[1.15rem] border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                    <div
+                        class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+                        <i class="fas fa-comments text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Quick Response</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">We try to reply quickly so you can keep moving with
+                        your shopping or order support.</p>
+                </div>
+                <div
+                    class="rounded-[1.15rem] border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                    <div
+                        class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+                        <i class="fas fa-shield-heart text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Trusted Support</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Whether it's a product question or a policy
+                        question, we keep the help clear and honest.</p>
+                </div>
+                <div
+                    class="rounded-[1.15rem] border border-sky-100 bg-white p-5 shadow-[0_12px_30px_rgba(148,163,184,0.10)]">
+                    <div
+                        class="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-sky-50 text-sky-600 ring-1 ring-sky-100">
+                        <i class="fas fa-receipt text-lg"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900">Order Help</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">Need help with cart, checkout, delivery, or
+                        returns? Reach out and we'll guide you.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    </section>
+    `;
+    %>
+
+    <%- include('../layout/app', { title: title || 'Contact Us' , body }) %>

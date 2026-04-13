@@ -15,6 +15,10 @@ if (fs.existsSync(envPath)) {
 const app = express();
 const port = 3000;
 
+// Body parsing middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
 // EJS setup
 app.set('view engine', 'ejs');
 const viewDirectories = [
