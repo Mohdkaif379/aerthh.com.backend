@@ -9,6 +9,13 @@ const cartRoutes = require('./cart/cart');
 const wishlistRoutes = require('./wishlist/wishlist');
 const aboutRoutes = require('./about/about');
 const contactRoutes = require('./contactus/contact');
+const faqRoutes = require('./faq/faq');
+const returnRoutes = require('./return/return');
+const refundRoutes = require('./refund/refund');
+const cancellationRoutes = require('./cancellation/cancellation');
+const privacyRoutes = require('./privacy/privacy');
+const termsRoutes = require('./terms/terms');
+const cookiesRoutes = require('./cookies/cookies');
 const trackorderRoutes = require('./trackorder/trackorder');
 const router = express.Router();
 
@@ -23,6 +30,13 @@ router.use('/cart', cartRoutes);
 router.use('/wishlist', wishlistRoutes);
 router.use('/about', aboutRoutes);
 router.use('/contact', contactRoutes);
+router.use('/faq', faqRoutes);
+router.use('/returnpolicy', returnRoutes);
+router.use('/refundpolicy', refundRoutes);
+router.use('/cancellationpolicy', cancellationRoutes);
+router.use('/privacy', privacyRoutes);
+router.use('/terms', termsRoutes);
+router.use('/cookies', cookiesRoutes);
 router.use('/trackorder', trackorderRoutes);
 
 module.exports = router;

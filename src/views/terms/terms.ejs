@@ -1,0 +1,102 @@
+<%
+const body = `
+<section class="px-3 pt-6 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="overflow-hidden rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-[0_18px_42px_rgba(15,23,42,0.06)] sm:p-6 md:p-8">
+      <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <p class="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-sky-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+            Terms & Conditions
+          </p>
+          <h1 class="mt-3 text-[27px] font-bold tracking-tight text-slate-900 sm:text-[32px] md:text-[36px]">Terms & Conditions</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">These terms explain how you can use our website, place orders, and interact with our services. By using our site, you agree to these conditions.</p>
+        </div>
+        <a href="/contact" class="inline-flex w-full items-center justify-center rounded-[1rem] border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-50 sm:w-auto">
+          Contact Support
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Usage</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Use the site responsibly and lawfully.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Orders</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Order information must be accurate and complete.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Updates</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">We may update these terms from time to time.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">User Responsibilities</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">What you agree to</h2>
+          <ul class="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Provide accurate account, contact, and shipping details.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Do not use the website for unlawful or harmful activities.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Review product, payment, and policy details before placing an order.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-xmark mt-1 text-rose-500"></i>
+              <span>We may refuse service or cancel orders in case of misuse or fraud.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Order & Service Terms</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">Key points</h2>
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Pricing</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Prices may change without prior notice.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Availability</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Product availability can vary by stock.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Delivery</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Delivery timelines depend on location and logistics.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Policies</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Refund, return, and cancellation rules apply separately.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Limitations</p>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Service availability</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">We may suspend or modify parts of the website or services at any time without notice.</p>
+          </div>
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Liability</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">We are not responsible for losses caused by misuse, inaccurate information, or circumstances beyond our control.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Terms & Conditions', body }) %>

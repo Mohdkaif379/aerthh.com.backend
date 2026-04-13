@@ -1,0 +1,102 @@
+<%
+const body = `
+<section class="px-3 pt-6 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="overflow-hidden rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-[0_18px_42px_rgba(15,23,42,0.06)] sm:p-6 md:p-8">
+      <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <p class="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-sky-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+            Cookies Policy
+          </p>
+          <h1 class="mt-3 text-[27px] font-bold tracking-tight text-slate-900 sm:text-[32px] md:text-[36px]">Cookies Policy</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">We use cookies and similar technologies to make the site work properly, remember your preferences, and improve your experience.</p>
+        </div>
+        <a href="/contact" class="inline-flex w-full items-center justify-center rounded-[1rem] border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-50 sm:w-auto">
+          Contact Support
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Essential</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Cookies that help the site function.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Preferences</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Remember your settings and choices.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Analytics</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Help us understand site usage and performance.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Cookie Types</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">What cookies we may use</h2>
+          <ul class="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Session cookies to keep you signed in and maintain secure navigation.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Preference cookies to remember language, layout, or saved choices.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Analytics cookies to improve site quality and user experience.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-xmark mt-1 text-rose-500"></i>
+              <span>We do not use cookies to share your personal data without a valid reason.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Your Choices</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">How you can manage cookies</h2>
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Browser settings</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">You can block or delete cookies from your browser.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Site experience</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Some features may not work properly if cookies are disabled.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Updates</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">We may update this policy when our website changes.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Support</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Reach out if you have questions about cookie usage.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Why It Matters</p>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Better experience</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">Cookies help us keep you logged in, remember preferences, and make browsing smoother.</p>
+          </div>
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Performance insight</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">We use data to understand what is working well and where we can improve the site.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Cookies Policy', body }) %>

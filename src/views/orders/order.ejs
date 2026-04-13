@@ -43,11 +43,31 @@ const body = `
   </div>
 </section>
 
+<div id="orderDetailModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-950/45 px-4 py-6 backdrop-blur-sm">
+  <div class="w-full max-w-3xl overflow-hidden rounded-[1.4rem] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
+    <div class="flex items-start justify-between border-b border-sky-100 px-5 py-4 sm:px-6">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">Order Details</p>
+        <h2 id="orderDetailTitle" class="mt-1 text-xl font-bold text-slate-900">Order</h2>
+      </div>
+      <button id="orderDetailCloseBtn" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-700" aria-label="Close order details">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="orderDetailContent" class="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[180px_1fr]"></div>
+  </div>
+</div>
+
 <script>
   (function () {
     const ordersList = document.getElementById('ordersList');
     const ordersMessage = document.getElementById('ordersMessage');
+    const orderDetailModal = document.getElementById('orderDetailModal');
+    const orderDetailTitle = document.getElementById('orderDetailTitle');
+    const orderDetailContent = document.getElementById('orderDetailContent');
+    const orderDetailCloseBtn = document.getElementById('orderDetailCloseBtn');
     const apiBase = 'https://aerthh.newhopeindia17.com/api/';
+    let currentOrders = [];
 
     function showMessage(text, isError) {
       if (!ordersMessage) return;
@@ -131,14 +151,91 @@ const body = `
       }
     }
 
+    function getOrderDetailMarkup(order) {
+      const product = order.product || {};
+      const image = product.image || 'https://via.placeholder.com/240x240/eef7ff/64748b?text=Product';
+      const title = product.product_name || 'Product';
+      const sku = product.sku || order.sku || '--';
+      const orderNumber = order.order_no || order.id || '--';
+      const orderStatus = order.status || '--';
+      const paymentMethod = order.payment_method || '--';
+      const paymentStatus = order.payment_status || '--';
+      const quantity = Number(order.quantity || 0);
+      const totalPrice = Number(order.total_price || 0);
+      const shippingCost = Number(order.shipping_cost || 0);
+      const finalAmount = totalPrice + shippingCost;
+
+      return ''
+        + '<div class="flex items-center justify-center rounded-[1rem] border border-sky-100 bg-white p-4">'
+        + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-40 w-40 object-contain">'
+        + '</div>'
+        + '<div class="min-w-0">'
+        + '<div class="flex flex-wrap items-start justify-between gap-3">'
+        + '<div>'
+        + '<h3 class="text-2xl font-bold text-slate-900">' + escapeHtml(title) + '</h3>'
+        + '<p class="mt-2 text-sm text-slate-500">Order No: <span class="font-semibold text-slate-700">' + escapeHtml(orderNumber) + '</span></p>'
+        + '</div>'
+        + '<span class="rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] ring-1 ' + getOrderBadgeClasses(orderStatus) + '">' + escapeHtml(orderStatus) + '</span>'
+        + '</div>'
+        + '<div class="mt-5 divide-y divide-slate-100 border-y border-slate-100">'
+        + '<div class="flex items-center justify-between gap-4 py-3">'
+        + '<span class="text-sm text-slate-500">Quantity</span>'
+        + '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(quantity) + '</span>'
+        + '</div>'
+        + '<div class="flex items-center justify-between gap-4 py-3">'
+        + '<span class="text-sm text-slate-500">Product SKU</span>'
+        + '<span class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(sku) + '</span>'
+        + '</div>'
+        + '<div class="flex items-center justify-between gap-4 py-3">'
+        + '<span class="text-sm text-slate-500">Payment Method</span>'
+        + '<span class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(paymentMethod) + '</span>'
+        + '</div>'
+        + '<div class="flex items-center justify-between gap-4 py-3">'
+        + '<span class="text-sm text-slate-500">Payment Status</span>'
+        + '<span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ring-1 ' + getPaymentBadgeClasses(paymentStatus) + '">' + escapeHtml(paymentStatus) + '</span>'
+        + '</div>'
+        + '<div class="flex items-center justify-between gap-4 py-3">'
+        + '<span class="text-sm text-slate-500">Shipping Cost</span>'
+        + '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(formatMoney(shippingCost)) + '</span>'
+        + '</div>'
+        + '</div>'
+        + '<div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">'
+        + '<span class="text-sm text-slate-500">Products Total</span>'
+        + '<span class="text-base font-semibold text-slate-900">' + escapeHtml(formatMoney(totalPrice)) + '</span>'
+        + '</div>'
+        + '<div class="mt-3 flex items-center justify-between">'
+        + '<span class="text-sm text-slate-500">Final Total</span>'
+        + '<span class="text-xl font-bold text-sky-700">' + escapeHtml(formatMoney(finalAmount)) + '</span>'
+        + '</div>'
+        + '</div>';
+    }
+
+    function openOrderModal(order) {
+      if (!orderDetailModal || !orderDetailTitle || !orderDetailContent) return;
+      const product = order.product || {};
+      orderDetailTitle.textContent = product.product_name || 'Order';
+      orderDetailContent.innerHTML = getOrderDetailMarkup(order);
+      orderDetailModal.classList.remove('hidden');
+      orderDetailModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeOrderModal() {
+      if (!orderDetailModal) return;
+      orderDetailModal.classList.add('hidden');
+      orderDetailModal.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+    }
+
     function renderOrders(list) {
       if (!ordersList) return;
+      currentOrders = Array.isArray(list) ? list.slice() : [];
       if (!Array.isArray(list) || !list.length) {
         ordersList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">No orders found.</div>';
         return;
       }
 
-      ordersList.innerHTML = list.map(function (order) {
+      ordersList.innerHTML = list.map(function (order, index) {
         const product = order.product || {};
         const image = product.image || 'https://via.placeholder.com/240x240/eef7ff/64748b?text=Product';
         const title = product.product_name || 'Product';
@@ -155,7 +252,13 @@ const body = `
         const paymentBadgeClasses = getPaymentBadgeClasses(paymentStatus);
 
         return ''
-          + '<div class="group overflow-hidden rounded-[1.35rem] border border-sky-100 bg-white shadow-[0_14px_28px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_rgba(15,23,42,0.08)]">'
+          + '<div class="group relative overflow-hidden rounded-[1.35rem] border border-sky-100 bg-white shadow-[0_14px_28px_rgba(15,23,42,0.05)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_18px_34px_rgba(15,23,42,0.08)]">'
+          + '<div class="absolute right-4 top-4 z-10 flex items-center gap-2 opacity-0 translate-y-1 pointer-events-none transition-all duration-200 group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto">'
+          + '<button type="button" data-view-order="' + index + '" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-600 shadow-sm transition hover:bg-sky-50" title="View" aria-label="View order">'
+          + '<i class="fa-solid fa-eye text-[12px]"></i>'
+          + '</button>'
+          + '<span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-100 bg-white text-rose-600 shadow-sm transition hover:bg-rose-50" title="Delete" aria-label="Delete order"><i class="fa-solid fa-trash-can text-[12px]"></i></span>'
+          + '</div>'
           + '<div class="flex flex-col gap-5 p-4 sm:p-5 lg:flex-row lg:items-start lg:justify-between lg:p-5">'
           + '<div class="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">'
           + '<div class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.15rem] border border-sky-100 bg-white p-2 transition-transform duration-300 group-hover:scale-[1.02] sm:h-28 sm:w-28">'
@@ -198,25 +301,8 @@ const body = `
           + '<p class="mt-4 text-sm text-slate-500">Final Total</p>'
           + '<p class="mt-1 text-2xl font-bold text-sky-700">' + escapeHtml(formatMoney(finalAmount)) + '</p>'
           + '</div>'
-          + '<div class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-1">'
-          + '<a href="/products/buy?id=' + encodeURIComponent(String(product.id || order.product_id || '')) + '" class="inline-flex w-full items-center justify-center rounded-[0.95rem] bg-gradient-to-r from-sky-500 to-blue-500 px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(56,189,248,0.20)] transition-all duration-300 hover:-translate-y-0.5 hover:from-sky-600 hover:to-blue-600 hover:shadow-[0_14px_24px_rgba(56,189,248,0.26)]">View Product</a>'
-          + '<button type="button" data-order-status="' + escapeHtml(orderStatus) + '" class="inline-flex w-full items-center justify-center rounded-[0.95rem] border border-rose-200 bg-white px-4 py-2.5 text-sm font-semibold text-rose-600 transition-all duration-300 hover:-translate-y-0.5 hover:bg-white sm:opacity-0 sm:pointer-events-none sm:group-hover:pointer-events-auto sm:group-hover:opacity-100">Cancel Request</button>'
-          + '</div>'
-          + '</div>'
           + '</div>';
       }).join('');
-
-      ordersList.querySelectorAll('button[data-order-status]').forEach(function (button) {
-        button.addEventListener('click', function () {
-          const status = String(button.getAttribute('data-order-status') || '').toLowerCase();
-          if (['delivered', 'canceled', 'cancelled', 'returned'].includes(status)) {
-            showMessage('This order can no longer be canceled from here.', true);
-            return;
-          }
-
-          showMessage('Cancellation request is not connected yet. Please contact support for help with this order.', false);
-        });
-      });
     }
 
     async function loadOrders() {
@@ -251,6 +337,36 @@ const body = `
         ordersList.innerHTML = '<div class="rounded-[1rem] border border-sky-100 bg-white p-5 text-sm text-slate-500 shadow-[0_10px_20px_rgba(15,23,42,0.04)]">Unable to load orders right now.</div>';
       }
     }
+
+    if (ordersList) {
+      ordersList.addEventListener('click', function (event) {
+        const viewButton = event.target.closest('[data-view-order]');
+        if (!viewButton) return;
+
+        const index = Number(viewButton.getAttribute('data-view-order'));
+        if (Number.isNaN(index) || !currentOrders[index]) return;
+
+        openOrderModal(currentOrders[index]);
+      });
+    }
+
+    if (orderDetailModal) {
+      orderDetailModal.addEventListener('click', function (event) {
+        if (event.target === orderDetailModal) {
+          closeOrderModal();
+        }
+      });
+    }
+
+    if (orderDetailCloseBtn) {
+      orderDetailCloseBtn.addEventListener('click', closeOrderModal);
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        closeOrderModal();
+      }
+    });
 
     loadOrders();
   })();

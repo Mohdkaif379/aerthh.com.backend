@@ -1,0 +1,102 @@
+<%
+const body = `
+<section class="px-3 pt-2 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="overflow-hidden rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-[0_18px_42px_rgba(15,23,42,0.06)] sm:p-6 md:p-8">
+      <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <p class="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-sky-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+            Refund Policy
+          </p>
+          <h1 class="mt-3 text-[27px] font-bold tracking-tight text-slate-900 sm:text-[32px] md:text-[36px]">Refund Policy</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">Refunds are reviewed after the returned item is received and checked. Approved refunds are processed for eligible requests made within 7 days of delivery.</p>
+        </div>
+        <a href="/contact" class="inline-flex w-full items-center justify-center rounded-[1rem] border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-50 sm:w-auto">
+          Contact Support
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Review Time</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Refunds are checked after return pickup or delivery within 7 days.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Method</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Refund goes back to the original payment method.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Help</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Support can guide you through the refund request.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Refund Window</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">When a refund can be requested</h2>
+          <ul class="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Refund requests must be raised within 7 days of delivery.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Items should be received back in a checked and approved condition.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-check mt-1 text-sky-500"></i>
+              <span>Refunds are generally issued only for eligible and approved returns.</span>
+            </li>
+            <li class="flex gap-3">
+              <i class="fa-solid fa-circle-xmark mt-1 text-rose-500"></i>
+              <span>Used, damaged, or policy-excluded items may not qualify for refunds.</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">How It Works</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">Refund process</h2>
+          <div class="mt-5 grid gap-3 sm:grid-cols-2">
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Step 1</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Reach out with your order details and refund reason.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Step 2</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Share photos if the product arrived damaged or wrong.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Step 3</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">We verify the return and approve the refund if eligible.</p>
+            </div>
+            <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+              <p class="text-[11px] font-bold uppercase tracking-[0.16em] text-sky-600">Step 4</p>
+              <p class="mt-2 text-sm font-semibold text-slate-900">Refund is processed after the return is confirmed.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+        <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Important Notes</p>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Refund timing</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">Once approved, refund timelines can vary depending on the payment method and your bank or wallet provider.</p>
+          </div>
+          <div class="rounded-[1rem] border border-sky-100 bg-white p-4">
+            <p class="text-sm font-semibold text-slate-900">Non-refundable cases</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">Orders outside the 7-day window or items not meeting the return conditions may not be refunded.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'Refund Policy', body }) %>

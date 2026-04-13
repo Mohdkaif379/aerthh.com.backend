@@ -1,0 +1,192 @@
+<%
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function slugify(value) {
+  return String(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+const groups = Array.isArray(faqGroups) ? faqGroups : [];
+
+const faqMarkup = groups.map(function (group) {
+  const groupId = 'faq-group-' + slugify(group.title);
+  const itemsMarkup = (Array.isArray(group.items) ? group.items : []).map(function (item, index) {
+    const itemId = 'faq-item-' + slugify(group.title) + '-' + index;
+    return `
+      <div class="rounded-[1rem] border border-sky-100 bg-white">
+        <button type="button" class="faq-item-toggle flex w-full items-center justify-between gap-4 px-4 py-3 text-left" data-faq-item="${itemId}">
+          <span class="text-sm font-semibold text-slate-900">${escapeHtml(item.question)}</span>
+          <i class="fa-solid fa-plus text-[12px] text-sky-500 transition-transform duration-300"></i>
+        </button>
+        <div id="${itemId}" class="hidden px-4 pb-4 text-sm leading-6 text-slate-600">
+          ${escapeHtml(item.answer)}
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="overflow-hidden rounded-[1.25rem] border border-sky-100 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+      <button type="button" class="faq-toggle flex w-full items-center justify-between gap-4 px-5 py-4 text-left" data-faq-target="${groupId}">
+        <span class="flex items-center gap-3">
+          <span class="flex h-10 w-10 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-600">
+            <i class="fa-solid ${escapeHtml(group.icon)}"></i>
+          </span>
+          <span>
+            <span class="block text-base font-semibold text-slate-900">${escapeHtml(group.title)}</span>
+            <span class="block text-sm text-slate-500">Tap to expand the questions</span>
+          </span>
+        </span>
+        <i class="fa-solid fa-chevron-down text-slate-400 transition-transform duration-300"></i>
+      </button>
+
+      <div id="${groupId}" class="faq-panel hidden border-t border-sky-100 px-5 py-4">
+        <div class="space-y-3">
+          ${itemsMarkup}
+        </div>
+      </div>
+    </div>
+  `;
+}).join('');
+
+const body = `
+<section class="px-3 pt-2 pb-10 sm:px-4 md:px-6">
+  <div class="mx-auto max-w-6xl">
+    <div class="overflow-hidden rounded-[1.5rem] border border-sky-100 bg-white p-4 shadow-[0_18px_42px_rgba(15,23,42,0.06)] sm:p-6 md:p-8">
+      <div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <p class="inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-3 py-1 text-[11px] font-bold uppercase tracking-[0.22em] text-sky-700">
+            <span class="h-1.5 w-1.5 rounded-full bg-sky-500"></span>
+            FAQ
+          </p>
+          <h1 class="mt-3 text-[27px] font-bold tracking-tight text-slate-900 sm:text-[32px] md:text-[36px]">Frequently Asked Questions</h1>
+          <p class="mt-3 max-w-2xl text-sm leading-relaxed text-slate-500 sm:text-base">Find quick answers about orders, payments, delivery, and returns. If you still need help, our support team is ready to assist.</p>
+        </div>
+        <a href="/contact" class="inline-flex w-full items-center justify-center rounded-[1rem] border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition-all duration-300 hover:-translate-y-0.5 hover:bg-sky-50 sm:w-auto">
+          Contact Support
+        </a>
+      </div>
+
+      <div class="mt-6 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Orders</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Track, review, and manage your purchases.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Payments</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">See payment methods and payment status details.</p>
+        </div>
+        <div class="rounded-[1rem] border border-sky-100 bg-white p-4 shadow-[0_10px_22px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.18em] text-sky-600">Support</p>
+          <p class="mt-2 text-sm font-semibold text-slate-900">Get help with delivery, returns, and account issues.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
+        <div class="rounded-[1.25rem] border border-sky-100 bg-white p-5 shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+          <p class="text-[11px] font-bold uppercase tracking-[0.22em] text-sky-600">Need help</p>
+          <h2 class="mt-2 text-xl font-bold text-slate-900">Support details</h2>
+          <div class="mt-5 space-y-4 text-sm text-slate-600">
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-envelope mt-1 text-sky-500"></i>
+              <div>
+                <p class="font-semibold text-slate-900">Email</p>
+                <p>info@aerthh.com</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-phone mt-1 text-sky-500"></i>
+              <div>
+                <p class="font-semibold text-slate-900">Phone</p>
+                <p>+13174780215</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-clock mt-1 text-sky-500"></i>
+              <div>
+                <p class="font-semibold text-slate-900">Working hours</p>
+                <p>Mon - Sat, 10:00 AM - 7:00 PM</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <i class="fa-solid fa-location-dot mt-1 text-sky-500"></i>
+              <div>
+                <p class="font-semibold text-slate-900">Location</p>
+                <p>1004C Sierra Madre Drive Greenwood Indiana Zip Code 46143</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 overflow-hidden rounded-[1rem] border border-sky-100 bg-white shadow-[0_10px_24px_rgba(15,23,42,0.04)]">
+            <div class="border-b border-sky-100 px-4 py-3">
+              <p class="text-sm font-semibold text-slate-900">Find us on the map</p>
+            </div>
+            <div class="min-h-[260px]">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3073.770921393662!2d-86.08434862402872!3d39.609842571580764!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x886b42c64f62ebab%3A0x590a6b8fcf0939fa!2s1004%20Sierra%20Madre%20Dr%2C%20Greenwood%2C%20IN%2046143%2C%20USA!5e0!3m2!1sen!2sin!4v1776059947420!5m2!1sen!2sin"
+                class="h-[260px] w-full"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          ${faqMarkup}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const groupButtons = document.querySelectorAll('.faq-toggle');
+    const itemButtons = document.querySelectorAll('.faq-item-toggle');
+
+    groupButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        const targetId = button.getAttribute('data-faq-target');
+        const panel = document.getElementById(targetId);
+        const icon = button.querySelector('i.fa-chevron-down');
+        if (!panel) return;
+
+        const isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden');
+        if (icon) {
+          icon.style.transform = isHidden ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+      });
+    });
+
+    itemButtons.forEach(function (button) {
+      button.addEventListener('click', function () {
+        const targetId = button.getAttribute('data-faq-item');
+        const answer = document.getElementById(targetId);
+        const icon = button.querySelector('i.fa-plus');
+        if (!answer) return;
+
+        const isHidden = answer.classList.contains('hidden');
+        answer.classList.toggle('hidden');
+        if (icon) {
+          icon.style.transform = isHidden ? 'rotate(45deg)' : 'rotate(0deg)';
+        }
+      });
+    });
+  })();
+</script>
+`;
+%>
+
+<%- include('../layout/app', { title: title || 'FAQ', body }) %>
