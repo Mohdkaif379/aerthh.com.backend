@@ -160,7 +160,7 @@
     class="animate-bounce mb-1 rounded-full border border-sky-100 bg-white/95 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
     Customer Support
   </div>
-  <button onclick="document.getElementById('supportModal').classList.remove('hidden')"
+  <button onclick="openSupportChat()"
     class="relative inline-flex items-center gap-2 rounded-full border border-sky-100 bg-white px-1 py-1 text-sm font-semibold text-sky-700 shadow-[0_18px_40px_rgba(15,23,42,0.16)] transition-all duration-300 hover:-translate-y-0.5 hover:border-sky-200 hover:text-sky-800 hover:shadow-[0_22px_46px_rgba(15,23,42,0.20)] group">
     <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-300 opacity-60"></span>
     <span
@@ -183,7 +183,7 @@
         <p class="text-xs text-sky-100" id="supportStatus">Loading...</p>
       </div>
     </div>
-    <button onclick="document.getElementById('supportModal').classList.add('hidden')"
+    <button onclick="closeSupportChat()"
       class="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20">
       <i class="fa-solid fa-times"></i>
     </button>
@@ -261,6 +261,8 @@
   }
 
   function appendSupportGreeting() {
+    if (localStorage.getItem('supportGreetingSeen')) return;
+
     const container = document.getElementById('chatMessages');
     const wrapper = document.createElement('div');
     wrapper.className = 'flex gap-2.5';
@@ -276,41 +278,122 @@
     container.scrollTop = container.scrollHeight;
   }
 
-  async function loadChatHistory() {
+  let chatPollingInterval = null;
+  let renderedMessageIds = new Set();
+
+  async function loadChatHistory(isPolling = false) {
     const token = getChatToken();
     const status = document.getElementById('supportStatus');
     if (!token) {
-      status.textContent = 'Please login to chat';
-      document.getElementById('chatLoginNotice').classList.remove('hidden');
-      document.getElementById('chatInput').disabled = true;
-      document.getElementById('chatSendBtn').disabled = true;
-      appendSupportGreeting();
+      if (!isPolling) {
+        status.textContent = 'Please login to chat';
+        document.getElementById('chatLoginNotice').classList.remove('hidden');
+        document.getElementById('chatInput').disabled = true;
+        document.getElementById('chatSendBtn').disabled = true;
+        appendSupportGreeting();
+      }
       return;
     }
 
-    status.textContent = 'Loading history...';
+    if (!isPolling) status.textContent = 'Loading history...';
     try {
       const res = await fetch(`${CHAT_API_BASE}/chat/history`, {
         headers: { 'Authorization': `Bearer ${token}`, 'Accept': 'application/json' }
       });
       const data = await res.json();
-      const container = document.getElementById('chatMessages');
-      container.innerHTML = '';
-
-      // Support ki side se by default greeting humesha sabse pehle dikhega
-      appendSupportGreeting();
+      if (!isPolling) {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+        appendSupportGreeting();
+        renderedMessageIds.clear();
+      }
 
       if (data.success && data.data && data.data.length > 0) {
-        data.data.forEach(appendMessage);
+        localStorage.setItem('supportGreetingSeen', 'true');
+        let hasNewMessages = false;
+        data.data.forEach(msg => {
+          const uniqueId = msg.id || (msg.message + msg.created_at);
+          if (!renderedMessageIds.has(uniqueId)) {
+            appendMessage(msg);
+            renderedMessageIds.add(uniqueId);
+            hasNewMessages = true;
+          }
+        });
+        
+        document.getElementById('chatInput').disabled = false;
+        document.getElementById('chatInput').placeholder = "Type your message...";
+        document.getElementById('chatSendBtn').disabled = false;
         status.textContent = 'We\'re here to help';
+
+        if (hasNewMessages) {
+          markMessagesAsRead();
+        }
+      } else if (data.success && data.data && data.data.length === 0) {
+        if (isPolling && renderedMessageIds.size > 0) {
+          if (!document.getElementById('startNewQueryBtn')) {
+            const container = document.getElementById('chatMessages');
+            const div = document.createElement('div');
+            div.className = 'text-center my-4';
+            div.innerHTML = `
+              <div class="text-xs text-sky-600 mb-2 font-medium">✅ This query has been marked as resolved.</div>
+              <button id="startNewQueryBtn" onclick="enableNewQuery()" class="rounded-full bg-white border border-sky-200 text-sky-700 px-4 py-2 text-xs font-semibold hover:bg-sky-50 transition-colors shadow-sm">Start a New Query</button>
+            `;
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+          }
+          document.getElementById('chatInput').disabled = true;
+          document.getElementById('chatInput').placeholder = "Chat closed. Start a new query.";
+          document.getElementById('chatSendBtn').disabled = true;
+          status.textContent = 'Query Resolved';
+        } else if (!isPolling) {
+          document.getElementById('chatInput').disabled = false;
+          document.getElementById('chatInput').placeholder = "Type your message...";
+          document.getElementById('chatSendBtn').disabled = false;
+          status.textContent = 'Typically replies in minutes';
+        }
       } else {
-        status.textContent = 'Typically replies in minutes';
+        if (!isPolling) status.textContent = 'Typically replies in minutes';
       }
     } catch (e) {
-      const container = document.getElementById('chatMessages');
-      container.innerHTML = '';
-      appendSupportGreeting();
-      status.textContent = 'Typically replies in minutes';
+      if (!isPolling) {
+        const container = document.getElementById('chatMessages');
+        container.innerHTML = '';
+        appendSupportGreeting();
+        status.textContent = 'Typically replies in minutes';
+        renderedMessageIds.clear();
+      }
+    }
+  }
+
+  function enableNewQuery() {
+    document.getElementById('chatInput').disabled = false;
+    document.getElementById('chatInput').placeholder = "Type your message...";
+    document.getElementById('chatSendBtn').disabled = false;
+    
+    // Clear and restart the chat view entirely
+    const container = document.getElementById('chatMessages');
+    container.innerHTML = '';
+    renderedMessageIds.clear();
+    appendSupportGreeting();
+    
+    document.getElementById('chatInput').focus();
+    status.textContent = 'Typically replies in minutes';
+  }
+
+  async function markMessagesAsRead() {
+    const token = getChatToken();
+    if (!token) return;
+    try {
+      await fetch(`${CHAT_API_BASE}/chat/read`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+    } catch (err) {
+      console.error('Error marking messages as read:', err);
     }
   }
 
@@ -327,8 +410,7 @@
       return;
     }
 
-    // Optimistically show message
-    appendMessage({ sender_type: 'customer', message, created_at: new Date().toISOString() });
+    // Do not optimistically append, just clear input and show spinner
     input.value = '';
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin text-sm"></i>';
@@ -348,6 +430,9 @@
       if (!res.ok || !data.success) {
         const errMsg = data.message || data.error || JSON.stringify(data.errors) || 'Failed to send';
         appendSystemMessage(`⚠️ ${errMsg}`);
+      } else {
+        localStorage.setItem('supportGreetingSeen', 'true');
+        await loadChatHistory(true);
       }
     } catch (err) {
       console.error('Chat send error:', err);
@@ -358,11 +443,16 @@
     }
   }
 
-  // Open modal and load history
-  document.querySelector('[onclick*="supportModal"]').addEventListener('click', function () {
-    const container = document.getElementById('chatMessages');
-    if (container.children.length === 0) {
-      loadChatHistory();
-    }
-  });
+  function openSupportChat() {
+    document.getElementById('supportModal').classList.remove('hidden');
+    loadChatHistory();
+    if (chatPollingInterval) clearInterval(chatPollingInterval);
+    chatPollingInterval = setInterval(() => loadChatHistory(true), 3000);
+  }
+
+  function closeSupportChat() {
+    document.getElementById('supportModal').classList.add('hidden');
+    if (chatPollingInterval) clearInterval(chatPollingInterval);
+    chatPollingInterval = null;
+  }
 </script>
