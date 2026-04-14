@@ -141,7 +141,7 @@
         <div class="text-left text-sm leading-relaxed text-slate-500">
           &copy; <%= new Date().getFullYear() %> AERTHH. All rights reserved.
         </div>
-        <div class="flex flex-wrap items-center justify-start gap-x-6 gap-y-2 md:justify-end">
+        <div class="flex flex-wrap items-center justify-start gap-x-6 gap-y-2 md:justify-end ">
           <a href="/privacy"
             class="text-xs text-slate-500 transition-colors duration-200 hover:text-sky-700">Privacy</a>
           <a href="/terms" class="text-xs text-slate-500 transition-colors duration-200 hover:text-sky-700">Terms</a>
@@ -155,7 +155,7 @@
   </div>
 </footer>
 
-<div class="fixed bottom-4 right-4 z-[2000] flex flex-col items-end gap-2 sm:bottom-6 sm:right-6">
+<div class="fixed bottom-20 right-4 z-[2000] flex flex-col items-end gap-2 sm:bottom-20 sm:right-6">
   <div
     class="animate-bounce mb-1 rounded-full border border-sky-100 bg-white/95 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-700 shadow-[0_12px_28px_rgba(15,23,42,0.12)]">
     Customer Support
@@ -197,7 +197,7 @@
   <!-- Chat Input -->
   <div class="border-t border-sky-100 bg-white p-3 shrink-0">
     <div id="chatLoginNotice" class="hidden text-center text-xs text-slate-500 py-1 mb-2">
-      <i class="fa-solid fa-lock mr-1 text-sky-400"></i> Please <a href="/signin"
+      <i class="fa-solid fa-lock mr-1 text-sky-400"></i> Please <a href="/auth/customer/signin"
         class="font-semibold text-sky-600 hover:underline">login</a> to send messages.
     </div>
     <form id="chatForm" class="flex items-center gap-2" onsubmit="handleChatSend(event)">
@@ -319,7 +319,7 @@
             hasNewMessages = true;
           }
         });
-        
+
         document.getElementById('chatInput').disabled = false;
         document.getElementById('chatInput').placeholder = "Type your message...";
         document.getElementById('chatSendBtn').disabled = false;
@@ -369,13 +369,13 @@
     document.getElementById('chatInput').disabled = false;
     document.getElementById('chatInput').placeholder = "Type your message...";
     document.getElementById('chatSendBtn').disabled = false;
-    
+
     // Clear and restart the chat view entirely
     const container = document.getElementById('chatMessages');
     container.innerHTML = '';
     renderedMessageIds.clear();
     appendSupportGreeting();
-    
+
     document.getElementById('chatInput').focus();
     status.textContent = 'Typically replies in minutes';
   }
