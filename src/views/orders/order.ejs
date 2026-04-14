@@ -43,9 +43,9 @@ const body = `
   </div>
 </section>
 
-<div id="orderDetailModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-950/45 px-4 py-6 backdrop-blur-sm">
-  <div class="w-full max-w-3xl overflow-hidden rounded-[1.4rem] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
-    <div class="flex items-start justify-between border-b border-sky-100 px-5 py-4 sm:px-6">
+<div id="orderDetailModal" class="fixed inset-0 z-[1600] hidden items-center justify-center bg-slate-950/45 px-4 py-4 backdrop-blur-sm">
+  <div class="flex w-full max-w-3xl flex-col overflow-hidden rounded-[1.4rem] border border-sky-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.18)]">
+    <div class="flex shrink-0 items-start justify-between border-b border-sky-100 px-5 py-3 sm:px-6 sm:py-4">
       <div>
         <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-sky-600">Order Details</p>
         <h2 id="orderDetailTitle" class="mt-1 text-xl font-bold text-slate-900">Order</h2>
@@ -54,7 +54,61 @@ const body = `
         <i class="fa-solid fa-xmark"></i>
       </button>
     </div>
-    <div id="orderDetailContent" class="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[180px_1fr]"></div>
+    <div id="orderDetailContent" class="grid gap-3 px-5 py-4 sm:px-6 sm:py-5 lg:grid-cols-[132px_1fr]"></div>
+  </div>
+</div>
+
+<div id="cancelOrderModal" class="fixed inset-0 z-[1700] hidden items-center justify-center bg-slate-950/50 px-4 py-6 backdrop-blur-sm">
+  <div class="w-full max-w-lg overflow-hidden rounded-[1.4rem] border border-rose-100 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.22)]">
+    <div class="flex items-start justify-between border-b border-rose-100 px-5 py-4 sm:px-6">
+      <div>
+        <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-rose-600">Cancel Order</p>
+        <h2 id="cancelOrderTitle" class="mt-1 text-xl font-bold text-slate-900">Cancel order</h2>
+      </div>
+      <button id="cancelOrderCloseBtn" type="button" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 transition hover:bg-slate-50 hover:text-slate-700" aria-label="Close cancel order dialog">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div class="px-5 py-5 sm:px-6">
+      <p id="cancelOrderSubtitle" class="text-sm text-slate-500">Please add a reason before canceling this order.</p>
+      <label for="cancelOrderReason" class="mt-4 block text-sm font-semibold text-slate-700">Cancel reason</label>
+      <textarea id="cancelOrderReason" rows="4" maxlength="500" placeholder="Tell us why you want to cancel this order..."
+        class="mt-2 w-full rounded-[1rem] border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-rose-300 focus:ring-1 focus:ring-rose-200"></textarea>
+      <div id="cancelOrderMessage" class="mt-3 hidden rounded-[1rem] px-4 py-3 text-sm"></div>
+      <div class="mt-5 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <button id="cancelOrderDismissBtn" type="button" class="inline-flex items-center justify-center rounded-[0.95rem] border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-50">
+          Keep order
+        </button>
+        <button id="cancelOrderSubmitBtn" type="button" class="inline-flex items-center justify-center rounded-[0.95rem] bg-gradient-to-r from-rose-500 to-red-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(244,63,94,0.22)] transition hover:from-rose-600 hover:to-red-600 disabled:cursor-not-allowed disabled:opacity-70">
+          Cancel Order
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="cancelSuccessModal" class="fixed inset-0 z-[1800] hidden items-center justify-center bg-slate-950/55 px-4 py-6 backdrop-blur-sm">
+  <div class="w-full max-w-md overflow-hidden rounded-[1.4rem] border border-emerald-100 bg-white shadow-[0_28px_80px_rgba(15,23,42,0.22)]">
+    <div class="border-b border-emerald-100 px-5 py-4 sm:px-6">
+      <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-600">Order Canceled</p>
+      <h2 class="mt-1 text-xl font-bold text-slate-900">Successfully canceled order</h2>
+    </div>
+    <div class="px-5 py-6 sm:px-6">
+      <div class="flex items-start gap-3 rounded-[1rem] border border-emerald-100 bg-emerald-50/70 px-4 py-4">
+        <div class="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+          <i class="fa-solid fa-circle-check text-sm"></i>
+        </div>
+        <div class="min-w-0">
+          <p id="cancelSuccessMessage" class="text-sm font-semibold text-emerald-800">Order canceled successfully.</p>
+          <p class="mt-1 text-sm text-emerald-700/80">Your order has been canceled and the update has been saved.</p>
+        </div>
+      </div>
+      <div class="mt-5 flex justify-end">
+        <button id="cancelSuccessOkBtn" type="button" class="inline-flex items-center justify-center rounded-[0.95rem] bg-gradient-to-r from-emerald-500 to-green-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(16,185,129,0.22)] transition hover:from-emerald-600 hover:to-green-600">
+          Okay
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -66,8 +120,20 @@ const body = `
     const orderDetailTitle = document.getElementById('orderDetailTitle');
     const orderDetailContent = document.getElementById('orderDetailContent');
     const orderDetailCloseBtn = document.getElementById('orderDetailCloseBtn');
+    const cancelOrderModal = document.getElementById('cancelOrderModal');
+    const cancelOrderTitle = document.getElementById('cancelOrderTitle');
+    const cancelOrderSubtitle = document.getElementById('cancelOrderSubtitle');
+    const cancelOrderReason = document.getElementById('cancelOrderReason');
+    const cancelOrderMessage = document.getElementById('cancelOrderMessage');
+    const cancelOrderSubmitBtn = document.getElementById('cancelOrderSubmitBtn');
+    const cancelOrderCloseBtn = document.getElementById('cancelOrderCloseBtn');
+    const cancelOrderDismissBtn = document.getElementById('cancelOrderDismissBtn');
+    const cancelSuccessModal = document.getElementById('cancelSuccessModal');
+    const cancelSuccessMessage = document.getElementById('cancelSuccessMessage');
+    const cancelSuccessOkBtn = document.getElementById('cancelSuccessOkBtn');
     const apiBase = 'https://aerthh.newhopeindia17.com/api/';
     let currentOrders = [];
+    let activeCancelOrder = null;
 
     function showMessage(text, isError) {
       if (!ordersMessage) return;
@@ -76,6 +142,15 @@ const body = `
         ? 'border border-rose-200 bg-white text-rose-600'
         : 'border border-sky-200 bg-white text-sky-700');
       ordersMessage.classList.remove('hidden');
+    }
+
+    function showCancelMessage(text, isError) {
+      if (!cancelOrderMessage) return;
+      cancelOrderMessage.textContent = text;
+      cancelOrderMessage.className = 'mt-3 rounded-[1rem] px-4 py-3 text-sm ' + (isError
+        ? 'border border-rose-200 bg-rose-50 text-rose-600'
+        : 'border border-emerald-200 bg-emerald-50 text-emerald-700');
+      cancelOrderMessage.classList.remove('hidden');
     }
 
     function formatMoney(value) {
@@ -140,6 +215,11 @@ const body = `
       return 'bg-white text-slate-600 ring-slate-200';
     }
 
+    function canCancelOrder(status) {
+      const value = String(status || '').toLowerCase();
+      return !['canceled', 'cancelled', 'delivered', 'completed', 'complete', 'returned'].includes(value);
+    }
+
     function getCustomerAuth() {
       try {
         return {
@@ -148,6 +228,16 @@ const body = `
         };
       } catch (error) {
         return { token: '', tokenType: 'Bearer' };
+      }
+    }
+
+    function getCustomerData() {
+      try {
+        const rawCustomerData = localStorage.getItem('customerData') || localStorage.getItem('userData') || localStorage.getItem('authData') || '{}';
+        const parsed = JSON.parse(rawCustomerData);
+        return parsed?.customer || parsed?.data || parsed || {};
+      } catch (error) {
+        return {};
       }
     }
 
@@ -164,48 +254,55 @@ const body = `
       const totalPrice = Number(order.total_price || 0);
       const shippingCost = Number(order.shipping_cost || 0);
       const finalAmount = totalPrice + shippingCost;
+      const detailOrderStatus = order.status || '--';
+      const isCancelable = canCancelOrder(detailOrderStatus);
 
       return ''
-        + '<div class="flex items-center justify-center rounded-[1rem] border border-sky-100 bg-white p-4">'
-        + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-40 w-40 object-contain">'
+        + '<div class="flex items-center justify-center rounded-[1rem] border border-sky-100 bg-white p-3.5">'
+        + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-24 w-24 object-contain sm:h-28 sm:w-28">'
         + '</div>'
         + '<div class="min-w-0">'
         + '<div class="flex flex-wrap items-start justify-between gap-3">'
         + '<div>'
-        + '<h3 class="text-2xl font-bold text-slate-900">' + escapeHtml(title) + '</h3>'
-        + '<p class="mt-2 text-sm text-slate-500">Order No: <span class="font-semibold text-slate-700">' + escapeHtml(orderNumber) + '</span></p>'
+        + '<h3 class="text-xl font-bold text-slate-900">' + escapeHtml(title) + '</h3>'
+        + '<p class="mt-1.5 text-xs text-slate-500">Order No: <span class="font-semibold text-slate-700">' + escapeHtml(orderNumber) + '</span></p>'
         + '</div>'
-        + '<span class="rounded-full px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.16em] ring-1 ' + getOrderBadgeClasses(orderStatus) + '">' + escapeHtml(orderStatus) + '</span>'
+        + '<span class="rounded-full px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.16em] ring-1 ' + getOrderBadgeClasses(orderStatus) + '">' + escapeHtml(orderStatus) + '</span>'
         + '</div>'
-        + '<div class="mt-5 divide-y divide-slate-100 border-y border-slate-100">'
-        + '<div class="flex items-center justify-between gap-4 py-3">'
-        + '<span class="text-sm text-slate-500">Quantity</span>'
-        + '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(quantity) + '</span>'
+        + '<div class="mt-4 divide-y divide-slate-100 border-y border-slate-100">'
+        + '<div class="flex items-center justify-between gap-4 py-2.5">'
+        + '<span class="text-xs text-slate-500">Quantity</span>'
+        + '<span class="text-xs font-semibold text-slate-900">' + escapeHtml(quantity) + '</span>'
         + '</div>'
-        + '<div class="flex items-center justify-between gap-4 py-3">'
-        + '<span class="text-sm text-slate-500">Product SKU</span>'
-        + '<span class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(sku) + '</span>'
+        + '<div class="flex items-center justify-between gap-4 py-2.5">'
+        + '<span class="text-xs text-slate-500">Product SKU</span>'
+        + '<span class="text-xs font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(sku) + '</span>'
         + '</div>'
-        + '<div class="flex items-center justify-between gap-4 py-3">'
-        + '<span class="text-sm text-slate-500">Payment Method</span>'
-        + '<span class="text-sm font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(paymentMethod) + '</span>'
+        + '<div class="flex items-center justify-between gap-4 py-2.5">'
+        + '<span class="text-xs text-slate-500">Payment Method</span>'
+        + '<span class="text-xs font-semibold uppercase tracking-[0.08em] text-slate-900">' + escapeHtml(paymentMethod) + '</span>'
         + '</div>'
-        + '<div class="flex items-center justify-between gap-4 py-3">'
-        + '<span class="text-sm text-slate-500">Payment Status</span>'
-        + '<span class="inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] ring-1 ' + getPaymentBadgeClasses(paymentStatus) + '">' + escapeHtml(paymentStatus) + '</span>'
+        + '<div class="flex items-center justify-between gap-4 py-2.5">'
+        + '<span class="text-xs text-slate-500">Payment Status</span>'
+        + '<span class="inline-flex items-center rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.12em] ring-1 ' + getPaymentBadgeClasses(paymentStatus) + '">' + escapeHtml(paymentStatus) + '</span>'
         + '</div>'
-        + '<div class="flex items-center justify-between gap-4 py-3">'
-        + '<span class="text-sm text-slate-500">Shipping Cost</span>'
-        + '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(formatMoney(shippingCost)) + '</span>'
+        + '<div class="flex items-center justify-between gap-4 py-2.5">'
+        + '<span class="text-xs text-slate-500">Shipping Cost</span>'
+        + '<span class="text-xs font-semibold text-slate-900">' + escapeHtml(formatMoney(shippingCost)) + '</span>'
         + '</div>'
         + '</div>'
-        + '<div class="mt-5 flex items-center justify-between border-t border-slate-100 pt-4">'
-        + '<span class="text-sm text-slate-500">Products Total</span>'
-        + '<span class="text-base font-semibold text-slate-900">' + escapeHtml(formatMoney(totalPrice)) + '</span>'
+        + '<div class="mt-4 flex items-center justify-between border-t border-slate-100 pt-3.5">'
+        + '<span class="text-xs text-slate-500">Products Total</span>'
+        + '<span class="text-sm font-semibold text-slate-900">' + escapeHtml(formatMoney(totalPrice)) + '</span>'
         + '</div>'
-        + '<div class="mt-3 flex items-center justify-between">'
-        + '<span class="text-sm text-slate-500">Final Total</span>'
-        + '<span class="text-xl font-bold text-sky-700">' + escapeHtml(formatMoney(finalAmount)) + '</span>'
+        + '<div class="mt-2.5 flex items-center justify-between">'
+        + '<span class="text-xs text-slate-500">Final Total</span>'
+        + '<span class="text-lg font-bold text-sky-700">' + escapeHtml(formatMoney(finalAmount)) + '</span>'
+        + '</div>'
+        + '<div class="mt-4 flex flex-col gap-2.5 sm:flex-row sm:justify-end">'
+        + (isCancelable
+          ? '<button type="button" data-cancel-order-from-detail class="inline-flex items-center justify-center rounded-[0.95rem] bg-gradient-to-r from-rose-500 to-red-500 px-4 py-2.5 text-xs font-semibold text-white shadow-[0_14px_28px_rgba(244,63,94,0.18)] transition hover:from-rose-600 hover:to-red-600">Cancel Order</button>'
+          : '<span class="inline-flex items-center justify-center rounded-[0.95rem] border border-slate-200 bg-slate-50 px-4 py-2.5 text-xs font-semibold text-slate-500">This order cannot be canceled</span>')
         + '</div>'
         + '</div>';
     }
@@ -225,6 +322,121 @@ const body = `
       orderDetailModal.classList.add('hidden');
       orderDetailModal.classList.remove('flex');
       document.body.classList.remove('overflow-hidden');
+    }
+
+    function openCancelModal(order) {
+      if (!cancelOrderModal || !cancelOrderTitle || !cancelOrderSubtitle || !cancelOrderReason || !cancelOrderMessage) return;
+      activeCancelOrder = order || null;
+      const product = order?.product || {};
+      const orderNumber = order?.order_no || order?.id || '--';
+      cancelOrderTitle.textContent = 'Cancel order #' + orderNumber;
+      cancelOrderSubtitle.textContent = 'You are canceling ' + (product.product_name || 'this order') + '. Please share a reason so we can process it.';
+      cancelOrderReason.value = '';
+      cancelOrderMessage.classList.add('hidden');
+      cancelOrderModal.classList.remove('hidden');
+      cancelOrderModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+      setTimeout(function () {
+        cancelOrderReason.focus();
+      }, 50);
+    }
+
+    function closeCancelModal() {
+      if (!cancelOrderModal) return;
+      activeCancelOrder = null;
+      cancelOrderModal.classList.add('hidden');
+      cancelOrderModal.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function openCancelSuccessModal(message) {
+      if (!cancelSuccessModal) return;
+      if (cancelSuccessMessage) {
+        cancelSuccessMessage.textContent = message || 'Order canceled successfully.';
+      }
+      cancelSuccessModal.classList.remove('hidden');
+      cancelSuccessModal.classList.add('flex');
+      document.body.classList.add('overflow-hidden');
+    }
+
+    function closeCancelSuccessModal() {
+      if (!cancelSuccessModal) return;
+      cancelSuccessModal.classList.add('hidden');
+      cancelSuccessModal.classList.remove('flex');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    function updateOrderInMemory(updatedOrder) {
+      const updatedId = String(updatedOrder?.id || '');
+      if (!updatedId) return;
+      currentOrders = currentOrders.map(function (order) {
+        return String(order?.id || '') === updatedId ? { ...order, ...updatedOrder } : order;
+      });
+      renderOrders(currentOrders);
+    }
+
+    async function cancelActiveOrder() {
+      if (!activeCancelOrder) return;
+
+      const auth = getCustomerAuth();
+      if (!auth.token) {
+        window.location.href = '/auth/customer/signin?redirect=' + encodeURIComponent('/orders');
+        return;
+      }
+
+      const orderId = String(activeCancelOrder.id || '').trim();
+      const cancelReason = String(cancelOrderReason?.value || '').trim();
+      const customerData = getCustomerData();
+
+      if (!orderId) {
+        showCancelMessage('Order id is missing.', true);
+        return;
+      }
+
+      if (!cancelReason) {
+        showCancelMessage('Please enter a cancel reason.', true);
+        return;
+      }
+
+      if (cancelOrderSubmitBtn) {
+        cancelOrderSubmitBtn.disabled = true;
+        cancelOrderSubmitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2 text-xs"></i> Canceling';
+      }
+
+      try {
+        const response = await fetch(apiBase + 'orders/' + encodeURIComponent(orderId) + '/cancel', {
+          method: 'PATCH',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            'Authorization': (auth.tokenType || 'Bearer') + ' ' + auth.token
+          },
+          body: JSON.stringify({
+            cancel_reason: cancelReason,
+            customer_id: customerData?.id || activeCancelOrder?.customer_id || null
+          })
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result?.status) {
+          throw new Error(result?.message || 'Unable to cancel order.');
+        }
+
+        showMessage(result?.message || 'Order canceled successfully.', false);
+        updateOrderInMemory(result?.data || { ...activeCancelOrder, status: 'canceled', cancel_reason: cancelReason });
+        closeCancelModal();
+        closeOrderModal();
+        openCancelSuccessModal(result?.message || 'Order canceled successfully.');
+      } catch (error) {
+        console.error('Order cancel error:', error);
+        showCancelMessage(error.message || 'Unable to cancel order.', true);
+      } finally {
+        if (cancelOrderSubmitBtn) {
+          cancelOrderSubmitBtn.disabled = false;
+          cancelOrderSubmitBtn.textContent = 'Cancel Order';
+        }
+      }
     }
 
     function renderOrders(list) {
@@ -257,11 +469,13 @@ const body = `
           + '<button type="button" data-view-order="' + index + '" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-sky-100 bg-white text-sky-600 shadow-sm transition hover:bg-sky-50" title="View" aria-label="View order">'
           + '<i class="fa-solid fa-eye text-[12px]"></i>'
           + '</button>'
-          + '<span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-100 bg-white text-rose-600 shadow-sm transition hover:bg-rose-50" title="Delete" aria-label="Delete order"><i class="fa-solid fa-trash-can text-[12px]"></i></span>'
+          + (canCancelOrder(orderStatus)
+            ? '<button type="button" data-cancel-order="' + index + '" class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-rose-100 bg-white text-rose-600 shadow-sm transition hover:bg-rose-50" title="Cancel" aria-label="Cancel order"><i class="fa-solid fa-ban text-[12px]"></i></button>'
+            : '<span class="inline-flex h-9 w-9 items-center justify-center rounded-full border border-slate-100 bg-white text-slate-400 shadow-sm" title="Unavailable" aria-label="Cancel unavailable"><i class="fa-solid fa-ban text-[12px]"></i></span>')
           + '</div>'
           + '<div class="flex flex-col gap-5 p-4 sm:p-5 lg:flex-row lg:items-start lg:justify-between lg:p-5">'
           + '<div class="flex min-w-0 flex-1 flex-col gap-4 sm:flex-row sm:items-start">'
-          + '<div class="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.15rem] border border-sky-100 bg-white p-2 transition-transform duration-300 group-hover:scale-[1.02] sm:h-28 sm:w-28">'
+          + '<div class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[1.15rem] border border-sky-100 bg-white p-2 transition-transform duration-300 group-hover:scale-[1.02] sm:h-24 sm:w-24">'
           + '<img src="' + escapeHtml(image) + '" alt="' + escapeHtml(title) + '" class="h-full w-full object-contain">'
           + '</div>'
           + '<div class="min-w-0 flex-1">'
@@ -348,6 +562,31 @@ const body = `
 
         openOrderModal(currentOrders[index]);
       });
+
+      ordersList.addEventListener('click', function (event) {
+        const cancelButton = event.target.closest('[data-cancel-order]');
+        if (!cancelButton) return;
+
+        const index = Number(cancelButton.getAttribute('data-cancel-order'));
+        if (Number.isNaN(index) || !currentOrders[index]) return;
+
+        openCancelModal(currentOrders[index]);
+      });
+    }
+
+    if (orderDetailContent) {
+      orderDetailContent.addEventListener('click', function (event) {
+        const detailCancelButton = event.target.closest('[data-cancel-order-from-detail]');
+        if (!detailCancelButton) return;
+
+        const order = currentOrders.find(function (item) {
+          return String(item?.id || '') === String(activeCancelOrder?.id || '');
+        }) || activeCancelOrder;
+
+        if (order) {
+          openCancelModal(order);
+        }
+      });
     }
 
     if (orderDetailModal) {
@@ -362,9 +601,43 @@ const body = `
       orderDetailCloseBtn.addEventListener('click', closeOrderModal);
     }
 
+    if (cancelOrderModal) {
+      cancelOrderModal.addEventListener('click', function (event) {
+        if (event.target === cancelOrderModal) {
+          closeCancelModal();
+        }
+      });
+    }
+
+    if (cancelOrderCloseBtn) {
+      cancelOrderCloseBtn.addEventListener('click', closeCancelModal);
+    }
+
+    if (cancelOrderDismissBtn) {
+      cancelOrderDismissBtn.addEventListener('click', closeCancelModal);
+    }
+
+    if (cancelOrderSubmitBtn) {
+      cancelOrderSubmitBtn.addEventListener('click', cancelActiveOrder);
+    }
+
+    if (cancelSuccessModal) {
+      cancelSuccessModal.addEventListener('click', function (event) {
+        if (event.target === cancelSuccessModal) {
+          closeCancelSuccessModal();
+        }
+      });
+    }
+
+    if (cancelSuccessOkBtn) {
+      cancelSuccessOkBtn.addEventListener('click', closeCancelSuccessModal);
+    }
+
     document.addEventListener('keydown', function (event) {
       if (event.key === 'Escape') {
         closeOrderModal();
+        closeCancelModal();
+        closeCancelSuccessModal();
       }
     });
 
