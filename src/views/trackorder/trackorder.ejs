@@ -177,6 +177,25 @@
             return !['canceled', 'cancelled', 'delivered', 'completed', 'complete', 'returned'].includes(value);
         }
 
+        function normalizeOrderNo(value) {
+            return String(value || '').trim().toUpperCase();
+        }
+
+        function pickMatchedOrder(data, requestedOrderNo) {
+            const requested = normalizeOrderNo(requestedOrderNo);
+            if (!requested) return null;
+
+            if (Array.isArray(data)) {
+                return data.find((item) => normalizeOrderNo(item?.order_no) === requested) || null;
+            }
+
+            if (data && typeof data === 'object') {
+                return normalizeOrderNo(data.order_no) === requested ? data : null;
+            }
+
+            return null;
+        }
+
         function openCancelModal(orderData) {
             if (!cancelOrderModal || !cancelOrderTitle || !cancelOrderSubtitle || !cancelOrderReason || !cancelOrderMessage) return;
             activeOrder = orderData || null;
@@ -292,6 +311,8 @@
                 return;
             }
 
+            const normalizedOrderNo = normalizeOrderNo(orderNoValue);
+
             // Reset UI states
             errorMessageContainer.classList.add('hidden');
             defaultPlaceholders.style.display = 'grid';
@@ -315,7 +336,7 @@
                 const response = await fetch('https://aerthh.newhopeindia17.com/api/track-order', {
                     method: 'POST',
                     headers: headersConfig,
-                    body: JSON.stringify({ order_no: orderNoValue })
+                    body: JSON.stringify({ order_no: normalizedOrderNo })
                 });
                 
                 let result;
@@ -326,8 +347,11 @@
                 }
                 
                 if (result.status && result.data) {
-                    const orderData = result.data;
-                    const p = orderData.product;
+                    const orderData = pickMatchedOrder(result.data, normalizedOrderNo);
+                    if (!orderData) {
+                        throw new Error('Order number mismatch. Please enter the exact order number.');
+                    }
+                    const p = orderData.product || {};
                     activeOrder = orderData;
                     
                     // Format dates safely
