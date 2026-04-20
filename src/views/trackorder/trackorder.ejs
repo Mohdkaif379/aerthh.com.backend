@@ -473,24 +473,6 @@
                     defaultPlaceholders.style.display = 'none';
                     dynamicOrderData.classList.remove('hidden');
 
-                    const isCancelable = canCancelOrder(orderData.status);
-                    if (isCancelable && dynamicOrderData.lastElementChild) {
-                        dynamicOrderData.lastElementChild.insertAdjacentHTML('beforeend',
-                            '<div class="mt-5 flex justify-end">' +
-                            '<button type="button" id="trackCancelOrderBtn" class="inline-flex items-center justify-center rounded-[0.95rem] bg-gradient-to-r from-rose-500 to-red-500 px-5 py-3 text-sm font-semibold text-white shadow-[0_14px_28px_rgba(244,63,94,0.18)] transition hover:from-rose-600 hover:to-red-600">Cancel Order</button>' +
-                            '</div>'
-                        );
-                        const trackCancelOrderBtn = document.getElementById('trackCancelOrderBtn');
-                        if (trackCancelOrderBtn) {
-                            trackCancelOrderBtn.addEventListener('click', () => openCancelModal(orderData));
-                        }
-                    } else if (dynamicOrderData.lastElementChild) {
-                        dynamicOrderData.lastElementChild.insertAdjacentHTML('beforeend',
-                            '<div class="mt-5 flex justify-end">' +
-                            '<span class="inline-flex items-center justify-center rounded-[0.95rem] border border-slate-200 bg-slate-50 px-5 py-3 text-sm font-semibold text-slate-500">This order cannot be canceled</span>' +
-                            '</div>'
-                        );
-                    }
                 } else {
                     // Show custom message
                     errorMessageText.textContent = result.message || 'Order not found. Please try a different Order ID.';
