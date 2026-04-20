@@ -528,7 +528,7 @@
                 }
             } catch (error) {
                 console.error("API Error:", error);
-                errorMessageText.textContent = 'Error tracking order. Please try again later.';
+                errorMessageText.textContent = error?.message || 'Error tracking order. Please try again later.';
                 errorMessageContainer.classList.remove('hidden');
             } finally {
                 // Remove loading state
