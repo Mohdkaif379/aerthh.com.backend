@@ -64,6 +64,7 @@
       </div>
     </section>
 
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
       (function () {
         const messageBox = document.getElementById('cartCheckoutMessage');
@@ -193,6 +194,115 @@
             }
         }
 
+        function getCustomerDisplayData() {
+            try {
+                const rawCustomerData = localStorage.getItem('customerData') || localStorage.getItem('userData') || localStorage.getItem('authData') || '{}';
+                const parsed = JSON.parse(rawCustomerData);
+                const customer = parsed?.customer || parsed?.data || parsed || {};
+                return {
+                    name: [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || customer?.name || checkoutState?.shippingAddress?.first_name || 'Customer',
+                    email: customer?.email || checkoutState?.shippingAddress?.email || '',
+                    contact: customer?.phone || customer?.mobile || checkoutState?.shippingAddress?.phone || ''
+                };
+            } catch (error) {
+                return {
+                    name: checkoutState?.shippingAddress?.first_name || 'Customer',
+                    email: checkoutState?.shippingAddress?.email || '',
+                    contact: checkoutState?.shippingAddress?.phone || ''
+                };
+            }
+        }
+
+        function loadRazorpaySdk() {
+            return new Promise(function (resolve, reject) {
+                if (window.Razorpay) {
+                    resolve(window.Razorpay);
+                    return;
+                }
+
+                const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+                if (existingScript) {
+                    existingScript.addEventListener('load', function () {
+                        if (window.Razorpay) {
+                            resolve(window.Razorpay);
+                        } else {
+                            reject(new Error('Razorpay SDK failed to load.'));
+                        }
+                    }, { once: true });
+                    existingScript.addEventListener('error', function () {
+                        reject(new Error('Unable to load Razorpay checkout.'));
+                    }, { once: true });
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.async = true;
+                script.onload = function () {
+                    if (window.Razorpay) {
+                        resolve(window.Razorpay);
+                    } else {
+                        reject(new Error('Razorpay SDK failed to initialize.'));
+                    }
+                };
+                script.onerror = function () {
+                    reject(new Error('Unable to load Razorpay checkout.'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        function openRazorpayCheckout(orderResult, paymentLabel) {
+            return new Promise(function (resolve, reject) {
+                const gateway = orderResult?.payment_gateway || {};
+                const razorpayOrderId = gateway?.razorpay_order_id || orderResult?.data?.payment_order_id || orderResult?.data?.razorpay_order_id;
+                const razorpayKey = gateway?.razorpay_key || gateway?.key;
+                const amount = Number(gateway?.amount || orderResult?.amount || 0);
+                const currency = gateway?.currency || 'INR';
+
+                if (!razorpayOrderId || !razorpayKey || !amount) {
+                    reject(new Error('Razorpay payment details are missing.'));
+                    return;
+                }
+
+                loadRazorpaySdk().then(function (Razorpay) {
+                    const customer = getCustomerDisplayData();
+                    const razorpayInstance = new Razorpay({
+                        key: razorpayKey,
+                        amount: Math.round(amount * 100),
+                        currency: currency,
+                        name: 'AERTHH',
+                        description: paymentLabel || 'Online Payment',
+                        order_id: razorpayOrderId,
+                        prefill: {
+                            name: customer.name || '',
+                            email: customer.email || '',
+                            contact: customer.contact || ''
+                        },
+                        theme: {
+                            color: '#0ea5e9'
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                reject(new Error('Payment was closed before completion.'));
+                            }
+                        },
+                        handler: function (response) {
+                            resolve({
+                                response: response,
+                                orderResult: orderResult
+                            });
+                        }
+                    });
+
+                    razorpayInstance.on('payment.failed', function (response) {
+                        reject(new Error(response?.error?.description || 'Payment failed. Please try again.'));
+                    });
+                    razorpayInstance.open();
+                }).catch(reject);
+            });
+        }
+
         try { cartItems = JSON.parse(sessionStorage.getItem('cartCheckoutItems') || '[]'); } catch (error) { cartItems = []; }
         try { checkoutState = JSON.parse(sessionStorage.getItem('checkoutState') || 'null'); } catch (error) { checkoutState = null; }
         if (!cartItems.length) { window.location.href = '/cart'; return; }
@@ -214,12 +324,15 @@
           showMessage('Placing your order...', false);
           try {
             for (const item of cartItems) {
-              await createOrder({ product_id: Number(item?.product?.id || item?.product_id || 0), quantity: Number(item?.quantity || 0), payment_method: paymentMethod }, auth);
+              const orderResult = await createOrder({ product_id: Number(item?.product?.id || item?.product_id || 0), quantity: Number(item?.quantity || 0), payment_method: paymentMethod }, auth);
+              if (paymentMethod === 'online') {
+                await openRazorpayCheckout(orderResult, paymentLabel);
+              }
             }
             setClearedCartItemIds(cartItems.map(function (item) { return item?.id || ''; }));
             sessionStorage.removeItem('cartCheckoutItems');
             sessionStorage.removeItem('checkoutState');
-            showMessage('Cart order placed successfully.', false);
+            showMessage(paymentMethod === 'online' ? 'Payment completed successfully.' : 'Cart order placed successfully.', false);
             openOrderSuccessModal(paymentLabel);
           } catch (error) {
             console.error('Cart checkout order create error:', error);
@@ -547,6 +660,7 @@
             `}
         </div>
     </section>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         (function () {
             const messageBox = document.getElementById('checkoutAddressMessage');
@@ -693,6 +807,116 @@
             }
         }
 
+        function getCustomerDisplayData() {
+            try {
+                const rawCustomerData = localStorage.getItem('customerData') || localStorage.getItem('userData') || localStorage.getItem('authData') || '{}';
+                const parsed = JSON.parse(rawCustomerData);
+                const customer = parsed?.customer || parsed?.data || parsed || {};
+                return {
+                    name: [customer?.first_name, customer?.last_name].filter(Boolean).join(' ') || customer?.name || checkoutState?.shippingAddress?.first_name || 'Customer',
+                    email: customer?.email || checkoutState?.shippingAddress?.email || '',
+                    contact: customer?.phone || customer?.mobile || checkoutState?.shippingAddress?.phone || ''
+                };
+            } catch (error) {
+                return {
+                    name: checkoutState?.shippingAddress?.first_name || 'Customer',
+                    email: checkoutState?.shippingAddress?.email || '',
+                    contact: checkoutState?.shippingAddress?.phone || ''
+                };
+            }
+        }
+
+        function loadRazorpaySdk() {
+            return new Promise(function (resolve, reject) {
+                if (window.Razorpay) {
+                    resolve(window.Razorpay);
+                    return;
+                }
+
+                const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+                if (existingScript) {
+                    existingScript.addEventListener('load', function () {
+                        if (window.Razorpay) {
+                            resolve(window.Razorpay);
+                        } else {
+                            reject(new Error('Razorpay SDK failed to load.'));
+                        }
+                    }, { once: true });
+                    existingScript.addEventListener('error', function () {
+                        reject(new Error('Unable to load Razorpay checkout.'));
+                    }, { once: true });
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                script.async = true;
+                script.onload = function () {
+                    if (window.Razorpay) {
+                        resolve(window.Razorpay);
+                    } else {
+                        reject(new Error('Razorpay SDK failed to initialize.'));
+                    }
+                };
+                script.onerror = function () {
+                    reject(new Error('Unable to load Razorpay checkout.'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        function openRazorpayCheckout(orderResult, paymentLabel) {
+            return new Promise(function (resolve, reject) {
+                const gateway = orderResult?.payment_gateway || {};
+                const razorpayOrderId = gateway?.razorpay_order_id || orderResult?.data?.payment_order_id || orderResult?.data?.razorpay_order_id;
+                const razorpayKey = gateway?.razorpay_key || gateway?.key;
+                const amount = Number(gateway?.amount || orderResult?.amount || 0);
+                const currency = gateway?.currency || 'INR';
+
+                if (!razorpayOrderId || !razorpayKey || !amount) {
+                    reject(new Error('Razorpay payment details are missing.'));
+                    return;
+                }
+
+                loadRazorpaySdk().then(function (Razorpay) {
+                    const customer = getCustomerDisplayData();
+                    const razorpayInstance = new Razorpay({
+                        key: razorpayKey,
+                        amount: Math.round(amount * 100),
+                        currency: currency,
+                        name: 'AERTHH',
+                        description: paymentLabel || 'Online Payment',
+                        order_id: razorpayOrderId,
+                        prefill: {
+                            name: customer.name || '',
+                            email: customer.email || '',
+                            contact: customer.contact || ''
+                        },
+                        theme: {
+                            color: '#0ea5e9'
+                        },
+                        modal: {
+                            ondismiss: function () {
+                                reject(new Error('Payment was closed before completion.'));
+                            }
+                        },
+                        handler: function (response) {
+                            resolve({
+                                response: response,
+                                orderResult: orderResult
+                            });
+                        }
+                    });
+
+                    razorpayInstance.on('payment.failed', function (response) {
+                        reject(new Error(response?.error?.description || 'Payment failed. Please try again.'));
+                    });
+
+                    razorpayInstance.open();
+                }).catch(reject);
+            });
+        }
+
         function openOrderSuccessModal(orderData, paymentLabel) {
             if (!orderSuccessModal) return;
             const orderTotal = Number(orderData?.total_price || 0)
@@ -798,7 +1022,7 @@
 
         function syncPaymentMethodSelection() {
             document.querySelectorAll('.payment-method-option').forEach(function (option) {
-                const radio = option.querySelector('input[name="paymentMethod"]');
+                const radio = option.querySelector('input[name="cartCheckoutPaymentMethod"]');
                 const isActive = !!(radio && radio.checked);
                 option.classList.toggle('border-sky-400', isActive);
                 option.classList.toggle('bg-sky-50', isActive);
@@ -957,12 +1181,18 @@
                         payment_method: selectedPaymentMethod ? selectedPaymentMethod.value : 'cod'
                     }, auth);
 
+                    if (selectedPaymentMethod && selectedPaymentMethod.value === 'online') {
+                        await openRazorpayCheckout(result, paymentLabel);
+                    }
+
                     try {
                         sessionStorage.removeItem('checkoutState');
                     } catch (storageError) {
                         console.warn('Unable to clear checkout state:', storageError);
                     }
-                    showMessage(result?.message || 'Order placed successfully.', false);
+                    showMessage(selectedPaymentMethod && selectedPaymentMethod.value === 'online'
+                        ? 'Payment completed successfully.'
+                        : (result?.message || 'Order placed successfully.'), false);
                     openOrderSuccessModal(result?.data || {}, paymentLabel);
                 } catch (error) {
                     console.error('Order create error:', error);
