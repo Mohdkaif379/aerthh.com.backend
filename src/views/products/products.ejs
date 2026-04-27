@@ -184,11 +184,19 @@
         const clearButton = document.getElementById('clearPriceFilter');
         const countLabel = document.getElementById('productsCountLabel');
         const sortSelect = document.getElementById('productsSort');
+        const searchInput = document.getElementById('productsSearch');
+        const showAllProductsBtn = document.getElementById('showAllProductsBtn');
+        const viewGridBtn = document.getElementById('viewGridBtn');
+        const viewListBtn = document.getElementById('viewListBtn');
         const productsGrid = document.getElementById('productsGrid');
         const productCards = Array.from(document.querySelectorAll('.product-card'));
         const maxPrice = ${JSON.stringify(maxFilterPrice)};
         const cartAddEndpoint = 'https://aerthh.newhopeindia17.com/api/cart/add';
         const wishlistAddEndpoint = 'https://aerthh.newhopeindia17.com/api/wishlist/add';
+        const headerSearchParams = new URLSearchParams(window.location.search);
+        const initialSearchQuery = String(headerSearchParams.get('search') || headerSearchParams.get('q') || '').trim();
+        let currentSearch = '';
+        let currentView = 'grid';
 
         function getCustomerAuth() {
           try {
@@ -332,13 +340,31 @@
           });
         }
 
+        function setViewMode(mode) {
+          currentView = mode === 'list' ? 'list' : 'grid';
+          if (!productsGrid) return;
+          productsGrid.classList.toggle('is-list', currentView === 'list');
+
+          if (viewGridBtn && viewListBtn) {
+            if (currentView === 'list') {
+              viewGridBtn.className = 'rounded-[0.7rem] px-4 py-2 text-sm font-semibold text-white/[0.75] transition hover:text-white';
+              viewListBtn.className = 'rounded-[0.7rem] bg-[linear-gradient(180deg,#f7d38b_0%,#d4a85f_100%)] px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_8px_18px_rgba(212,168,95,0.25)]';
+            } else {
+              viewGridBtn.className = 'rounded-[0.7rem] bg-[linear-gradient(180deg,#f7d38b_0%,#d4a85f_100%)] px-4 py-2 text-sm font-semibold text-slate-950 shadow-[0_8px_18px_rgba(212,168,95,0.25)]';
+              viewListBtn.className = 'rounded-[0.7rem] px-4 py-2 text-sm font-semibold text-white/[0.75] transition hover:text-white';
+            }
+          }
+        }
+
         function applyPriceFilter(value) {
           const numericValue = Math.max(0, Math.min(Number(value || maxPrice), maxPrice));
           let visibleCount = 0;
 
           productCards.forEach(function(card) {
             const cardPrice = Number(card.dataset.price || 0);
-            const isVisible = cardPrice <= numericValue;
+            const cardTitle = String(card.dataset.title || '').toLowerCase();
+            const matchesSearch = !currentSearch || cardTitle.indexOf(currentSearch) !== -1;
+            const isVisible = cardPrice <= numericValue && matchesSearch;
             card.style.display = isVisible ? '' : 'none';
             if (isVisible) visibleCount += 1;
           });
@@ -373,9 +399,41 @@
           });
         }
 
+        if (searchInput) {
+          if (initialSearchQuery) {
+            searchInput.value = initialSearchQuery;
+            currentSearch = initialSearchQuery.toLowerCase();
+          }
+
+          searchInput.addEventListener('input', function() {
+            currentSearch = String(this.value || '').trim().toLowerCase();
+            applyPriceFilter(priceRange ? priceRange.value : maxPrice);
+          });
+        }
+
         if (clearButton && priceRange) {
           clearButton.addEventListener('click', function() {
             priceRange.value = String(maxPrice);
+            currentSearch = '';
+            if (searchInput) {
+              searchInput.value = '';
+            }
+            applyPriceFilter(maxPrice);
+          });
+        }
+
+        if (showAllProductsBtn && priceRange) {
+          showAllProductsBtn.addEventListener('click', function() {
+            priceRange.value = String(maxPrice);
+            currentSearch = '';
+            if (searchInput) {
+              searchInput.value = '';
+            }
+            if (sortSelect) {
+              sortSelect.value = 'default';
+            }
+            sortProducts('default');
+            setViewMode('grid');
             applyPriceFilter(maxPrice);
           });
         }
@@ -453,6 +511,10 @@
         });
 
         applyPriceFilter(maxPrice);
+        setViewMode('grid');
+        if (initialSearchQuery) {
+          applyPriceFilter(priceRange ? priceRange.value : maxPrice);
+        }
       })();
     </script>
   ` : ''}
